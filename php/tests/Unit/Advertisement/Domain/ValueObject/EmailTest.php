@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Demo\App\Unit\Advertisement\Domain\ValueObject;
 
+use Demo\App\Advertisement\Domain\Exceptions\InvalidEmailException;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +20,8 @@ class EmailTest extends TestCase
 
     public function testShouldThrowAnExceptionWhenEmailIsInvalid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidEmailException::class);
+        $this->expectExceptionMessage('Invalid email ' . self::INVALID_EMAIL);
         new Email(self::INVALID_EMAIL);
     }
 }

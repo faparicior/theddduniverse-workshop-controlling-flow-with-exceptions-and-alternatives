@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Exception;
 
@@ -21,7 +22,7 @@ final class RenewAdvertisementUseCase
         $advertisement = $this->advertisementRepository->findById($command->id);
 
         if (!$advertisement->password()->isValidatedWith($command->password)) {
-            throw new Exception('Invalid password');
+            throw InvalidPasswordException::build();
         }
 
         $advertisement->renew(Password::fromPlainPassword($command->password));

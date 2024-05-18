@@ -7,6 +7,7 @@ use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdver
 use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdvertisementUseCase;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
+use Exception;
 
 final class PublishAdvertisementController
 {
@@ -16,18 +17,25 @@ final class PublishAdvertisementController
 
     public function request(FrameworkRequest $request): FrameworkResponse
     {
-        $command = new PublishAdvertisementCommand(
-            ($request->content())['id'],
-            ($request->content())['description'],
-            ($request->content())['email'],
-            ($request->content())['password'],
-        );
+        try {
+            $command = new PublishAdvertisementCommand(
+                ($request->content())['id'],
+                ($request->content())['description'],
+                ($request->content())['email'],
+                ($request->content())['password'],
+            );
 
-        $this->useCase->execute($command);
+            $this->useCase->execute($command);
 
-        return new FrameworkResponse(
-            FrameworkResponse::STATUS_CREATED,
-            []
-        );
+            return new FrameworkResponse(
+                FrameworkResponse::STATUS_CREATED,
+                []
+            );
+        } catch (Exception $e) {
+            return new FrameworkResponse(
+                FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
+                []
+            );
+        }
     }
 }

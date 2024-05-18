@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Demo\App\Advertisement\Infrastructure\Persistence;
 
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
@@ -40,8 +41,9 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
     {
         $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id));
         if(!$result) {
-            throw new Exception('Advertisement not found');
+            throw AdvertisementNotFoundException::build();
         }
+
         $row = $result[0];
         return new Advertisement(
             $row['id'],

@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use InvalidArgumentException;
+use Demo\App\Advertisement\Domain\Exceptions\InvalidEmailException;
 
 final readonly class Email
 {
+    /**
+     * @throws InvalidEmailException
+     */
     public function __construct(private string $email)
     {
         if (!$this->validateEmail($email)) {
-            throw new InvalidArgumentException('Invalid email');
+            throw InvalidEmailException::withEmail($this->email);
         }
     }
 
