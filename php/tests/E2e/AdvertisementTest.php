@@ -112,7 +112,7 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
-        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
 
 
         $resultSet = $this->connection->query('select * from advertisements;');
@@ -135,7 +135,7 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
-        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
@@ -156,7 +156,7 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
-        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
     }
 
     public function testShouldFailChangingNonExistentAdvertisement(): void
@@ -175,7 +175,7 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
-        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
     }
 
     private function emptyDatabase(): void
