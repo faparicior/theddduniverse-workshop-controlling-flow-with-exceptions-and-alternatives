@@ -7,6 +7,7 @@ use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdverti
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementUseCase;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
+use Exception;
 
 final class UpdateAdvertisementController
 {
@@ -16,17 +17,25 @@ final class UpdateAdvertisementController
 
     public function request(FrameworkRequest $request): FrameworkResponse
     {
-        $command = new UpdateAdvertisementCommand(
-            $request->getIdPath(),
-            ($request->content())['description'],
-            ($request->content())['password'],
-        );
+        try {
+            $command = new UpdateAdvertisementCommand(
+                $request->getIdPath(),
+                ($request->content())['description'],
+                ($request->content())['email'],
+                ($request->content())['password'],
+            );
 
-        $this->useCase->execute($command);
+            $this->useCase->execute($command);
 
-        return new FrameworkResponse(
-            FrameworkResponse::STATUS_OK,
-            []
-        );
+            return new FrameworkResponse(
+                FrameworkResponse::STATUS_OK,
+                []
+            );
+        } catch (Exception $e) {
+            return new FrameworkResponse(
+                FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
+                []
+            );
+        }
     }
 }

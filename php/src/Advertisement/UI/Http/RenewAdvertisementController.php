@@ -7,6 +7,7 @@ use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertise
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementUseCase;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
+use Exception;
 
 final class RenewAdvertisementController
 {
@@ -16,16 +17,24 @@ final class RenewAdvertisementController
 
     public function request(FrameworkRequest $request): FrameworkResponse
     {
-        $command = new RenewAdvertisementCommand(
-            $request->getIdPath(),
-            ($request->content())['password'],
-        );
+        try {
+            $command = new RenewAdvertisementCommand(
+                $request->getIdPath(),
+                ($request->content())['password'],
+            );
 
-        $this->useCase->execute($command);
+            $this->useCase->execute($command);
 
-        return new FrameworkResponse(
-            FrameworkResponse::STATUS_OK,
-            []
-        );
+            return new FrameworkResponse(
+                FrameworkResponse::STATUS_OK,
+                []
+            );
+
+        } catch (Exception $e) {
+            return new FrameworkResponse(
+                FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
+                []
+            );
+        }
     }
 }

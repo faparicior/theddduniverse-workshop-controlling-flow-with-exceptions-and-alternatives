@@ -39,6 +39,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
             [
                 'id' => self::FLAT_ID,
                 'description' => 'Dream advertisement ',
+                'email' => 'email@test.com',
                 'password' => 'myPassword',
             ]
         );
@@ -59,6 +60,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
             'advertisements/' . self::FLAT_ID,
             [
                 'description' => 'Dream advertisement changed ',
+                'email' => 'email@test.com',
                 'password' => 'myPassword',
             ],
         );
@@ -98,9 +100,10 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
     private function withAnAdvertisementWithAMd5PasswordCreated(): void
     {
-        $this->connection->execute(sprintf("INSERT INTO advertisements (id, description, password, advertisement_date) VALUES ('%s', '%s', '%s', '%s')",
+        $this->connection->execute(sprintf("INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES ('%s', '%s', '%s', '%s', '%s')",
                 self::FLAT_ID,
                 'Dream advertisement ',
+                'email@test.com',
                 md5('myPassword'),
                 self::ADVERTISEMENT_CREATION_DATE,
             )

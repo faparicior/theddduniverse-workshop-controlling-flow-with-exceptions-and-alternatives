@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model;
 
+use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 
 final class Advertisement
@@ -10,6 +11,7 @@ final class Advertisement
     public function __construct(
         private readonly string $id,
         private string $description,
+        private Email $email,
         private Password $password,
         private \DateTime $date
     ){
@@ -21,9 +23,10 @@ final class Advertisement
         $this->updateDate();
     }
 
-    public function update(string $description, Password $password): void
+    public function update(string $description, Email $email, Password $password): void
     {
         $this->description = $description;
+        $this->email = $email;
         $this->password = $password;
         $this->updateDate();
     }
@@ -36,6 +39,11 @@ final class Advertisement
     public function description(): string
     {
         return $this->description;
+    }
+
+    public function email(): Email
+    {
+        return $this->email;
     }
 
     public function password(): Password

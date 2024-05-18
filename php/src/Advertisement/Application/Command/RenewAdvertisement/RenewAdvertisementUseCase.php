@@ -21,7 +21,7 @@ final class RenewAdvertisementUseCase
         $advertisement = $this->advertisementRepository->findById($command->id);
 
         if (!$advertisement->password()->isValidatedWith($command->password)) {
-            return;
+            throw new Exception('Invalid password');
         }
 
         $advertisement->renew(Password::fromPlainPassword($command->password));

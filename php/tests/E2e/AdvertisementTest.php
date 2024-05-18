@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 final class AdvertisementTest extends TestCase
 {
     private const string FLAT_ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
+    private const string NON_EXISTENT_FLAT_ID = '99999999-2930-483e-b610-d6b0e5b19b29';
     private const string ADVERTISEMENT_CREATION_DATE = '2024-02-03 13:30:23';
 
     private DependencyInjectionResolver $resolver;
@@ -37,6 +38,7 @@ final class AdvertisementTest extends TestCase
                 'id' => self::FLAT_ID,
                 'description' => 'Dream advertisement ',
                 'password' => 'myPassword',
+                'email' => 'email@test.com',
             ]
         );
 
@@ -56,12 +58,14 @@ final class AdvertisementTest extends TestCase
             'advertisements/' . self::FLAT_ID,
             [
                 'description' => 'Dream advertisement changed ',
+                'email' => 'email@test.com',
                 'password' => 'myPassword',
             ]
         );
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
+        self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement changed ', $resultSet[0]['description']);
@@ -83,6 +87,7 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
+        self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
@@ -99,6 +104,7 @@ final class AdvertisementTest extends TestCase
             [
                 'id' => self::FLAT_ID,
                 'description' => 'Dream advertisement changed ',
+                'email' => 'email@test.com',
                 'password' => 'myBadPassword',
             ],
         );
@@ -106,6 +112,8 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
+        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
+
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement ', $resultSet[0]['description']);
@@ -127,10 +135,47 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEmpty($response->data());
+        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
         self::equalTo($diff->days);
+    }
+
+    public function testShouldFailRenewingNonExistentAdvertisement(): void
+    {
+        $this->withAnAdvertisementCreated();
+
+        $request = new FrameworkRequest(
+            FrameworkRequest::METHOD_PATCH,
+            'advertisements/' . self::NON_EXISTENT_FLAT_ID,
+            [
+                'password' => 'myPassword',
+            ]
+        );
+        $response = $this->server->route($request);
+
+        self::assertEmpty($response->data());
+        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
+    }
+
+    public function testShouldFailChangingNonExistentAdvertisement(): void
+    {
+        $this->withAnAdvertisementCreated();
+
+        $request = new FrameworkRequest(
+            FrameworkRequest::METHOD_PUT,
+            'advertisements/' . self::NON_EXISTENT_FLAT_ID,
+            [
+                'description' => 'Dream advertisement changed ',
+                'email' => 'email@test.com',
+                'password' => 'myPassword',
+            ]
+        );
+        $response = $this->server->route($request);
+
+        self::assertEmpty($response->data());
+        self::assertEquals(FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR, $response->statusCode());
     }
 
     private function emptyDatabase(): void
@@ -140,9 +185,10 @@ final class AdvertisementTest extends TestCase
 
     private function withAnAdvertisementCreated(): void
     {
-        $this->connection->execute(sprintf("INSERT INTO advertisements (id, description, password, advertisement_date) VALUES ('%s', '%s', '%s', '%s')",
+        $this->connection->execute(sprintf("INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES ('%s', '%s', '%s', '%s', '%s')",
                 self::FLAT_ID,
                 'Dream advertisement ',
+                'email@test.com',
                 md5('myPassword'),
                 self::ADVERTISEMENT_CREATION_DATE,
             )

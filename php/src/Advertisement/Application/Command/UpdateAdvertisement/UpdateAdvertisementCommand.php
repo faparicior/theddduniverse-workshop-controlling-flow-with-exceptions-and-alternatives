@@ -8,6 +8,7 @@ final readonly class UpdateAdvertisementCommand
     public function __construct(
         public string $id,
         public string $description,
+        public string $email,
         public string $password,
     ){}
 }

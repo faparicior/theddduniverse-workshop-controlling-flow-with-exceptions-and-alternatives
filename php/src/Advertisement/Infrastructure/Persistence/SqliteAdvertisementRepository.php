@@ -5,6 +5,7 @@ namespace Demo\App\Advertisement\Infrastructure\Persistence;
 
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
+use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
@@ -21,10 +22,11 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
     public function save(Advertisement $advertisement): void
     {
         $this->dbConnection->execute(sprintf('
-            INSERT INTO advertisements (id, description, password, advertisement_date) VALUES (\'%1$s\', \'%2$s\', \'%3$s\', \'%4$s\') 
-            ON CONFLICT(id) DO UPDATE SET description = \'%2$s\', password = \'%3$s\', advertisement_date = \'%4$s\';',
+            INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES (\'%1$s\', \'%2$s\', \'%3$s\', \'%4$s\', \'%5$s\') 
+            ON CONFLICT(id) DO UPDATE SET description = \'%2$s\', email = \'%3$s\', password = \'%4$s\', advertisement_date = \'%5$s\';',
                 $advertisement->id(),
                 $advertisement->description(),
+                $advertisement->email()->value(),
                 $advertisement->password()->value(),
                 $advertisement->date()->format('Y-m-d H:i:s')
             )
@@ -44,6 +46,7 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
         return new Advertisement(
             $row['id'],
             $row['description'],
+            new Email($row['email']),
             Password::fromEncryptedPassword($row['password']),
             new \DateTime($row['advertisement_date'])
         );

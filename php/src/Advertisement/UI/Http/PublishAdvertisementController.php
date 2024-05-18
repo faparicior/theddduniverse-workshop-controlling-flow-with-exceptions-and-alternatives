@@ -19,6 +19,7 @@ final class PublishAdvertisementController
         $command = new PublishAdvertisementCommand(
             ($request->content())['id'],
             ($request->content())['description'],
+            ($request->content())['email'],
             ($request->content())['password'],
         );
 
