@@ -51,7 +51,6 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
             $response->data()
         );
 
-
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
     }
