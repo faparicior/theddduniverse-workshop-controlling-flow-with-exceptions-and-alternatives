@@ -7,11 +7,12 @@ use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdverti
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementUseCase;
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
+use Demo\App\Common\UserInterface\GenericController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
 
-final class UpdateAdvertisementController
+final class UpdateAdvertisementController extends GenericController
 {
     public function __construct(private UpdateAdvertisementUseCase $useCase)
     {
@@ -29,32 +30,11 @@ final class UpdateAdvertisementController
 
             $this->useCase->execute($command);
 
-            return new FrameworkResponse(
-                FrameworkResponse::STATUS_OK,
-                [
-                    'errors' => '',
-                    'code' => FrameworkResponse::STATUS_OK,
-                    'message' => '',
-                ]
-            );
-        } catch (DomainException|ApplicationException $e) {
-            return new FrameworkResponse(
-                FrameworkResponse::STATUS_BAD_REQUEST,
-                [
-                    'errors' => $e->getMessage(),
-                    'code' => FrameworkResponse::STATUS_BAD_REQUEST,
-                    'message' => $e->getMessage(),
-                ]
-            );
-        } catch (Exception $e) {
-            return new FrameworkResponse(
-                FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
-                [
-                    'errors' => $e->getMessage(),
-                    'code' => FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
-                    'message' => $e->getMessage(),
-                ]
-            );
+            return $this->processSuccessfulCommand();
+        } catch (DomainException|ApplicationException $exception) {
+            return $this->processDomainOrApplicationExceptionResponse($exception);
+        } catch (Exception $exception) {
+            return $this->processGenericException($exception);
         }
     }
 }

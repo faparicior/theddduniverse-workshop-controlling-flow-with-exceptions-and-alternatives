@@ -170,7 +170,7 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_NOT_FOUND, $response->statusCode());
         self::assertEquals(
             $this->notFoundCommandResponse(),
             $response->data(),
@@ -192,7 +192,7 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_NOT_FOUND, $response->statusCode());
         self::assertEquals(
             $this->notFoundCommandResponse(),
             $response->data(),
@@ -238,7 +238,7 @@ final class AdvertisementTest extends TestCase
     {
         return [
             'errors' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
-            'code' => 400,
+            'code' => 404,
             'message' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
         ];
     }
