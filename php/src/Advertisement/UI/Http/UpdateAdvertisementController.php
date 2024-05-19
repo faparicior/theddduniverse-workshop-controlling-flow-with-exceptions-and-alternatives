@@ -5,11 +5,12 @@ namespace Demo\App\Advertisement\UI\Http;
 
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementUseCase;
+use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
 
-final class UpdateAdvertisementController
+final class UpdateAdvertisementController extends CommonController
 {
     public function __construct(private UpdateAdvertisementUseCase $useCase)
     {
@@ -27,15 +28,9 @@ final class UpdateAdvertisementController
 
             $this->useCase->execute($command);
 
-            return new FrameworkResponse(
-                FrameworkResponse::STATUS_OK,
-                []
-            );
-        } catch (Exception $e) {
-            return new FrameworkResponse(
-                FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
-                []
-            );
+            return $this->processSuccessfulCommand();
+        } catch (Exception $exception) {
+            return $this->processGenericException($exception);
         }
     }
 }

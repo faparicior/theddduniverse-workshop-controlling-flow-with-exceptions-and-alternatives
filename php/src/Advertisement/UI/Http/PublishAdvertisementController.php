@@ -5,10 +5,12 @@ namespace Demo\App\Advertisement\UI\Http;
 
 use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdvertisementUseCase;
+use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
+use Exception;
 
-final class PublishAdvertisementController
+final class PublishAdvertisementController extends CommonController
 {
     public function __construct(private PublishAdvertisementUseCase $useCase)
     {
@@ -16,18 +18,19 @@ final class PublishAdvertisementController
 
     public function request(FrameworkRequest $request): FrameworkResponse
     {
-        $command = new PublishAdvertisementCommand(
-            ($request->content())['id'],
-            ($request->content())['description'],
-            ($request->content())['email'],
-            ($request->content())['password'],
-        );
+        try {
+            $command = new PublishAdvertisementCommand(
+                ($request->content())['id'],
+                ($request->content())['description'],
+                ($request->content())['email'],
+                ($request->content())['password'],
+            );
 
-        $this->useCase->execute($command);
+            $this->useCase->execute($command);
 
-        return new FrameworkResponse(
-            FrameworkResponse::STATUS_CREATED,
-            []
-        );
+            return $this->processSuccessfulCreateCommand();
+        } catch (Exception $exception) {
+            return $this->processGenericException($exception);
+        }
     }
 }

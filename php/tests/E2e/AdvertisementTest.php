@@ -64,7 +64,6 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
 
         $resultSet = $this->connection->query('select * from advertisements;');
