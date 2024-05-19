@@ -47,7 +47,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
         $response = $this->server->route($request);
         self::assertEquals(FrameworkResponse::STATUS_CREATED, $response->statusCode());
         self::assertEquals(
-            $this->successCommandResponse(),
+            $this->successCommandResponse(FrameworkResponse::STATUS_CREATED),
             $response->data()
         );
 
@@ -126,11 +126,11 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
         self::assertStringStartsWith('$argon2i$', $password);
     }
 
-    private function successCommandResponse(): array
+    private function successCommandResponse(int $statusCode = 200): array
     {
         return [
             'errors' => '',
-            'code' => 200,
+            'code' => $statusCode,
             'message' => '',
         ];
     }
