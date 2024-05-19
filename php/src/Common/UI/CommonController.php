@@ -14,10 +14,10 @@ abstract class CommonController
     protected function processGenericException(Exception $exception): FrameworkResponse
     {
         return new FrameworkResponse(
-            FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
+            FrameworkResponse::STATUS_BAD_REQUEST,
             [
                 'errors' => $exception->getMessage(),
-                'code' => FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
+                'code' => FrameworkResponse::STATUS_BAD_REQUEST,
                 'message' => $exception->getMessage(),
             ]
         );

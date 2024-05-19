@@ -11,8 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 final class AdvertisementTest extends TestCase
 {
-    private const string FLAT_ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
-    private const string NON_EXISTENT_FLAT_ID = '99999999-2930-483e-b610-d6b0e5b19b29';
+    private const string ADVERTISEMENT_ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
+    private const string NON_EXISTENT_ADVERTISEMENT_ID = '99999999-2930-483e-b610-d6b0e5b19b29';
     private const string ADVERTISEMENT_CREATION_DATE = '2024-02-03 13:30:23';
 
     private DependencyInjectionResolver $resolver;
@@ -35,7 +35,7 @@ final class AdvertisementTest extends TestCase
             FrameworkRequest::METHOD_POST,
             'advertisement',
             [
-                'id' => self::FLAT_ID,
+                'id' => self::ADVERTISEMENT_ID,
                 'description' => 'Dream advertisement ',
                 'password' => 'myPassword',
                 'email' => 'email@test.com',
@@ -44,6 +44,39 @@ final class AdvertisementTest extends TestCase
 
         $response = $this->server->route($request);
         self::assertEquals(FrameworkResponse::STATUS_CREATED, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(FrameworkResponse::STATUS_CREATED),
+            $response->data(),
+        );
+
+        $resultSet = $this->connection->query('select * from advertisements;');
+        self::assertEquals('Dream advertisement ', $resultSet[0][1]);
+    }
+
+    public function testShouldFailPublishingAnAdvertisementWithSameId(): void
+    {
+        $this->withAnAdvertisementCreated();
+
+        $request = new FrameworkRequest(
+            FrameworkRequest::METHOD_POST,
+            'advertisement',
+            [
+                'id' => self::ADVERTISEMENT_ID,
+                'description' => 'Dream advertisement ',
+                'password' => 'myPassword',
+                'email' => 'email@test.com',
+            ]
+        );
+
+        $response = $this->server->route($request);
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->errorCommandResponse(
+                FrameworkResponse::STATUS_BAD_REQUEST,
+                sprintf('Advertisement with id %s already exists', self::ADVERTISEMENT_ID)
+            ),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement ', $resultSet[0][1]);
@@ -55,7 +88,7 @@ final class AdvertisementTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PUT,
-            'advertisements/' . self::FLAT_ID,
+            'advertisements/' . self::ADVERTISEMENT_ID,
             [
                 'description' => 'Dream advertisement changed ',
                 'email' => 'email@test.com',
@@ -65,6 +98,10 @@ final class AdvertisementTest extends TestCase
         $response = $this->server->route($request);
 
         self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement changed ', $resultSet[0]['description']);
@@ -78,15 +115,18 @@ final class AdvertisementTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PATCH,
-            'advertisements/' . self::FLAT_ID,
+            'advertisements/' . self::ADVERTISEMENT_ID,
             [
                 'password' => 'myPassword',
             ]
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
@@ -99,9 +139,9 @@ final class AdvertisementTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PUT,
-            'advertisements/' . self::FLAT_ID,
+            'advertisements/' . self::ADVERTISEMENT_ID,
             [
-                'id' => self::FLAT_ID,
+                'id' => self::ADVERTISEMENT_ID,
                 'description' => 'Dream advertisement changed ',
                 'email' => 'email@test.com',
                 'password' => 'myBadPassword',
@@ -110,9 +150,11 @@ final class AdvertisementTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
-
+        self::assertEquals(
+            $this->invalidPasswordCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement ', $resultSet[0]['description']);
@@ -125,7 +167,7 @@ final class AdvertisementTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PATCH,
-            'advertisements/' . self::FLAT_ID,
+            'advertisements/' . self::ADVERTISEMENT_ID,
             [
                 'password' => 'myBadPassword',
             ]
@@ -133,8 +175,11 @@ final class AdvertisementTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->invalidPasswordCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
@@ -147,15 +192,18 @@ final class AdvertisementTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PATCH,
-            'advertisements/' . self::NON_EXISTENT_FLAT_ID,
+            'advertisements/' . self::NON_EXISTENT_ADVERTISEMENT_ID,
             [
                 'password' => 'myPassword',
             ]
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
-        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_NOT_FOUND, $response->statusCode());
+        self::assertEquals(
+            $this->notFoundCommandResponse(),
+            $response->data(),
+        );
     }
 
     public function testShouldFailChangingNonExistentAdvertisement(): void
@@ -164,7 +212,7 @@ final class AdvertisementTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PUT,
-            'advertisements/' . self::NON_EXISTENT_FLAT_ID,
+            'advertisements/' . self::NON_EXISTENT_ADVERTISEMENT_ID,
             [
                 'description' => 'Dream advertisement changed ',
                 'email' => 'email@test.com',
@@ -173,8 +221,11 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
-        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(FrameworkResponse::STATUS_NOT_FOUND, $response->statusCode());
+        self::assertEquals(
+            $this->notFoundCommandResponse(),
+            $response->data(),
+        );
     }
 
     private function emptyDatabase(): void
@@ -185,12 +236,48 @@ final class AdvertisementTest extends TestCase
     private function withAnAdvertisementCreated(): void
     {
         $this->connection->execute(sprintf("INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES ('%s', '%s', '%s', '%s', '%s')",
-                self::FLAT_ID,
+                self::ADVERTISEMENT_ID,
                 'Dream advertisement ',
                 'email@test.com',
                 md5('myPassword'),
                 self::ADVERTISEMENT_CREATION_DATE,
             )
         );
+    }
+
+    private function successCommandResponse(int $code = 200): array
+    {
+        return [
+            'errors' => '',
+            'code' => $code,
+            'message' => '',
+        ];
+    }
+
+    private function errorCommandResponse(int $code = 400, string $message = ''): array
+    {
+        return [
+            'errors' => $message,
+            'code' => $code,
+            'message' => $message,
+        ];
+    }
+
+    private function invalidPasswordCommandResponse(): array
+    {
+        return [
+            'errors' => 'Invalid password',
+            'code' => 400,
+            'message' => 'Invalid password',
+        ];
+    }
+
+    private function notFoundCommandResponse(): array
+    {
+        return [
+            'errors' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
+            'code' => 404,
+            'message' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
+        ];
     }
 }

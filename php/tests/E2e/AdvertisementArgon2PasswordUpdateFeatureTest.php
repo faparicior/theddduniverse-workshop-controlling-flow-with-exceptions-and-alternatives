@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 {
-    private const string FLAT_ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
+    private const string ADVERTISEMENT_ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
     private const string ADVERTISEMENT_CREATION_DATE = '2024-02-03 13:30:23';
 
     private DependencyInjectionResolver $resolver;
@@ -37,7 +37,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
             FrameworkRequest::METHOD_POST,
             'advertisement',
             [
-                'id' => self::FLAT_ID,
+                'id' => self::ADVERTISEMENT_ID,
                 'description' => 'Dream advertisement ',
                 'email' => 'email@test.com',
                 'password' => 'myPassword',
@@ -46,6 +46,10 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $response = $this->server->route($request);
         self::assertEquals(FrameworkResponse::STATUS_CREATED, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(FrameworkResponse::STATUS_CREATED),
+            $response->data()
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
@@ -57,7 +61,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PUT,
-            'advertisements/' . self::FLAT_ID,
+            'advertisements/' . self::ADVERTISEMENT_ID,
             [
                 'description' => 'Dream advertisement changed ',
                 'email' => 'email@test.com',
@@ -67,7 +71,10 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data()
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
@@ -79,7 +86,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $request = new FrameworkRequest(
             FrameworkRequest::METHOD_PATCH,
-            'advertisements/' . self::FLAT_ID,
+            'advertisements/' . self::ADVERTISEMENT_ID,
             [
                 'password' => 'myPassword',
             ],
@@ -87,7 +94,10 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data()
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
@@ -101,7 +111,7 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
     private function withAnAdvertisementWithAMd5PasswordCreated(): void
     {
         $this->connection->execute(sprintf("INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES ('%s', '%s', '%s', '%s', '%s')",
-                self::FLAT_ID,
+                self::ADVERTISEMENT_ID,
                 'Dream advertisement ',
                 'email@test.com',
                 md5('myPassword'),
@@ -113,5 +123,14 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
     private function expectHasAnArgon2Password($password): void
     {
         self::assertStringStartsWith('$argon2i$', $password);
+    }
+
+    private function successCommandResponse(int $statusCode = 200): array
+    {
+        return [
+            'errors' => '',
+            'code' => $statusCode,
+            'message' => '',
+        ];
     }
 }
