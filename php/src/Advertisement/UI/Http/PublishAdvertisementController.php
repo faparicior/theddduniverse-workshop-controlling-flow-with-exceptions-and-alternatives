@@ -7,7 +7,7 @@ use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdver
 use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdvertisementUseCase;
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
-use Demo\App\Common\UserInterface\CommonController;
+use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;

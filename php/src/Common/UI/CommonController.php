@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Demo\App\Common\UserInterface;
+namespace Demo\App\Common\UI;
 
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
