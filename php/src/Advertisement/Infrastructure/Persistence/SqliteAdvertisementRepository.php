@@ -41,9 +41,9 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
      * @throws InvalidEmailException
      * @throws InvalidUniqueIdentifierException
      */
-    public function findById(string $id): ?Advertisement
+    public function findById(AdvertisementId $id): ?Advertisement
     {
-        $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id));
+        $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id->value()));
         if(!$result) {
             return null;
         }

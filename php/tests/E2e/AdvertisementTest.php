@@ -53,6 +53,35 @@ final class AdvertisementTest extends TestCase
         self::assertEquals('Dream advertisement ', $resultSet[0][1]);
     }
 
+    public function testShouldFailPublishingAnAdvertisementWithSameId(): void
+    {
+        $this->withAnAdvertisementCreated();
+
+        $request = new FrameworkRequest(
+            FrameworkRequest::METHOD_POST,
+            'advertisement',
+            [
+                'id' => self::ADVERTISEMENT_ID,
+                'description' => 'Dream advertisement ',
+                'password' => 'myPassword',
+                'email' => 'email@test.com',
+            ]
+        );
+
+        $response = $this->server->route($request);
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->errorCommandResponse(
+                FrameworkResponse::STATUS_BAD_REQUEST,
+                sprintf('Advertisement with id %s already exists', self::ADVERTISEMENT_ID)
+            ),
+            $response->data(),
+        );
+
+        $resultSet = $this->connection->query('select * from advertisements;');
+        self::assertEquals('Dream advertisement ', $resultSet[0][1]);
+    }
+
     public function testShouldChangeAnAdvertisement(): void
     {
         $this->withAnAdvertisementCreated();
@@ -222,6 +251,15 @@ final class AdvertisementTest extends TestCase
             'errors' => '',
             'code' => $code,
             'message' => '',
+        ];
+    }
+
+    private function errorCommandResponse(int $code = 400, string $message = ''): array
+    {
+        return [
+            'errors' => $message,
+            'code' => $code,
+            'message' => $message,
         ];
     }
 

@@ -6,6 +6,7 @@ namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Exception;
 
@@ -20,7 +21,7 @@ final class RenewAdvertisementUseCase
      */
     public function execute(RenewAdvertisementCommand $command): void
     {
-        $advertisement = $this->advertisementRepository->findById($command->id);
+        $advertisement = $this->advertisementRepository->findById(new AdvertisementId($command->id));
 
         if (!$advertisement) {
             throw AdvertisementNotFoundException::withId($command->id);
