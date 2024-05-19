@@ -22,7 +22,7 @@ final class InvalidEmailException extends DomainException
 
     public static function withEmail(string $email): self
     {
-        return self::build(sprintf('Invalid email %s', $email));
+        return self::build(self::INVALID_EMAIL_FORMAT_MESSAGE . ' ' . $email);
     }
 
     public function message(): string

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Demo\App\Advertisement\Domain\Exceptions;
+namespace Demo\App\Advertisement\Application\Exceptions;
 
-use Demo\App\Common\Domain\DomainException;
+use Demo\App\Common\Application\ApplicationException;
 use Throwable;
 
-final class InvalidPasswordException extends DomainException
+final class InvalidPasswordException extends ApplicationException
 {
     public const string INVALID_PASSWORD_MESSAGE = 'Invalid password';
 

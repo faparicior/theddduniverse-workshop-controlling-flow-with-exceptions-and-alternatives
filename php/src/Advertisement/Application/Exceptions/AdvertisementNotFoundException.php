@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Demo\App\Advertisement\Domain\Exceptions;
+namespace Demo\App\Advertisement\Application\Exceptions;
 
-use Demo\App\Common\Domain\DomainException;
+use Demo\App\Common\Application\ApplicationException;
 use Throwable;
 
-final class AdvertisementNotFoundException extends DomainException
+final class AdvertisementNotFoundException extends ApplicationException
 {
     private const string NOT_FOUND_MESSAGE = 'Advertisement not found';
+    private const string NOT_FOUND_WITH_ID_MESSAGE = self::NOT_FOUND_MESSAGE . ' with ID: ';
 
     /**
      * @param string $message
@@ -23,6 +24,10 @@ final class AdvertisementNotFoundException extends DomainException
         return new self($message);
     }
 
+    public static function withId(string $id): self
+    {
+        return new self(self::NOT_FOUND_WITH_ID_MESSAGE . $id);
+    }
 
     public function message(): string
     {

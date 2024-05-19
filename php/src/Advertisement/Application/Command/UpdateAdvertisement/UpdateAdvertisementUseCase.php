@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\UpdateAdvertisement;
 
+use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
+use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
-use Demo\App\Advertisement\Domain\Exceptions\InvalidPasswordException;
+use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Exception;
@@ -22,12 +24,16 @@ final class UpdateAdvertisementUseCase
     {
         $advertisement = $this->advertisementRepository->findById($command->id);
 
+        if (!$advertisement) {
+            throw AdvertisementNotFoundException::build();
+        }
+
         if (!$advertisement->password()->isValidatedWith($command->password)) {
             throw InvalidPasswordException::build();
         }
 
         $advertisement->update(
-            $command->description,
+            new Description($command->description),
             new Email($command->email),
             Password::fromPlainPassword($command->password),
         );

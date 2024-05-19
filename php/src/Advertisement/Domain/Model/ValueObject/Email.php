@@ -10,20 +10,20 @@ final readonly class Email
     /**
      * @throws InvalidEmailException
      */
-    public function __construct(private string $email)
+    public function __construct(private string $value)
     {
-        if (!$this->validateEmail($email)) {
-            throw InvalidEmailException::withEmail($this->email);
+        if (!$this->validate($value)) {
+            throw InvalidEmailException::withEmail($this->value);
         }
     }
 
     public function value(): string
     {
-        return $this->email;
+        return $this->value;
     }
 
-    private function validateEmail(string $email): string|bool
+    private function validate(string $value): string|bool
     {
-        return filter_var($email, FILTER_VALIDATE_EMAIL);
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 }

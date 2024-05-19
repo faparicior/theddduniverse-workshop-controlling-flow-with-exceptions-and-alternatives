@@ -5,6 +5,7 @@ namespace Demo\App\Advertisement\UI\Http;
 
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementUseCase;
+use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
@@ -30,7 +31,7 @@ final class RenewAdvertisementController
                 FrameworkResponse::STATUS_OK,
                 []
             );
-        } catch (DomainException $e) {
+        } catch (DomainException|ApplicationException $e) {
             return new FrameworkResponse(
                 FrameworkResponse::STATUS_BAD_REQUEST,
                 []

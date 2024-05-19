@@ -21,7 +21,7 @@ class EmailTest extends TestCase
     public function testShouldThrowAnExceptionWhenEmailIsInvalid()
     {
         $this->expectException(InvalidEmailException::class);
-        $this->expectExceptionMessage('Invalid email ' . self::INVALID_EMAIL);
+        $this->expectExceptionMessage('Invalid email format ' . self::INVALID_EMAIL);
         new Email(self::INVALID_EMAIL);
     }
 }
