@@ -5,17 +5,25 @@ namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
 
 use Exception;
+use SensitiveParameter;
 
 final readonly class Password
 {
-    private function __construct(private string $value)
+
+    private function __construct(
+        #[SensitiveParameter]
+        private string $value
+    )
     {
     }
 
     /**
      * @throws Exception
      */
-    public static function fromPlainPassword(string $password): self
+    public static function fromPlainPassword(
+        #[SensitiveParameter]
+        string $password)
+    : self
     {
         $result = password_hash($password, PASSWORD_ARGON2I);
         if(null === $result || false === $result) {
@@ -24,7 +32,10 @@ final readonly class Password
         return new Password($result);
     }
 
-    public static function fromEncryptedPassword(string $password): self
+    public static function fromEncryptedPassword(
+        #[SensitiveParameter]
+        string $password
+    ): self
     {
         return new Password($password);
     }
@@ -34,7 +45,10 @@ final readonly class Password
         return $this->value;
     }
 
-    public function isValidatedWith(string $password): bool
+    public function isValidatedWith(
+        #[SensitiveParameter]
+        string $password
+    ): bool
     {
         $hashSpecs = password_get_info($this->value);
 
