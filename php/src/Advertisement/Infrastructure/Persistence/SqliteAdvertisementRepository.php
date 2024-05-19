@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Infrastructure\Persistence;
 
-use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Exceptions\InvalidEmailException;
 use Demo\App\Advertisement\Domain\Exceptions\InvalidUniqueIdentifierException;
@@ -15,7 +14,6 @@ use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
-use Exception;
 
 class SqliteAdvertisementRepository implements AdvertisementRepository
 {
