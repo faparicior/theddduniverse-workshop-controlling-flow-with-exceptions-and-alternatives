@@ -15,7 +15,7 @@ final class DescriptionEmptyException extends DomainException
         parent::__construct($message);
     }
 
-    public static function build(string $message = self::DESCRIPTION_EMPTY_MESSAGE, int $code = 0, Throwable $previous = null): self
+    public static function build(string $message = self::DESCRIPTION_EMPTY_MESSAGE): self
     {
         return new self($message);
     }

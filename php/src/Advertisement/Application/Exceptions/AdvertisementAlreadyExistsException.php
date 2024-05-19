@@ -8,7 +8,6 @@ use Throwable;
 
 final class AdvertisementAlreadyExistsException extends ApplicationException
 {
-    private const string ADVERTISEMENT_ALREADY_EXISTS_MESSAGE = 'Advertisement already exists';
     private const string ADVERTISEMENT_WITH_ID_S_ALREADY_EXISTS_MESSAGE = 'Advertisement with id %s already exists';
 
     /**
@@ -17,11 +16,6 @@ final class AdvertisementAlreadyExistsException extends ApplicationException
     private function __construct(string $message)
     {
         parent::__construct($message);
-    }
-
-    public static function build(string $message = self::ADVERTISEMENT_ALREADY_EXISTS_MESSAGE, int $code = 0, Throwable $previous = null): self
-    {
-        return new self($message);
     }
 
     public static function withId(string $id): self

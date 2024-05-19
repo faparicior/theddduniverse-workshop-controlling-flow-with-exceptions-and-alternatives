@@ -8,8 +8,7 @@ use Throwable;
 
 final class AdvertisementNotFoundException extends ApplicationException
 {
-    private const string NOT_FOUND_MESSAGE = 'Advertisement not found';
-    private const string NOT_FOUND_WITH_ID_MESSAGE = self::NOT_FOUND_MESSAGE . ' with ID: ';
+    private const string NOT_FOUND_WITH_ID_MESSAGE = 'Advertisement not found with ID: ';
     private const int NOT_FOUND_ERROR_CODE = 404;
 
     /**
@@ -18,11 +17,6 @@ final class AdvertisementNotFoundException extends ApplicationException
     private function __construct(string $message)
     {
         parent::__construct($message, self::NOT_FOUND_ERROR_CODE);
-    }
-
-    public static function build(string $message = self::NOT_FOUND_MESSAGE, int $code = 0, Throwable $previous = null): self
-    {
-        return new self($message);
     }
 
     public static function withId(string $id): self

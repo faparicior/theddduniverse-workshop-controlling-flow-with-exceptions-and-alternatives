@@ -15,7 +15,7 @@ final class InvalidPasswordException extends ApplicationException
         parent::__construct($message);
     }
 
-    public static function build(string $message = self::INVALID_PASSWORD_MESSAGE, int $code = 0, Throwable $previous = null): self
+    public static function build(string $message = self::INVALID_PASSWORD_MESSAGE): self
     {
         return new self($message);
     }

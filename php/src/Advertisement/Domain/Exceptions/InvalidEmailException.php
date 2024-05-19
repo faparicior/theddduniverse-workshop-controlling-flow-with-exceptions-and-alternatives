@@ -15,14 +15,9 @@ final class InvalidEmailException extends DomainException
         parent::__construct($message);
     }
 
-    public static function build(string $message = self::INVALID_EMAIL_FORMAT_MESSAGE, int $code = 0, Throwable $previous = null): self
-    {
-        return new self($message);
-    }
-
     public static function withEmail(string $email): self
     {
-        return self::build(self::INVALID_EMAIL_FORMAT_MESSAGE . ' ' . $email);
+        return new self(self::INVALID_EMAIL_FORMAT_MESSAGE . ' ' . $email);
     }
 
     public function message(): string
