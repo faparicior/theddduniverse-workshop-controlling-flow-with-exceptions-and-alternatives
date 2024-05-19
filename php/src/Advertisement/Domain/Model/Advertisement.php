@@ -3,17 +3,20 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model;
 
+use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementDate;
+use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
+use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 
 final class Advertisement
 {
     public function __construct(
-        private readonly string $id,
-        private string $description,
+        private readonly AdvertisementId $id,
+        private Description $description,
         private Email $email,
         private Password $password,
-        private \DateTime $date
+        private AdvertisementDate $date
     ){
     }
 
@@ -23,7 +26,7 @@ final class Advertisement
         $this->updateDate();
     }
 
-    public function update(string $description, Email $email, Password $password): void
+    public function update(Description $description, Email $email, Password $password): void
     {
         $this->description = $description;
         $this->email = $email;
@@ -31,12 +34,12 @@ final class Advertisement
         $this->updateDate();
     }
 
-    public function id(): string
+    public function id(): AdvertisementId
     {
         return $this->id;
     }
 
-    public function description(): string
+    public function description(): Description
     {
         return $this->description;
     }
@@ -51,13 +54,13 @@ final class Advertisement
         return $this->password;
     }
 
-    public function date(): \DateTime
+    public function date(): AdvertisementDate
     {
         return $this->date;
     }
 
     private function updateDate(): void
     {
-        $this->date = new \DateTime();
+        $this->date = new AdvertisementDate(new \DateTime());
     }
 }

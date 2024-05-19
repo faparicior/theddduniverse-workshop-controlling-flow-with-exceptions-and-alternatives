@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-final readonly class Email
+final readonly class AdvertisementId
 {
     public function __construct(private string $value)
     {
         if (!$this->validate($value)) {
-            throw new \InvalidArgumentException('Invalid email');
+            throw new \InvalidArgumentException('Invalid unique identifier');
         }
     }
 
@@ -17,8 +17,8 @@ final readonly class Email
         return $this->value;
     }
 
-    private function validate(string $value): string|bool
+    private function validate(string $value): bool
     {
-        return filter_var($value, FILTER_VALIDATE_EMAIL);
+        return preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $value) != 0;
     }
 }
