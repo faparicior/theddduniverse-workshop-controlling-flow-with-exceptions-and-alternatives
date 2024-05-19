@@ -7,12 +7,12 @@ use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdverti
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementUseCase;
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
-use Demo\App\Common\UserInterface\GenericController;
+use Demo\App\Common\UserInterface\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
 
-final class UpdateAdvertisementController extends GenericController
+final class UpdateAdvertisementController extends CommonController
 {
     public function __construct(private UpdateAdvertisementUseCase $useCase)
     {

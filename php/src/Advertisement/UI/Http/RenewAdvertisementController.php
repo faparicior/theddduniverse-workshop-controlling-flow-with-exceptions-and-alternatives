@@ -7,12 +7,12 @@ use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertise
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementUseCase;
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
-use Demo\App\Common\UserInterface\GenericController;
+use Demo\App\Common\UserInterface\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
 
-final class RenewAdvertisementController extends GenericController
+final class RenewAdvertisementController extends CommonController
 {
     public function __construct(private RenewAdvertisementUseCase $useCase)
     {

@@ -9,7 +9,7 @@ use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
 
-abstract class GenericController
+abstract class CommonController
 {
     public abstract function request(FrameworkRequest $request): FrameworkResponse;
 
