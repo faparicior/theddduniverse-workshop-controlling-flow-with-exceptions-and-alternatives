@@ -25,7 +25,7 @@ final class UpdateAdvertisementUseCase
         $advertisement = $this->advertisementRepository->findById($command->id);
 
         if (!$advertisement) {
-            throw AdvertisementNotFoundException::build();
+            throw AdvertisementNotFoundException::withId($command->id);
         }
 
         if (!$advertisement->password()->isValidatedWith($command->password)) {

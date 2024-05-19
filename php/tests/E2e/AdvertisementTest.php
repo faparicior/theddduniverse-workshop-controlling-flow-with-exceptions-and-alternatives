@@ -44,6 +44,10 @@ final class AdvertisementTest extends TestCase
 
         $response = $this->server->route($request);
         self::assertEquals(FrameworkResponse::STATUS_CREATED, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(FrameworkResponse::STATUS_CREATED),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement ', $resultSet[0][1]);
@@ -64,8 +68,11 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement changed ', $resultSet[0]['description']);
@@ -86,8 +93,11 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_OK, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
@@ -111,9 +121,11 @@ final class AdvertisementTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
-
+        self::assertEquals(
+            $this->invalidPasswordCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         self::assertEquals('Dream advertisement ', $resultSet[0]['description']);
@@ -134,8 +146,11 @@ final class AdvertisementTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->invalidPasswordCommandResponse(),
+            $response->data(),
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
@@ -155,8 +170,11 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->notFoundCommandResponse(),
+            $response->data(),
+        );
     }
 
     public function testShouldFailChangingNonExistentAdvertisement(): void
@@ -174,8 +192,11 @@ final class AdvertisementTest extends TestCase
         );
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
         self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->notFoundCommandResponse(),
+            $response->data(),
+        );
     }
 
     private function emptyDatabase(): void
@@ -193,5 +214,32 @@ final class AdvertisementTest extends TestCase
                 self::ADVERTISEMENT_CREATION_DATE,
             )
         );
+    }
+
+    private function successCommandResponse(int $code = 200): array
+    {
+        return [
+            'errors' => '',
+            'code' => $code,
+            'message' => '',
+        ];
+    }
+
+    private function invalidPasswordCommandResponse(): array
+    {
+        return [
+            'errors' => 'Invalid password',
+            'code' => 400,
+            'message' => 'Invalid password',
+        ];
+    }
+
+    private function notFoundCommandResponse(): array
+    {
+        return [
+            'errors' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
+            'code' => 400,
+            'message' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
+        ];
     }
 }

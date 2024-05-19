@@ -19,7 +19,7 @@ final class AdvertisementNotFoundException extends ApplicationException
         parent::__construct($message);
     }
 
-    public static function build(string $message = self::NOT_FOUND_MESSAGE, int $code = 0, Throwable $previous = null): self
+    public static function build(string $message = self::NOT_FOUND_MESSAGE, int $code = 404, Throwable $previous = null): self
     {
         return new self($message);
     }

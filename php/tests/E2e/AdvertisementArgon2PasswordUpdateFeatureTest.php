@@ -46,6 +46,11 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $response = $this->server->route($request);
         self::assertEquals(FrameworkResponse::STATUS_CREATED, $response->statusCode());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data()
+        );
+
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
@@ -67,7 +72,10 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data()
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
@@ -87,7 +95,10 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
 
         $response = $this->server->route($request);
 
-        self::assertEmpty($response->data());
+        self::assertEquals(
+            $this->successCommandResponse(),
+            $response->data()
+        );
 
         $resultSet = $this->connection->query('select * from advertisements;');
         $this->expectHasAnArgon2Password($resultSet[0]['password']);
@@ -113,5 +124,14 @@ final class AdvertisementArgon2PasswordUpdateFeatureTest extends TestCase
     private function expectHasAnArgon2Password($password): void
     {
         self::assertStringStartsWith('$argon2i$', $password);
+    }
+
+    private function successCommandResponse(): array
+    {
+        return [
+            'errors' => '',
+            'code' => 200,
+            'message' => '',
+        ];
     }
 }
