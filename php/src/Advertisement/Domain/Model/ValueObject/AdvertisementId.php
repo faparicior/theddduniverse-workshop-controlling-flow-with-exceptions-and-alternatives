@@ -3,18 +3,20 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use Demo\App\Advertisement\Domain\Exceptions\InvalidUniqueIdentifierException;
+use Demo\App\Advertisement\Domain\Errors\AdvertisementIdErrors;
+use Demo\App\Common\Result;
 
 final readonly class AdvertisementId
 {
-    /**
-     * @throws InvalidUniqueIdentifierException
-     */
-    public function __construct(private string $value)
+    private function __construct(private string $value) {}
+
+    public static function build(string $value): Result
     {
-        if (!$this->validate($value)) {
-            throw InvalidUniqueIdentifierException::withId($this->value);
+        if (!self::validate($value)) {
+            return Result::failure(sprintf(AdvertisementIdErrors::ADVERTISEMENT_ID_INVALID->getMessage(), $value));
         }
+
+        return Result::success(new self($value));
     }
 
     public function value(): string
@@ -22,7 +24,7 @@ final readonly class AdvertisementId
         return $this->value;
     }
 
-    private function validate(string $value): bool
+    private static function validate(string $value): bool
     {
         return preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $value) != 0;
     }

@@ -3,14 +3,24 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use Demo\App\Advertisement\Domain\Exceptions\DescriptionEmptyException;
-use Demo\App\Advertisement\Domain\Exceptions\DescriptionTooLongException;
+use Demo\App\Advertisement\Domain\Errors\DescriptionErrors;
+use Demo\App\Common\Result;
 
 final class Description
 {
-    public function __construct(private string $value)
+    public function __construct(private string $value) {}
+
+    public static function build(string $value): Result
     {
-        $this->validate($value);
+        if (!self::validateMinLength($value)) {
+            return Result::failure(DescriptionErrors::DESCRIPTION_MIN_LENGTH_INVALID->getMessage());
+        }
+
+        if (!self::validateMaxLength($value)) {
+            return Result::failure(sprintf(DescriptionErrors::DESCRIPTION_MAX_LENGTH_INVALID->getMessage(), $value));
+        }
+
+        return Result::success(new self($value));
     }
 
     public function value(): string
@@ -18,18 +28,13 @@ final class Description
         return $this->value;
     }
 
-    /**
-     * @throws DescriptionTooLongException
-     * @throws DescriptionEmptyException
-     */
-    private function validate(string $value): void
+    private static function validateMinLength(string $value): bool
     {
-        if (mb_strlen($value) === 0) {
-            throw DescriptionEmptyException::build();
-        }
+        return mb_strlen($value) > 0;
+    }
 
-        if (mb_strlen($value) > 200) {
-            throw DescriptionTooLongException::withLongitudeMessage($this->value);
-        }
+    private static function validateMaxLength(string $value): bool
+    {
+        return mb_strlen($value) < 200;
     }
 }

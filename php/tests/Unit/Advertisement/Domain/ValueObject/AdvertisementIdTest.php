@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Demo\App\Unit\Advertisement\Domain\ValueObject;
 
-use Demo\App\Advertisement\Domain\Exceptions\InvalidUniqueIdentifierException;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use PHPUnit\Framework\TestCase;
 
@@ -14,14 +13,19 @@ class AdvertisementIdTest extends TestCase
 
     public function testShouldCreateAnAdvertisementId()
     {
-        $advertisementId = new AdvertisementId(self::ID);
-        $this->assertEquals(self::ID, $advertisementId->value());
+        $result = AdvertisementId::build(self::ID);
+        self::assertTrue($result->isSuccess());
+
+        $advertisementId = $result->getData();
+        self::assertInstanceOf(AdvertisementId::class, $advertisementId);
+        self::assertEquals(self::ID, $advertisementId->value());
     }
 
-    public function testShouldThrowAnExceptionWhenIdHasNotUuidV4Standards()
+    public function testShouldReturnAnErrorWhenIdHasNotUuidV4Standards()
     {
-        $this->expectException(InvalidUniqueIdentifierException::class);
-        $this->expectExceptionMessage('Invalid unique identifier format for ' . self::INVALID_ID);
-        new AdvertisementId(self::INVALID_ID);
+        $result = AdvertisementId::build(self::INVALID_ID);
+
+        self::assertFalse($result->isSuccess());
+        self::assertEquals('Invalid unique identifier format for ' . self::INVALID_ID, $result->getError());
     }
 }
