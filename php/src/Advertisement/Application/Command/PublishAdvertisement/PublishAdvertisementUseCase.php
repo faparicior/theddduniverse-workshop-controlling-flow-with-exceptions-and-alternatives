@@ -12,7 +12,6 @@ use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Common\Result;
-use Exception;
 
 final class PublishAdvertisementUseCase
 {
@@ -20,9 +19,6 @@ final class PublishAdvertisementUseCase
     {
     }
 
-    /**
-     * @throws Exception
-     */
     public function execute(PublishAdvertisementCommand $command): Result
     {
         $result = AdvertisementId::build($command->id);
