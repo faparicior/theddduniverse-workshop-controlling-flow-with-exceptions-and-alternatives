@@ -21,49 +21,49 @@ final class PublishAdvertisementUseCase
 
     public function execute(PublishAdvertisementCommand $command): Result
     {
-        $result = AdvertisementId::build($command->id);
-        if ($result->isError()) {
-            return $result;
+        $advertisementIdResult = AdvertisementId::build($command->id);
+        if ($advertisementIdResult->isError()) {
+            return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
-        $advertisementId = $result->unwrap();
+        $advertisementId = $advertisementIdResult->unwrap();
 
-        $result = Description::build($command->description);
-        if ($result->isError()) {
-            return $result;
+        $descriptionResult = Description::build($command->description);
+        if ($descriptionResult->isError()) {
+            return $descriptionResult;
         }
         /** @var Description $description */
-        $description = $result->unwrap();
+        $description = $descriptionResult->unwrap();
 
-        $result = Email::build($command->email);
-        if ($result->isError()) {
-            return $result;
+        $emailResult = Email::build($command->email);
+        if ($emailResult->isError()) {
+            return $emailResult;
         }
         /** @var Email $email */
-        $email = $result->unwrap();
+        $email = $emailResult->unwrap();
 
-        $result = Password::fromPlainPassword($command->password);
-        if ($result->isError()) {
-            return $result;
+        $passwordResult = Password::fromPlainPassword($command->password);
+        if ($passwordResult->isError()) {
+            return $passwordResult;
         }
         /** @var Password $password */
-        $password = $result->unwrap();
+        $password = $passwordResult->unwrap();
 
-        $result = $this->advertisementRepository->findById($advertisementId);
+        $advertisementIdResult = $this->advertisementRepository->findById($advertisementId);
 
-        if($result->isSuccess()) {
+        if($advertisementIdResult->isSuccess()) {
             return Result::failure(sprintf(PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(), $advertisementId->value()));
         }
 
-        $result = AdvertisementDate::build(new \DateTime());
-        if ($result->isError()) {
-            return $result;
+        $advertisementDateResult = AdvertisementDate::build(new \DateTime());
+        if ($advertisementDateResult->isError()) {
+            return $advertisementDateResult;
         }
 
         /** @var AdvertisementDate $date */
-        $date = $result->unwrap();
+        $date = $advertisementDateResult->unwrap();
 
-        $result = Advertisement::build(
+        $advertisementResult = Advertisement::build(
             $advertisementId,
             $description,
             $email,
@@ -71,17 +71,17 @@ final class PublishAdvertisementUseCase
             $date,
         );
 
-        if ($result->isError()) {
-            return $result;
+        if ($advertisementResult->isError()) {
+            return $advertisementResult;
         }
 
         /** @var Advertisement $advertisement */
-        $advertisement = $result->unwrap();
+        $advertisement = $advertisementResult->unwrap();
 
-        $result = $this->advertisementRepository->save($advertisement);
+        $saveResult = $this->advertisementRepository->save($advertisement);
 
-        if ($result->isError()) {
-            return $result;
+        if ($saveResult->isError()) {
+            return $saveResult;
         }
 
         return Result::success();
