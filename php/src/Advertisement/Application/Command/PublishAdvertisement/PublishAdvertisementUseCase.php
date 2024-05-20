@@ -29,7 +29,6 @@ final class PublishAdvertisementUseCase
         $advertisementId = $advertisementIdResult->unwrap();
 
         $findAdvertisementResult = $this->advertisementRepository->findById($advertisementId);
-
         if ($findAdvertisementResult->isSuccess()) {
             return Result::failure(sprintf(PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(), $advertisementId->value()));
         }
