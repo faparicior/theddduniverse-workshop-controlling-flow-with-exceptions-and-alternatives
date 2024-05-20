@@ -28,6 +28,12 @@ final class PublishAdvertisementUseCase
         /** @var AdvertisementId $advertisementId */
         $advertisementId = $advertisementIdResult->unwrap();
 
+        $findAdvertisementResult = $this->advertisementRepository->findById($advertisementId);
+
+        if ($findAdvertisementResult->isSuccess()) {
+            return Result::failure(sprintf(PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(), $advertisementId->value()));
+        }
+
         $descriptionResult = Description::build($command->description);
         if ($descriptionResult->isError()) {
             return $descriptionResult;
@@ -48,12 +54,6 @@ final class PublishAdvertisementUseCase
         }
         /** @var Password $password */
         $password = $passwordResult->unwrap();
-
-        $advertisementIdResult = $this->advertisementRepository->findById($advertisementId);
-
-        if($advertisementIdResult->isSuccess()) {
-            return Result::failure(sprintf(PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(), $advertisementId->value()));
-        }
 
         $advertisementDateResult = AdvertisementDate::build(new \DateTime());
         if ($advertisementDateResult->isError()) {
