@@ -5,6 +5,7 @@ namespace Demo\App\Common\UI;
 
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
+use Demo\App\Common\Result;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
@@ -22,6 +23,18 @@ abstract class CommonController
                 'errors' => $e->getMessage(),
                 'code' => $responseCode,
                 'message' => $e->getMessage(),
+            ]
+        );
+    }
+
+    protected function processFailedCommand(Result $result): FrameworkResponse
+    {
+        return new FrameworkResponse(
+            FrameworkResponse::STATUS_BAD_REQUEST,
+            [
+                'errors' => $result->getError(),
+                'code' => FrameworkResponse::STATUS_BAD_REQUEST,
+                'message' => $result->getError(),
             ]
         );
     }

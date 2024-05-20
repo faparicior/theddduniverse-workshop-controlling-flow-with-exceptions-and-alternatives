@@ -18,7 +18,7 @@ final readonly class Result
         $this->error = $error;
     }
 
-    public static function success(object $data): Result
+    public static function success(?object $data = null): Result
     {
         return new self(true, $data);
     }
@@ -33,11 +33,16 @@ final readonly class Result
         return $this->isSuccess;
     }
 
+    public function isError(): bool
+    {
+        return !$this->isSuccess;
+    }
+
     /**
      * @throws RuntimeException
      * @return object
      */
-    public function getData(): object
+    public function unwrap(): object
     {
         if (!$this->isSuccess) {
             throw new RuntimeException('Result is not successful, data is unavailable.');

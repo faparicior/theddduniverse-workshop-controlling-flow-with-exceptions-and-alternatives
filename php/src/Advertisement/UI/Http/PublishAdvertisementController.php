@@ -28,11 +28,12 @@ final class PublishAdvertisementController extends CommonController
                 ($request->content())['password'],
             );
 
-            $this->useCase->execute($command);
-
-            return $this->processSuccessfulCreateCommand();
-        } catch (DomainException|ApplicationException $exception) {
-            return $this->processDomainOrApplicationExceptionResponse($exception);
+            $result = $this->useCase->execute($command);
+            if($result->isSuccess()) {
+                return $this->processSuccessfulCreateCommand();
+            } else {
+                return $this->processFailedCommand($result);
+            }
         } catch (Exception $exception) {
             return $this->processGenericException($exception);
         }

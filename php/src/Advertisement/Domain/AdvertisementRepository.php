@@ -5,10 +5,11 @@ namespace Demo\App\Advertisement\Domain;
 
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
+use Demo\App\Common\Result;
 
 interface AdvertisementRepository
 {
-    public function save(Advertisement $advertisement): void;
+    public function save(Advertisement $advertisement): Result;
 
-    public function findById(AdvertisementId $id): ?Advertisement;
+    public function findById(AdvertisementId $id): Result;
 }

@@ -18,20 +18,27 @@ class PasswordTest extends TestCase
         $class = new ReflectionClass(Password::class);
         $constructor = $class->getConstructor();
 
-        $this->assertTrue($constructor->isPrivate(), 'Constructor is not private');
+        self::assertTrue($constructor->isPrivate(), 'Constructor is not private');
     }
 
     public function testShouldBeCreatedWithAStrongHash(): void
     {
-        $password = Password::fromPlainPassword('plain-password');
+        $result = Password::fromPlainPassword('plain-password');
+        $password = $result->unwrap();
 
+        self::assertInstanceOf(Password::class, $password);
         self::assertStringStartsWith('$argon2i$', $password->value());
     }
 
     public function testShouldBeCreatedWithEncryptedValueWithoutChangeTheOriginalHash(): void
     {
-        $strongPassword = Password::fromEncryptedPassword(self::STRONG_ALGORITHM_PASSWORD);
-        $weakPassword = Password::fromEncryptedPassword(self::MD5_ALGORITHM_PASSWORD);
+        $result = Password::fromEncryptedPassword(self::STRONG_ALGORITHM_PASSWORD);
+        $strongPassword = $result->unwrap();
+        self::assertInstanceOf(Password::class, $strongPassword);
+
+        $result = Password::fromEncryptedPassword(self::MD5_ALGORITHM_PASSWORD);
+        $weakPassword = $result->unwrap();
+        self::assertInstanceOf(Password::class, $weakPassword);
 
         self::assertEquals(self::STRONG_ALGORITHM_PASSWORD, $strongPassword->value());
         self::assertEquals(self::MD5_ALGORITHM_PASSWORD, $weakPassword->value());
@@ -39,14 +46,16 @@ class PasswordTest extends TestCase
 
     public function testShouldValidatePasswordsWithAStrongAlgorithm(): void
     {
-        $password = Password::fromEncryptedPassword(self::STRONG_ALGORITHM_PASSWORD);
+        $result = Password::fromEncryptedPassword(self::STRONG_ALGORITHM_PASSWORD);
+        $password = $result->unwrap();
 
         self::assertTrue($password->isValidatedWith(self::PLAIN_PASSWORD));
     }
 
     public function testShouldValidatePasswordsWithAWeakAlgorithm(): void
     {
-        $password = Password::fromEncryptedPassword(self::MD5_ALGORITHM_PASSWORD);
+        $result = Password::fromEncryptedPassword(self::MD5_ALGORITHM_PASSWORD);
+        $password = $result->unwrap();
 
         self::assertTrue($password->isValidatedWith(self::PLAIN_PASSWORD));
     }

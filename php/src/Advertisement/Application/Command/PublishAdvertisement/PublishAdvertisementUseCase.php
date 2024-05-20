@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\PublishAdvertisement;
 
-use Demo\App\Advertisement\Application\Errors\ErrorDictionary;
-use Demo\App\Advertisement\Application\Exceptions\AdvertisementAlreadyExistsException;
+use Demo\App\Advertisement\Application\Errors\PublishAdvertisementErrors;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementDate;
@@ -27,29 +26,68 @@ final class PublishAdvertisementUseCase
     public function execute(PublishAdvertisementCommand $command): Result
     {
         $result = AdvertisementId::build($command->id);
-        if (!$result->isSuccess()) {
+        if ($result->isError()) {
             return $result;
         }
-
-        $result = AdvertisementId::build($command->id);
-        if (!$result->isSuccess()) {
-            return $result;
-        }
-
         /** @var AdvertisementId $advertisementId */
-        $advertisementId = $result->getData();
-        if ($this->advertisementRepository->findById($advertisementId)) {
-            return Result::failure(ErrorDictionary::ADVERTISEMENT_WITH_ID_S_ALREADY_EXISTS_MESSAGE->value);
+        $advertisementId = $result->unwrap();
+
+        $result = Description::build($command->description);
+        if ($result->isError()) {
+            return $result;
+        }
+        /** @var Description $description */
+        $description = $result->unwrap();
+
+        $result = Email::build($command->email);
+        if ($result->isError()) {
+            return $result;
+        }
+        /** @var Email $email */
+        $email = $result->unwrap();
+
+        $result = Password::fromPlainPassword($command->password);
+        if ($result->isError()) {
+            return $result;
+        }
+        /** @var Password $password */
+        $password = $result->unwrap();
+
+        $result = $this->advertisementRepository->findById($advertisementId);
+
+        if($result->isSuccess()) {
+            return Result::failure(sprintf(PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(), $advertisementId->value()));
         }
 
-        $advertisement = new Advertisement(
+        $result = AdvertisementDate::build(new \DateTime());
+        if ($result->isError()) {
+            return $result;
+        }
+
+        /** @var AdvertisementDate $date */
+        $date = $result->unwrap();
+
+        $result = Advertisement::build(
             $advertisementId,
-            new Description($command->description),
-            new Email($command->email),
-            Password::fromPlainPassword($command->password),
-            new AdvertisementDate(new \DateTime()),
+            $description,
+            $email,
+            $password,
+            $date,
         );
 
-//        $this->advertisementRepository->save($advertisement);
+        if ($result->isError()) {
+            return $result;
+        }
+
+        /** @var Advertisement $advertisement */
+        $advertisement = $result->unwrap();
+
+        $result = $this->advertisementRepository->save($advertisement);
+
+        if ($result->isError()) {
+            return $result;
+        }
+
+        return Result::success();
     }
 }

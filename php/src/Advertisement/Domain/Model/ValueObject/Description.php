@@ -8,7 +8,7 @@ use Demo\App\Common\Result;
 
 final class Description
 {
-    public function __construct(private string $value) {}
+    private function __construct(private string $value) {}
 
     public static function build(string $value): Result
     {
@@ -17,7 +17,7 @@ final class Description
         }
 
         if (!self::validateMaxLength($value)) {
-            return Result::failure(sprintf(DescriptionErrors::DESCRIPTION_MAX_LENGTH_INVALID->getMessage(), $value));
+            return Result::failure(sprintf(DescriptionErrors::DESCRIPTION_MAX_LENGTH_INVALID->getMessage(), mb_strlen($value)));
         }
 
         return Result::success(new self($value));

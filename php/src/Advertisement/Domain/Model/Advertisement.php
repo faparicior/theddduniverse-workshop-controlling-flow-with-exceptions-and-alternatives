@@ -8,30 +8,47 @@ use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
+use Demo\App\Common\Result;
 
 final class Advertisement
 {
-    public function __construct(
+    private function __construct(
         private readonly AdvertisementId $id,
         private Description $description,
         private Email $email,
         private Password $password,
         private AdvertisementDate $date
-    ){
+    ) {}
+
+    public static function build(AdvertisementId $id, Description $description, Email $email, Password $password, AdvertisementDate $date): Result
+    {
+        return Result::success(new self($id, $description, $email, $password, $date));
     }
 
-    public function renew(Password $password): void
+    public function renew(Password $password): Result
     {
         $this->password = $password;
-        $this->updateDate();
+        $result = $this->updateDate();
+
+        if ($result->isError()) {
+            return $result;
+        }
+
+        return Result::success();
     }
 
-    public function update(Description $description, Email $email, Password $password): void
+    public function update(Description $description, Email $email, Password $password): Result
     {
         $this->description = $description;
         $this->email = $email;
         $this->password = $password;
-        $this->updateDate();
+        $result = $this->updateDate();
+
+        if ($result->isError()) {
+            return $result;
+        }
+
+        return Result::success();
     }
 
     public function id(): AdvertisementId
@@ -59,8 +76,17 @@ final class Advertisement
         return $this->date;
     }
 
-    private function updateDate(): void
+    private function updateDate(): Result
     {
-        $this->date = new AdvertisementDate(new \DateTime());
+        $result = AdvertisementDate::build(new \DateTime());
+        if ($result->isError()) {
+            return $result;
+        }
+
+        /** @var AdvertisementDate $date */
+        $date = $result->unwrap();
+        $this->date = $date;
+
+        return Result::success();
     }
 }
