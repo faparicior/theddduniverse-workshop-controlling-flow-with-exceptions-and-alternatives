@@ -20,12 +20,12 @@ final readonly class Result
         $this->errorCode = $errorCode;
     }
 
-    public static function success(?object $data = null): Result
+    public static function success(?object $data = null): self
     {
         return new self(true, $data);
     }
 
-    public static function failure(string $error, string $errorCode = null): Result
+    public static function failure(string $error, string $errorCode = null): self
     {
         return new self(false, null, $error, $errorCode);
     }

@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 
-use Demo\App\Advertisement\Application\Errors\RenewAdvertisementErrors;
+use Demo\App\Advertisement\Application\Errors\AdvertisementNotFoundError;
+use Demo\App\Advertisement\Application\Errors\PasswordDoesNotMatchError;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
+use Demo\App\Advertisement\Infrastructure\Errors\ZeroRecordsError;
 use Demo\App\Common\Result;
 use Exception;
 
@@ -31,6 +33,9 @@ final class RenewAdvertisementUseCase
 
         $advertisementResult = $this->advertisementRepository->findById($advertisementId);
         if ($advertisementResult->isError()) {
+            if ($advertisementResult instanceof ZeroRecordsError) {
+                return AdvertisementNotFoundError::build($advertisementId->value());
+            }
             return $advertisementResult;
         }
         /** @var Advertisement $advertisement */
@@ -68,7 +73,7 @@ final class RenewAdvertisementUseCase
     private function validatePasswordMatch(string $password, Advertisement $advertisement): Result
     {
         if (!$advertisement->password()->isValidatedWith($password)) {
-            return Result::failure(RenewAdvertisementErrors::PASSWORD_DOES_NOT_MATCH->getMessage());
+            return PasswordDoesNotMatchError::build();
         }
         return Result::success();
     }

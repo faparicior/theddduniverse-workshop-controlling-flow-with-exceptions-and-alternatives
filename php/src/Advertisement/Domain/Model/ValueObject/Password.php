@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-
-use Demo\App\Advertisement\Domain\Errors\PasswordErrors;
+use Demo\App\Advertisement\Domain\Errors\ProblemHashingPasswordError;
 use Demo\App\Common\Result;
 use Exception;
 use SensitiveParameter;
@@ -29,7 +28,7 @@ final readonly class Password
     {
         $hash = password_hash($password, PASSWORD_ARGON2I);
         if(null === $hash || false === $hash) {
-            return Result::failure(PasswordErrors::PROBLEM_HASHING_PASSWORD->getMessage());
+            return ProblemHashingPasswordError::build();
         }
         return Result::success(new self($hash));
     }

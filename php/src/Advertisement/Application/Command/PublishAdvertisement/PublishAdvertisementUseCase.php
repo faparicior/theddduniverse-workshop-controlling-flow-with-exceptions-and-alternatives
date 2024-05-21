@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\PublishAdvertisement;
 
-use Demo\App\Advertisement\Application\Errors\PublishAdvertisementErrors;
+use Demo\App\Advertisement\Application\Errors\AdvertisementAlreadyExistsError;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
@@ -26,12 +26,7 @@ final class PublishAdvertisementUseCase
 
         $findAdvertisementResult = $this->advertisementRepository->findById($advertisement->id());
         if ($findAdvertisementResult->isSuccess()) {
-            return Result::failure(
-                sprintf(
-                    PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(),
-                    $advertisement->id()->value()
-                )
-            );
+            return AdvertisementAlreadyExistsError::build($advertisement->id()->value());
         }
 
         $this->advertisementRepository->save($advertisement);

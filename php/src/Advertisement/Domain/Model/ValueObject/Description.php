@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use Demo\App\Advertisement\Domain\Errors\DescriptionErrors;
+use Demo\App\Advertisement\Domain\Errors\DescriptionEmptyError;
+use Demo\App\Advertisement\Domain\Errors\DescriptionTooLongError;
 use Demo\App\Common\Result;
 
 final class Description
@@ -13,11 +14,11 @@ final class Description
     public static function build(string $value): Result
     {
         if (!self::validateMinLength($value)) {
-            return Result::failure(DescriptionErrors::DESCRIPTION_MIN_LENGTH_INVALID->getMessage());
+            return DescriptionEmptyError::build();
         }
 
         if (!self::validateMaxLength($value)) {
-            return Result::failure(sprintf(DescriptionErrors::DESCRIPTION_MAX_LENGTH_INVALID->getMessage(), mb_strlen($value)));
+            return DescriptionTooLongError::build($value);
         }
 
         return Result::success(new self($value));

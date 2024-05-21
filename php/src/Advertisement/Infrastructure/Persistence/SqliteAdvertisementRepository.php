@@ -7,7 +7,7 @@ use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
-use Demo\App\Advertisement\Infrastructure\Errors\AdvertisementRepositoryErrors;
+use Demo\App\Advertisement\Infrastructure\Errors\ZeroRecordsError;
 use Demo\App\Common\Result;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
@@ -38,8 +38,7 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
     {
         $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id->value()));
         if(!$result) {
-            $error = AdvertisementRepositoryErrors::ADVERTISEMENT_NOT_FOUND;
-            return Result::failure($error->getMessage() . $id->value(), $error->getCode());
+            return ZeroRecordsError::build($id->value());
         }
 
         $row = $result[0];
