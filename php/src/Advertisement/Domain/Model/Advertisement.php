@@ -20,9 +20,45 @@ final class Advertisement
         private AdvertisementDate $date
     ) {}
 
-    public static function build(AdvertisementId $id, Description $description, Email $email, Password $password, AdvertisementDate $date): Result
+    public static function build(string $id, string $description, string $email, string $password, \DateTime $date): Result
     {
-        return Result::success(new self($id, $description, $email, $password, $date));
+        $advertisementIdResult = AdvertisementId::build($id);
+        if ($advertisementIdResult->isError()) {
+            return $advertisementIdResult;
+        }
+        /** @var AdvertisementId $advertisementId */
+        $advertisementId = $advertisementIdResult->unwrap();
+
+        $descriptionResult = Description::build($description);
+        if ($descriptionResult->isError()) {
+            return $descriptionResult;
+        }
+        /** @var Description $description */
+        $description = $descriptionResult->unwrap();
+
+        $emailResult = Email::build($email);
+        if ($emailResult->isError()) {
+            return $emailResult;
+        }
+        /** @var Email $email */
+        $email = $emailResult->unwrap();
+
+        $passwordResult = Password::fromPlainPassword($password);
+        if ($passwordResult->isError()) {
+            return $passwordResult;
+        }
+        /** @var Password $password */
+        $password = $passwordResult->unwrap();
+
+        $advertisementDateResult = AdvertisementDate::build($date);
+        if ($advertisementDateResult->isError()) {
+            return $advertisementDateResult;
+        }
+
+        /** @var AdvertisementDate $date */
+        $date = $advertisementDateResult->unwrap();
+
+        return Result::success(new self($advertisementId, $description, $email, $password, $date));
     }
 
     public function renew(Password $password): Result

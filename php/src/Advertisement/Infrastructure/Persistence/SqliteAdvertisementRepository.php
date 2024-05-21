@@ -5,11 +5,7 @@ namespace Demo\App\Advertisement\Infrastructure\Persistence;
 
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
-use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementDate;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
-use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
-use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
-use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Common\Result;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
@@ -52,48 +48,12 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
 
         $row = $result[0];
 
-        $result = AdvertisementId::build($row['id']);
-        if ($result->isError()) {
-            return $result;
-        }
-        /** @var AdvertisementId $advertisementId */
-        $advertisementId = $result->unwrap();
-
-        $result = Description::build($row['description']);
-        if ($result->isError()) {
-            return $result;
-        }
-        /** @var Description $description */
-        $description = $result->unwrap();
-
-        $result = Email::build($row['email']);
-        if ($result->isError()) {
-            return $result;
-        }
-        /** @var Email $email */
-        $email = $result->unwrap();
-
-        $result = Password::fromEncryptedPassword($row['password']);
-        if ($result->isError()) {
-            return $result;
-        }
-        /** @var Password $password */
-        $password = $result->unwrap();
-
-        $result = AdvertisementDate::build(new \DateTime($row['advertisement_date']));
-        if ($result->isError()) {
-            return $result;
-        }
-
-        /** @var AdvertisementDate $date */
-        $date = $result->unwrap();
-
         return Advertisement::build(
-            $advertisementId,
-            $description,
-            $email,
-            $password,
-            $date,
+            $row['id'],
+            $row['description'],
+            $row['email'],
+            $row['password'],
+            new \DateTime($row['advertisement_date']),
         );
     }
 }
