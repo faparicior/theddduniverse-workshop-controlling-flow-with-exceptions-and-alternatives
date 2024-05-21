@@ -29,11 +29,12 @@ abstract class CommonController
 
     protected function processFailedCommand(Result $result): FrameworkResponse
     {
+        $statusCode = $result->getErrorCode() === 'NOT_FOUND' ? FrameworkResponse::STATUS_NOT_FOUND : FrameworkResponse::STATUS_BAD_REQUEST;
         return new FrameworkResponse(
-            FrameworkResponse::STATUS_BAD_REQUEST,
+            $statusCode,
             [
                 'errors' => $result->getError(),
-                'code' => FrameworkResponse::STATUS_BAD_REQUEST,
+                'code' => $statusCode,
                 'message' => $result->getError(),
             ]
         );

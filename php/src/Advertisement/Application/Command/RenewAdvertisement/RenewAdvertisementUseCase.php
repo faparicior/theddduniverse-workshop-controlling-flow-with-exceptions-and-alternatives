@@ -56,7 +56,8 @@ final class RenewAdvertisementUseCase
         /** @var Advertisement $advertisement */
         $advertisement = $renewResult->unwrap();
 
-        return $this->advertisementRepository->save($advertisement);
+        $this->advertisementRepository->save($advertisement);
+        return Result::success();
     }
 
     private function validateAdvertisementId(RenewAdvertisementCommand $command): Result

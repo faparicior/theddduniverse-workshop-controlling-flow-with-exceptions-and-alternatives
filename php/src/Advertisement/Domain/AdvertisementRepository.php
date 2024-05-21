@@ -9,7 +9,7 @@ use Demo\App\Common\Result;
 
 interface AdvertisementRepository
 {
-    public function save(Advertisement $advertisement): Result;
+    public function save(Advertisement $advertisement): void;
 
     public function findById(AdvertisementId $id): Result;
 }

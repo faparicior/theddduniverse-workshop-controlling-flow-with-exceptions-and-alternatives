@@ -77,7 +77,7 @@ final class Advertisement
             return $result;
         }
 
-        return Result::success();
+        return Result::success($this);
     }
 
     public function id(): AdvertisementId

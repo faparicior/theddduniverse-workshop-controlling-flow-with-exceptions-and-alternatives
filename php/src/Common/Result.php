@@ -10,12 +10,14 @@ final readonly class Result
     private bool $isSuccess;
     private ?object $data;
     private ?string $error;
+    private ?string $errorCode;
 
-    private function __construct(bool $isSuccess, ?object $data = null, ?string $error = null)
+    private function __construct(bool $isSuccess, ?object $data = null, ?string $error = null, ?string $errorCode = null)
     {
         $this->isSuccess = $isSuccess;
         $this->data = $data;
         $this->error = $error;
+        $this->errorCode = $errorCode;
     }
 
     public static function success(?object $data = null): Result
@@ -23,9 +25,9 @@ final readonly class Result
         return new self(true, $data);
     }
 
-    public static function failure(string $error): Result
+    public static function failure(string $error, string $errorCode = null): Result
     {
-        return new self(false, null, $error);
+        return new self(false, null, $error, $errorCode);
     }
 
     public function isSuccess(): bool
@@ -58,5 +60,10 @@ final readonly class Result
         }
 
         return $this->error;
+    }
+
+    public function getErrorCode(): ?string
+    {
+        return $this->errorCode;
     }
 }

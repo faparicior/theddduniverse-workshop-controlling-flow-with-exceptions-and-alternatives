@@ -34,11 +34,7 @@ final class PublishAdvertisementUseCase
             );
         }
 
-        $saveResult = $this->advertisementRepository->save($advertisement);
-
-        if ($saveResult->isError()) {
-            return $saveResult;
-        }
+        $this->advertisementRepository->save($advertisement);
 
         return Result::success();
     }

@@ -7,6 +7,7 @@ use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
+use Demo\App\Advertisement\Infrastructure\Errors\AdvertisementRepositoryErrors;
 use Demo\App\Common\Result;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
@@ -19,32 +20,26 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
         $this->dbConnection = $connection;
     }
 
-    public function save(Advertisement $advertisement): Result
+    public function save(Advertisement $advertisement): void
     {
-        try {
-            $this->dbConnection->execute(sprintf('
+        $this->dbConnection->execute(sprintf('
             INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES (\'%1$s\', \'%2$s\', \'%3$s\', \'%4$s\', \'%5$s\') 
             ON CONFLICT(id) DO UPDATE SET description = \'%2$s\', email = \'%3$s\', password = \'%4$s\', advertisement_date = \'%5$s\';',
-                    $advertisement->id()->value(),
-                    $advertisement->description()->value(),
-                    $advertisement->email()->value(),
-                    $advertisement->password()->value(),
-                    $advertisement->date()->value()->format('Y-m-d H:i:s')
-                )
-            );
-        } catch (\Throwable $exception)
-        {
-            return Result::failure($exception->getMessage());
-        }
-
-        return Result::success();
+                $advertisement->id()->value(),
+                $advertisement->description()->value(),
+                $advertisement->email()->value(),
+                $advertisement->password()->value(),
+                $advertisement->date()->value()->format('Y-m-d H:i:s')
+            )
+        );
     }
 
     public function findById(AdvertisementId $id): Result
     {
         $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id->value()));
         if(!$result) {
-            return Result::failure('Advertisement not found');
+            $error = AdvertisementRepositoryErrors::ADVERTISEMENT_NOT_FOUND;
+            return Result::failure($error->getMessage() . $id->value(), $error->getCode());
         }
 
         $row = $result[0];
