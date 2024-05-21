@@ -21,17 +21,41 @@ final class PublishAdvertisementUseCase
 
     public function execute(PublishAdvertisementCommand $command): Result
     {
+        $advertisementResult = $this->validateAdvertisement($command);
+        if ($advertisementResult->isError()) {
+            return $advertisementResult;
+        }
+
+        /** @var Advertisement $advertisement */
+        $advertisement = $advertisementResult->unwrap();
+
+        $findAdvertisementResult = $this->advertisementRepository->findById($advertisement->id());
+        if ($findAdvertisementResult->isSuccess()) {
+            return Result::failure(
+                sprintf(
+                    PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(),
+                    $advertisement->id()->value()
+                )
+            );
+        }
+
+        $saveResult = $this->advertisementRepository->save($advertisement);
+
+        if ($saveResult->isError()) {
+            return $saveResult;
+        }
+
+        return Result::success();
+    }
+
+    private function validateAdvertisement(PublishAdvertisementCommand $command): Result
+    {
         $advertisementIdResult = AdvertisementId::build($command->id);
         if ($advertisementIdResult->isError()) {
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
         $advertisementId = $advertisementIdResult->unwrap();
-
-        $findAdvertisementResult = $this->advertisementRepository->findById($advertisementId);
-        if ($findAdvertisementResult->isSuccess()) {
-            return Result::failure(sprintf(PublishAdvertisementErrors::ADVERTISEMENT_ALREADY_EXISTS->getMessage(), $advertisementId->value()));
-        }
 
         $descriptionResult = Description::build($command->description);
         if ($descriptionResult->isError()) {
@@ -62,27 +86,12 @@ final class PublishAdvertisementUseCase
         /** @var AdvertisementDate $date */
         $date = $advertisementDateResult->unwrap();
 
-        $advertisementResult = Advertisement::build(
+        return Advertisement::build(
             $advertisementId,
             $description,
             $email,
             $password,
             $date,
         );
-
-        if ($advertisementResult->isError()) {
-            return $advertisementResult;
-        }
-
-        /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->unwrap();
-
-        $saveResult = $this->advertisementRepository->save($advertisement);
-
-        if ($saveResult->isError()) {
-            return $saveResult;
-        }
-
-        return Result::success();
     }
 }
