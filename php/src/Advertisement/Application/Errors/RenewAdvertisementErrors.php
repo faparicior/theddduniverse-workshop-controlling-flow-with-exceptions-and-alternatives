@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Errors;
 
-enum RenewAdvertisementErrors
+use Demo\App\Common\ErrorsDictionary;
+
+enum RenewAdvertisementErrors implements ErrorsDictionary
 {
     case PASSWORD_DOES_NOT_MATCH;
 
@@ -12,5 +14,10 @@ enum RenewAdvertisementErrors
         return match ($this) {
             self::PASSWORD_DOES_NOT_MATCH => 'Invalid password',
         };
+    }
+
+    public function getCode(): string
+    {
+        return '';
     }
 }

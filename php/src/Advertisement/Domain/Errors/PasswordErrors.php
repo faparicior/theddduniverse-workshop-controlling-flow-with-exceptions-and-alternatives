@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Errors;
 
-enum PasswordErrors
+use Demo\App\Common\ErrorsDictionary;
+
+enum PasswordErrors implements ErrorsDictionary
 {
     case PROBLEM_HASHING_PASSWORD;
 
@@ -12,5 +14,10 @@ enum PasswordErrors
         return match ($this) {
             self::PROBLEM_HASHING_PASSWORD => 'Problem hashing password',
         };
+    }
+
+    public function getCode(): string
+    {
+        return '';
     }
 }

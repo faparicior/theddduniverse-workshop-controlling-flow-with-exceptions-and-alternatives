@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Infrastructure\Errors;
 
-enum AdvertisementRepositoryErrors
+use Demo\App\Common\ErrorsDictionary;
+
+enum AdvertisementRepositoryErrors implements ErrorsDictionary
 {
     case ADVERTISEMENT_NOT_FOUND;
 

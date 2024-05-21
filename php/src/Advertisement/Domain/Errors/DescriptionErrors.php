@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Errors;
 
-enum DescriptionErrors
+use Demo\App\Common\ErrorsDictionary;
+
+enum DescriptionErrors implements ErrorsDictionary
 {
     case DESCRIPTION_MIN_LENGTH_INVALID;
     case DESCRIPTION_MAX_LENGTH_INVALID;
@@ -15,4 +17,8 @@ enum DescriptionErrors
             self::DESCRIPTION_MAX_LENGTH_INVALID => 'Description has more than 200 characters: Has %s characters',
         };
     }
-}
+
+    public function getCode(): string
+    {
+        return '';
+    }}

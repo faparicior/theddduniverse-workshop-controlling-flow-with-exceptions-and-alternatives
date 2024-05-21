@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Errors;
 
-enum AdvertisementIdErrors
+use Demo\App\Common\ErrorsDictionary;
+
+enum AdvertisementIdErrors implements ErrorsDictionary
 {
     case ADVERTISEMENT_ID_INVALID;
 
@@ -14,4 +16,8 @@ enum AdvertisementIdErrors
         };
     }
 
+    public function getCode(): string
+    {
+        return '';
+    }
 }
