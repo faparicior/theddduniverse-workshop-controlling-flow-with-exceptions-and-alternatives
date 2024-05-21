@@ -6,6 +6,7 @@ namespace Demo\App\Advertisement\Application\Command\PublishAdvertisement;
 use Demo\App\Advertisement\Application\Errors\PublishAdvertisementErrors;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
+use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Common\Result;
 
 final class PublishAdvertisementUseCase
@@ -44,11 +45,18 @@ final class PublishAdvertisementUseCase
 
     private function validateAdvertisement(PublishAdvertisementCommand $command): Result
     {
+        $passwordResult = Password::fromPlainPassword($command->password);
+        if ($passwordResult->isError()) {
+            return $passwordResult;
+        }
+        /** @var Password $password */
+        $password = $passwordResult->unwrap();
+
         return Advertisement::build(
             $command->id,
             $command->description,
             $command->email,
-            $command->password,
+            $password,
             new \DateTime(),
         );
     }

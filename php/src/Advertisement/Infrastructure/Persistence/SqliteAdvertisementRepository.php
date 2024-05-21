@@ -6,6 +6,7 @@ namespace Demo\App\Advertisement\Infrastructure\Persistence;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
+use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Common\Result;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
@@ -48,11 +49,18 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
 
         $row = $result[0];
 
+        $passwordResult = Password::fromEncryptedPassword($row['password']);
+        if ($passwordResult->isError()) {
+            return $passwordResult;
+        }
+        /** @var Password $password */
+        $password = $passwordResult->unwrap();
+
         return Advertisement::build(
             $row['id'],
             $row['description'],
             $row['email'],
-            $row['password'],
+            $password,
             new \DateTime($row['advertisement_date']),
         );
     }

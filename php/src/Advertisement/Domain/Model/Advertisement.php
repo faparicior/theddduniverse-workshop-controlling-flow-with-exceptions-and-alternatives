@@ -20,7 +20,7 @@ final class Advertisement
         private AdvertisementDate $date
     ) {}
 
-    public static function build(string $id, string $description, string $email, string $password, \DateTime $date): Result
+    public static function build(string $id, string $description, string $email, Password $password, \DateTime $date): Result
     {
         $advertisementIdResult = AdvertisementId::build($id);
         if ($advertisementIdResult->isError()) {
@@ -43,13 +43,6 @@ final class Advertisement
         /** @var Email $email */
         $email = $emailResult->unwrap();
 
-        $passwordResult = Password::fromPlainPassword($password);
-        if ($passwordResult->isError()) {
-            return $passwordResult;
-        }
-        /** @var Password $password */
-        $password = $passwordResult->unwrap();
-
         $advertisementDateResult = AdvertisementDate::build($date);
         if ($advertisementDateResult->isError()) {
             return $advertisementDateResult;
@@ -70,7 +63,7 @@ final class Advertisement
             return $result;
         }
 
-        return Result::success();
+        return Result::success($this);
     }
 
     public function update(Description $description, Email $email, Password $password): Result

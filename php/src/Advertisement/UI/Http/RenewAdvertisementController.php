@@ -26,11 +26,12 @@ final class RenewAdvertisementController extends CommonController
                 ($request->content())['password'],
             );
 
-            $this->useCase->execute($command);
-
-            return $this->processSuccessfulCommand();
-        } catch (DomainException|ApplicationException $exception) {
-            return $this->processDomainOrApplicationExceptionResponse($exception);
+            $result = $this->useCase->execute($command);
+            if ($result->isSuccess()) {
+                return $this->processSuccessfulCommand();
+            } else {
+                return $this->processFailedCommand($result);
+            }
         } catch (Exception $exception) {
             return $this->processGenericException($exception);
         }
