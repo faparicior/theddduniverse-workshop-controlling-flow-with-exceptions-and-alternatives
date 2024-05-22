@@ -1,6 +1,6 @@
 package advertisement.domain.model.value_object
 
-class Email(private var value: String) {
+class AdvertisementId(private var value: String) {
 
     init {
         this.validate(value)
@@ -11,10 +11,10 @@ class Email(private var value: String) {
     }
 
     private fun validate(value: String) {
-        val regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"
+        val regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 
         if (!value.matches(regex.toRegex())) {
-            throw IllegalArgumentException("Invalid email")
+            throw IllegalArgumentException("Invalid unique identifier format for " + value)
         }
     }
 }
