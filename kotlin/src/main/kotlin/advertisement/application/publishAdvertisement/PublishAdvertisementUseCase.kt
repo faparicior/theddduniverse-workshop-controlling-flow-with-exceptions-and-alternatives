@@ -10,8 +10,14 @@ import java.time.LocalDateTime
 
 class PublishAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(publishAdvertisementCommand: PublishAdvertisementCommand) {
+        val advertisementId = AdvertisementId(publishAdvertisementCommand.id)
+
+        if (null !== advertisementRepository.findById(advertisementId)) {
+            throw IllegalArgumentException("Advertisement with id %s already exists".format(advertisementId.value()))
+        }
+
         val advertisement = Advertisement(
-            AdvertisementId(publishAdvertisementCommand.id),
+            advertisementId,
             Description(publishAdvertisementCommand.description),
             Password.fromPlainPassword(publishAdvertisementCommand.password),
             AdvertisementDate(LocalDateTime.now())

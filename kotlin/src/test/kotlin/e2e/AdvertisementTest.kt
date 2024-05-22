@@ -18,6 +18,7 @@ class AdvertisementTest {
         private const val DESCRIPTION = "Dream advertisement"
         private const val NEW_DESCRIPTION = "Dream advertisement changed"
         private const val ID = "6fa00b21-2930-483e-b610-d6b0e5b19b29"
+        private const val NON_EXISTENT_ADVERTISEMENT_ID = "99999999-2930-483e-b610-d6b0e5b19b29"
         private const val PASSWORD = "myPassword"
         private const val INCORRECT_PASSWORD = "myBadPassword"
 
@@ -36,7 +37,6 @@ class AdvertisementTest {
 
     @Test
     fun `should publish an advertisement`() {
-
         val server = Server(DependencyInjectionResolver())
 
         val result = server.route(FrameworkRequest(
@@ -51,7 +51,7 @@ class AdvertisementTest {
         )
 
         Assertions.assertEquals(FrameworkResponse.STATUS_CREATED, result.statusCode)
-        Assertions.assertEquals(this.successCommandResponse(HTTP_CREATED), result.content)
+        Assertions.assertEquals(successCommandResponse(HTTP_CREATED), result.content)
 
         val resultSet = this.connection.query("SELECT * from advertisements;")
         var description = ""
@@ -65,7 +65,29 @@ class AdvertisementTest {
 
     @Test
     fun `should fail publishing an advertisement with same id`() {
+        withAnAdvertisementCreated {
+            val server = Server(DependencyInjectionResolver())
 
+            val result = server.route(FrameworkRequest(
+                FrameworkRequest.METHOD_POST,
+                "advertisement",
+                mapOf(
+                    "id" to ID,
+                    "description" to DESCRIPTION,
+                    "password" to PASSWORD,
+                )
+            )
+            )
+
+            Assertions.assertEquals(FrameworkResponse.STATUS_BAD_REQUEST, result.statusCode)
+            Assertions.assertEquals(
+                errorCommandResponse(
+                    FrameworkResponse.STATUS_BAD_REQUEST.toString(),
+                    "Advertisement with id %s already exists".format(ID)
+                ),
+                result.content
+            )
+        }
     }
 
     @Test
@@ -197,12 +219,37 @@ class AdvertisementTest {
 
     @Test
     fun `should fail renewing non existent advertisement`() {
+        val server = Server(DependencyInjectionResolver())
 
+        val result = server.route(FrameworkRequest(
+            FrameworkRequest.METHOD_PATCH,
+            "advertisement/$NON_EXISTENT_ADVERTISEMENT_ID",
+            mapOf(
+                "password" to PASSWORD,
+            )
+        )
+        )
+
+        Assertions.assertEquals(FrameworkResponse.STATUS_NOT_FOUND, result.statusCode)
+        Assertions.assertEquals(notfoundCommandResponse("Advertisement not found with Id $NON_EXISTENT_ADVERTISEMENT_ID"), result.content)
     }
 
     @Test
     fun `should fail updating non existent advertisement`() {
+        val server = Server(DependencyInjectionResolver())
 
+        val result = server.route(FrameworkRequest(
+            FrameworkRequest.METHOD_PUT,
+            "advertisement/$NON_EXISTENT_ADVERTISEMENT_ID",
+            mapOf(
+                "description" to DESCRIPTION,
+                "password" to PASSWORD,
+            )
+        )
+        )
+
+        Assertions.assertEquals(FrameworkResponse.STATUS_NOT_FOUND, result.statusCode)
+        Assertions.assertEquals(notfoundCommandResponse("Advertisement not found with Id $NON_EXISTENT_ADVERTISEMENT_ID"), result.content)
     }
 
     private fun successCommandResponse(code: String = "200"): Map<String, String> {
@@ -210,6 +257,22 @@ class AdvertisementTest {
             "errors" to "",
             "code" to code,
             "message" to ""
+        )
+    }
+
+    private fun errorCommandResponse(code: String = "400", message: String): Map<String, String> {
+        return mapOf(
+            "errors" to message,
+            "code" to code,
+            "message" to message
+        )
+    }
+
+    private fun notfoundCommandResponse(message: String): Map<String, String> {
+        return mapOf(
+            "errors" to message,
+            "code" to "404",
+            "message" to message
         )
     }
 

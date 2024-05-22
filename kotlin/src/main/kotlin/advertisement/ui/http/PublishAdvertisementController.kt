@@ -9,14 +9,18 @@ import framework.FrameworkResponse
 class PublishAdvertisementController(private val useCase: PublishAdvertisementUseCase): CommonController(){
 
     fun execute(request: FrameworkRequest): FrameworkResponse {
-        useCase.execute(
-            PublishAdvertisementCommand(
-                request.content["id"]!!,
-                request.content["description"]!!,
-                request.content["password"]!!,
+        try {
+            useCase.execute(
+                PublishAdvertisementCommand(
+                    request.content["id"]!!,
+                    request.content["description"]!!,
+                    request.content["password"]!!,
+                )
             )
-        )
 
-        return processSuccessfulCreateCommand()
+            return processSuccessfulCreateCommand()
+        } catch (e: Exception) {
+            return processGenericException(e)
+        }
     }
 }

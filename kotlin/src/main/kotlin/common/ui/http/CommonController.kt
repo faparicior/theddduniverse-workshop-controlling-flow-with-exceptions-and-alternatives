@@ -37,4 +37,17 @@ abstract class CommonController {
             ),
         )
     }
+
+    protected fun processNotFoundCommand(exception: Exception): FrameworkResponse {
+        val message = exception.message.toString()
+
+        return FrameworkResponse(
+            FrameworkResponse.STATUS_NOT_FOUND,
+            mapOf(
+                "errors" to message,
+                "code" to FrameworkResponse.STATUS_NOT_FOUND.toString(),
+                "message" to message,
+            ),
+        )
+    }
 }

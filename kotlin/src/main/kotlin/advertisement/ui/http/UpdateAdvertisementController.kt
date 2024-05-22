@@ -5,6 +5,7 @@ import advertisement.application.updateAdvertisement.UpdateAdvertisementUseCase
 import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
+import java.util.NoSuchElementException
 
 class UpdateAdvertisementController(private val useCase: UpdateAdvertisementUseCase): CommonController(){
 
@@ -19,6 +20,8 @@ class UpdateAdvertisementController(private val useCase: UpdateAdvertisementUseC
             )
 
             return processSuccessfulCommand()
+        } catch (e: NoSuchElementException) {
+            return processNotFoundCommand(e)
         } catch (e: Exception) {
             return processGenericException(e)
         }

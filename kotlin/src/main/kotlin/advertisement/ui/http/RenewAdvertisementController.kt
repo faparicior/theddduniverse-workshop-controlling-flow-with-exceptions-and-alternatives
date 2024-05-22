@@ -5,6 +5,7 @@ import advertisement.application.renewAdvertisement.RenewAdvertisementUseCase
 import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
+import java.util.NoSuchElementException
 
 class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCase): CommonController() {
 
@@ -18,6 +19,8 @@ class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCas
             )
 
             return processSuccessfulCommand()
+        } catch (e: NoSuchElementException) {
+            return processNotFoundCommand(e)
         } catch (e: Exception) {
             return processGenericException(e)
         }

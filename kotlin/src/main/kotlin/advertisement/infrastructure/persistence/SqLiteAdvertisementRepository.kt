@@ -19,13 +19,13 @@ class SqLiteAdvertisementRepository(private val connection: DatabaseConnection):
         )
     }
 
-    override fun findById(id: String): Advertisement {
+    override fun findById(id: AdvertisementId): Advertisement? {
         val result = connection.query(
-            "SELECT * FROM advertisements WHERE id = '${id}'"
+            "SELECT * FROM advertisements WHERE id = '${id.value()}'"
         )
 
         if (!result.next()) {
-            throw Exception("Advertisement not found")
+            return null
         }
 
         return Advertisement(
