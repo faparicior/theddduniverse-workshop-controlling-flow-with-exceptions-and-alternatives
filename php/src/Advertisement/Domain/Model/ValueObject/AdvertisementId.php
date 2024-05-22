@@ -8,7 +8,7 @@ final readonly class AdvertisementId
     public function __construct(private string $value)
     {
         if (!$this->validate($value)) {
-            throw new \InvalidArgumentException('Invalid unique identifier');
+            throw new \InvalidArgumentException('Invalid unique identifier format for ' . $this->value);
         }
     }
 

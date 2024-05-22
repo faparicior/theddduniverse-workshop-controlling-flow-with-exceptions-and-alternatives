@@ -8,7 +8,7 @@ final readonly class Email
     public function __construct(private string $value)
     {
         if (!$this->validate($value)) {
-            throw new \InvalidArgumentException('Invalid email');
+            throw new \InvalidArgumentException('Invalid email format ' . $this->value);
         }
     }
 

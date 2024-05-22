@@ -18,11 +18,13 @@ final class Description
     private function validate(string $value): void
     {
         if (mb_strlen($value) === 0) {
-            throw new \InvalidArgumentException('Empty description');
+            throw new \InvalidArgumentException('Description empty');
         }
 
         if (mb_strlen($value) > 200) {
-            throw new \InvalidArgumentException('Description too long');
+            throw new \InvalidArgumentException(
+                sprintf('Description has more than 200 characters: Has %d characters', mb_strlen($value))
+            );
         }
     }
 }
