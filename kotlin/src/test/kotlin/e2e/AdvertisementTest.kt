@@ -20,6 +20,10 @@ class AdvertisementTest {
         private const val ID = "6fa00b21-2930-483e-b610-d6b0e5b19b29"
         private const val PASSWORD = "myPassword"
         private const val INCORRECT_PASSWORD = "myBadPassword"
+
+        private const val HTTP_CREATED = "201"
+        private const val HTTP_OK = "200"
+        private const val HTTP_BAD_REQUEST = "400"
     }
 
     private lateinit var connection: DatabaseConnection
@@ -47,6 +51,7 @@ class AdvertisementTest {
         )
 
         Assertions.assertEquals(FrameworkResponse.STATUS_CREATED, result.statusCode)
+        Assertions.assertEquals(this.successCommandResponse(HTTP_CREATED), result.content)
 
         val resultSet = this.connection.query("SELECT * from advertisements;")
         var description = ""
@@ -56,6 +61,11 @@ class AdvertisementTest {
         }
 
         Assertions.assertEquals(DESCRIPTION, description)
+    }
+
+    @Test
+    fun `should fail publishing an advertisement with same id`() {
+
     }
 
     @Test
@@ -75,6 +85,7 @@ class AdvertisementTest {
             )
 
             Assertions.assertEquals(FrameworkResponse.STATUS_OK, result.statusCode)
+            Assertions.assertEquals(this.successCommandResponse(HTTP_OK), result.content)
 
             val resultSet = this.connection.query("SELECT * from advertisements;")
             var description = ""
@@ -107,6 +118,7 @@ class AdvertisementTest {
             )
 
             Assertions.assertEquals(FrameworkResponse.STATUS_OK, result.statusCode)
+            Assertions.assertEquals(this.successCommandResponse(HTTP_OK), result.content)
 
             val resultSet = this.connection.query("SELECT * from advertisements;")
             var date: LocalDateTime? = null
@@ -137,7 +149,8 @@ class AdvertisementTest {
                 )
             )
 
-            Assertions.assertEquals(FrameworkResponse.STATUS_OK, result.statusCode)
+            Assertions.assertEquals(FrameworkResponse.STATUS_BAD_REQUEST, result.statusCode)
+            Assertions.assertEquals(invalidPasswordCommandResponse(), result.content)
 
             val resultSet = this.connection.query("SELECT * from advertisements;")
             var description = ""
@@ -168,8 +181,9 @@ class AdvertisementTest {
                 )
             )
 
-            Assertions.assertEquals(FrameworkResponse.STATUS_OK, result.statusCode)
 
+            Assertions.assertEquals(FrameworkResponse.STATUS_BAD_REQUEST, result.statusCode)
+            Assertions.assertEquals(invalidPasswordCommandResponse(), result.content)
             val resultSet = this.connection.query("SELECT * from advertisements;")
             var date: LocalDateTime? = null
 
@@ -179,6 +193,32 @@ class AdvertisementTest {
 
             Assertions.assertTrue(date!!.isEqual(LocalDateTime.parse(ADVERTISEMENT_CREATION_DATE)))
         }
+    }
+
+    @Test
+    fun `should fail renewing non existent advertisement`() {
+
+    }
+
+    @Test
+    fun `should fail updating non existent advertisement`() {
+
+    }
+
+    private fun successCommandResponse(code: String = "200"): Map<String, String> {
+        return mapOf(
+            "errors" to "",
+            "code" to code,
+            "message" to ""
+        )
+    }
+
+    private fun invalidPasswordCommandResponse(): Map<String, String> {
+        return mapOf(
+            "errors" to "Invalid password",
+            "code" to HTTP_BAD_REQUEST,
+            "message" to "Invalid password"
+        )
     }
 
     private fun withAnAdvertisementCreated(block: () -> Unit)

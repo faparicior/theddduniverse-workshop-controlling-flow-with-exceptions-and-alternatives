@@ -2,10 +2,11 @@ package advertisement.ui.http
 
 import advertisement.application.publishAdvertisement.PublishAdvertisementCommand
 import advertisement.application.publishAdvertisement.PublishAdvertisementUseCase
+import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
 
-class PublishAdvertisementController(private val useCase: PublishAdvertisementUseCase) {
+class PublishAdvertisementController(private val useCase: PublishAdvertisementUseCase): CommonController(){
 
     fun execute(request: FrameworkRequest): FrameworkResponse {
         useCase.execute(
@@ -16,9 +17,6 @@ class PublishAdvertisementController(private val useCase: PublishAdvertisementUs
             )
         )
 
-        return FrameworkResponse(
-            FrameworkResponse.STATUS_CREATED,
-            mapOf(),
-        )
+        return processSuccessfulCreateCommand()
     }
 }

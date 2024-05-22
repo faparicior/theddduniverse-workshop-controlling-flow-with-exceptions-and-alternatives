@@ -7,8 +7,8 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
     fun execute(renewAdvertisementCommand: RenewAdvertisementCommand) {
         val advertisement = advertisementRepository.findById(renewAdvertisementCommand.id)
 
-        if (!advertisement.password?.isValidatedWith(renewAdvertisementCommand.password)!!)
-            return
+        if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
+            throw IllegalArgumentException("Invalid password")
 
         advertisement.renew(Password.fromPlainPassword(renewAdvertisementCommand.password))
 

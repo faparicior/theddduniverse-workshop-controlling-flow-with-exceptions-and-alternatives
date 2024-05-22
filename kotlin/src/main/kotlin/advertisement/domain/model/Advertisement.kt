@@ -1,11 +1,14 @@
 package advertisement.domain.model
 
+import advertisement.domain.model.value_object.AdvertisementDate
+import advertisement.domain.model.value_object.AdvertisementId
+import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 import java.time.LocalDateTime
 
-data class Advertisement(val id: String?, var description: String?, var password: Password?, var date: LocalDateTime)
+data class Advertisement(val id: AdvertisementId, var description: Description, var password: Password, var date: AdvertisementDate)
 {
-    fun update(description: String?, password: Password)
+    fun update(description: Description, password: Password)
     {
         this.description = description
         this.password = password
@@ -20,6 +23,6 @@ data class Advertisement(val id: String?, var description: String?, var password
 
     private fun updateDate()
     {
-        this.date = LocalDateTime.now()
+        this.date = AdvertisementDate(LocalDateTime.now())
     }
 }

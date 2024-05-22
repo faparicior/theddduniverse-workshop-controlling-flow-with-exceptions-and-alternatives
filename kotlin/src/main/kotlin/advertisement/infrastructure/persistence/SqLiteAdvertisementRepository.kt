@@ -2,17 +2,20 @@ package advertisement.infrastructure.persistence
 
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
+import advertisement.domain.model.value_object.AdvertisementDate
+import advertisement.domain.model.value_object.AdvertisementId
+import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 import framework.database.DatabaseConnection
 import java.time.LocalDateTime
 
 class SqLiteAdvertisementRepository(private val connection: DatabaseConnection): AdvertisementRepository {
     override fun save(advertisement: Advertisement) {
-        val passwordHash = advertisement.password!!.value()
+        val passwordHash = advertisement.password.value()
         connection.execute(
             "INSERT INTO advertisements (id, description, password, advertisement_date) VALUES ('" +
-                    "${advertisement.id}', '${advertisement.description}', '$passwordHash', '${advertisement.date}') " +
-                    "ON CONFLICT(id) DO UPDATE SET description = '${advertisement.description}', password = '${passwordHash}', advertisement_date = '${advertisement.date}';"
+                    "${advertisement.id.value()}', '${advertisement.description.value()}', '$passwordHash', '${advertisement.date.value()}') " +
+                    "ON CONFLICT(id) DO UPDATE SET description = '${advertisement.description.value()}', password = '${passwordHash}', advertisement_date = '${advertisement.date.value()}';"
         )
     }
 
@@ -26,10 +29,10 @@ class SqLiteAdvertisementRepository(private val connection: DatabaseConnection):
         }
 
         return Advertisement(
-            result.getString("id"),
-            result.getString("description"),
+            AdvertisementId(result.getString("id")),
+            Description(result.getString("description")),
             Password.fromEncryptedPassword(result.getString("password")),
-            LocalDateTime.parse(result.getString("advertisement_date")),
+            AdvertisementDate(LocalDateTime.parse(result.getString("advertisement_date"))),
         )
     }
 }
