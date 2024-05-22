@@ -13,6 +13,7 @@ use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
 use Exception;
+use UnexpectedValueException;
 
 class SqliteAdvertisementRepository implements AdvertisementRepository
 {
@@ -36,15 +37,13 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
         );
     }
 
-    /**
-     * @throws Exception
-     */
-    public function findById(AdvertisementId $id): Advertisement
-    {
+    public function findById(AdvertisementId $id): ?Advertisement
+{
         $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id->value()));
         if(!$result) {
-            throw new Exception('Advertisement not found');
+            return null;
         }
+
         $row = $result[0];
         return new Advertisement(
             new AdvertisementId($row['id']),

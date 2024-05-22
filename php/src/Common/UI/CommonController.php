@@ -46,4 +46,16 @@ abstract class CommonController
             ]
         );
     }
+
+    protected function processNotFoundException(Exception $exception): FrameworkResponse
+    {
+        return new FrameworkResponse(
+            FrameworkResponse::STATUS_NOT_FOUND,
+            [
+                'errors' => $exception->getMessage(),
+                'code' => FrameworkResponse::STATUS_NOT_FOUND,
+                'message' => $exception->getMessage(),
+            ]
+        );
+    }
 }

@@ -23,8 +23,14 @@ final class PublishAdvertisementUseCase
      */
     public function execute(PublishAdvertisementCommand $command): void
     {
+        $advertisementId = new AdvertisementId($command->id);
+
+        if ($this->advertisementRepository->findById($advertisementId)) {
+            throw new Exception(sprintf('Advertisement with Id %s already exists', $advertisementId->value()));
+        }
+
         $advertisement = new Advertisement(
-            new AdvertisementId($command->id),
+            $advertisementId,
             new Description($command->description),
             new Email($command->email),
             Password::fromPlainPassword($command->password),

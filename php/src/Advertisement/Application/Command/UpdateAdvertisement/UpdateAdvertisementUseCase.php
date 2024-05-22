@@ -9,6 +9,7 @@ use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Exception;
+use UnexpectedValueException;
 
 final class UpdateAdvertisementUseCase
 {
@@ -21,7 +22,11 @@ final class UpdateAdvertisementUseCase
      */
     public function execute(UpdateAdvertisementCommand $command): void
     {
-        $advertisement = $this->advertisementRepository->findById(new AdvertisementId($command->id));
+        $advertisementId = new AdvertisementId($command->id);
+        $advertisement = $this->advertisementRepository->findById($advertisementId);
+        if (!$advertisement) {
+            throw new UnexpectedValueException('Advertisement not found with Id: ' . $advertisementId->value());
+        }
 
         if (!$advertisement->password()->isValidatedWith($command->password)) {
             throw new Exception('Invalid password');

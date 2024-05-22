@@ -10,5 +10,5 @@ interface AdvertisementRepository
 {
     public function save(Advertisement $advertisement): void;
 
-    public function findById(AdvertisementId $id): Advertisement;
+    public function findById(AdvertisementId $id): ?Advertisement;
 }

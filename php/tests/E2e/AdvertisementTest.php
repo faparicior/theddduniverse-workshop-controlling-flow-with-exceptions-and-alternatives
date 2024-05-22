@@ -73,7 +73,7 @@ final class AdvertisementTest extends TestCase
         self::assertEquals(
             $this->errorCommandResponse(
                 FrameworkResponse::STATUS_BAD_REQUEST,
-                sprintf('Advertisement with id %s already exists', self::ADVERTISEMENT_ID)
+                sprintf('Advertisement with Id %s already exists', self::ADVERTISEMENT_ID)
             ),
             $response->data(),
         );
@@ -275,9 +275,9 @@ final class AdvertisementTest extends TestCase
     private function notFoundCommandResponse(): array
     {
         return [
-            'errors' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
+            'errors' => 'Advertisement not found with Id: 99999999-2930-483e-b610-d6b0e5b19b29',
             'code' => 404,
-            'message' => 'Advertisement not found with ID: 99999999-2930-483e-b610-d6b0e5b19b29',
+            'message' => 'Advertisement not found with Id: 99999999-2930-483e-b610-d6b0e5b19b29',
         ];
     }
 }

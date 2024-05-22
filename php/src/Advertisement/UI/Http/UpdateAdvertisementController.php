@@ -29,6 +29,8 @@ final class UpdateAdvertisementController extends CommonController
             $this->useCase->execute($command);
 
             return $this->processSuccessfulCommand();
+        } catch (\UnexpectedValueException $exception) {
+            return $this->processNotFoundException($exception);
         } catch (Exception $exception) {
             return $this->processGenericException($exception);
         }
