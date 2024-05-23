@@ -1,5 +1,6 @@
 package unit.advertisement.domain.model.value_object
 
+import advertisement.domain.exceptions.InvalidUniqueIdentifierException
 import advertisement.domain.model.value_object.AdvertisementId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -21,7 +22,7 @@ class AdvertisementIdTest
 
     @Test
     fun testShouldThrowAnExceptionWhenIdHasNotUuidV4Standards() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
+        Assertions.assertThrows(InvalidUniqueIdentifierException::class.java) {
             AdvertisementId(INVALID_ID)
         }
     }

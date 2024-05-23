@@ -1,5 +1,6 @@
 package advertisement.application.publishAdvertisement
 
+import advertisement.application.exceptions.AdvertisementAlreadyExistsException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementDate
@@ -13,7 +14,7 @@ class PublishAdvertisementUseCase(private val advertisementRepository: Advertise
         val advertisementId = AdvertisementId(publishAdvertisementCommand.id)
 
         if (null !== advertisementRepository.findById(advertisementId)) {
-            throw IllegalArgumentException("Advertisement with id %s already exists".format(advertisementId.value()))
+            throw AdvertisementAlreadyExistsException.withId(advertisementId.value())
         }
 
         val advertisement = Advertisement(

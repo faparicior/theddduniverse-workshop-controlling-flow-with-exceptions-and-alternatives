@@ -7,6 +7,17 @@ abstract class CommonController {
 
     protected fun processGenericException(exception: Exception): FrameworkResponse {
         return FrameworkResponse(
+            FrameworkResponse.STATUS_INTERNAL_SERVER_ERROR,
+            mapOf(
+                "errors" to exception.message.toString(),
+                "code" to FrameworkResponse.STATUS_BAD_REQUEST.toString(),
+                "message" to exception.message.toString(),
+            ),
+        )
+    }
+
+    protected fun processApplicationOrDomainException(exception: Exception): FrameworkResponse {
+        return FrameworkResponse(
             FrameworkResponse.STATUS_BAD_REQUEST,
             mapOf(
                 "errors" to exception.message.toString(),

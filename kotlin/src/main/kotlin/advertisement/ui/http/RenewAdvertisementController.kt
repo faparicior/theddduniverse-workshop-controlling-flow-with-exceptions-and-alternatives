@@ -2,10 +2,11 @@ package advertisement.ui.http
 
 import advertisement.application.renewAdvertisement.RenewAdvertisementCommand
 import advertisement.application.renewAdvertisement.RenewAdvertisementUseCase
+import common.application.ApplicationException
+import common.application.ElementNotFoundException
 import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
-import java.util.NoSuchElementException
 
 class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCase): CommonController() {
 
@@ -19,8 +20,10 @@ class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCas
             )
 
             return processSuccessfulCommand()
-        } catch (e: NoSuchElementException) {
+        } catch (e: ElementNotFoundException) {
             return processNotFoundCommand(e)
+        } catch (e: ApplicationException) {
+            return processApplicationOrDomainException(e)
         } catch (e: Exception) {
             return processGenericException(e)
         }

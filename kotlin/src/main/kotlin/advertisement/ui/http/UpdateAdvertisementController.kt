@@ -2,10 +2,11 @@ package advertisement.ui.http
 
 import advertisement.application.updateAdvertisement.UpdateAdvertisementCommand
 import advertisement.application.updateAdvertisement.UpdateAdvertisementUseCase
+import common.application.ApplicationException
+import common.application.ElementNotFoundException
 import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
-import java.util.NoSuchElementException
 
 class UpdateAdvertisementController(private val useCase: UpdateAdvertisementUseCase): CommonController(){
 
@@ -18,10 +19,11 @@ class UpdateAdvertisementController(private val useCase: UpdateAdvertisementUseC
                     request.content["password"]!!,
                 )
             )
-
             return processSuccessfulCommand()
-        } catch (e: NoSuchElementException) {
+        } catch (e: ElementNotFoundException) {
             return processNotFoundCommand(e)
+        } catch (e: ApplicationException) {
+            return processApplicationOrDomainException(e)
         } catch (e: Exception) {
             return processGenericException(e)
         }

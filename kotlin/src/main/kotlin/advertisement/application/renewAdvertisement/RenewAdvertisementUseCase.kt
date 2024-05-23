@@ -1,5 +1,7 @@
 package advertisement.application.renewAdvertisement
 
+import advertisement.application.exceptions.AdvertisementNotFoundException
+import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
@@ -10,11 +12,11 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
         val advertisement = advertisementRepository.findById(advertisementId)
 
         if (null === advertisement) {
-            throw NoSuchElementException("Advertisement not found with Id ${advertisementId.value()}")
+            throw AdvertisementNotFoundException.withId(advertisementId.value())
         }
 
         if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
-            throw IllegalArgumentException("Invalid password")
+            throw InvalidPasswordException.build()
 
         advertisement.renew(Password.fromPlainPassword(renewAdvertisementCommand.password))
 

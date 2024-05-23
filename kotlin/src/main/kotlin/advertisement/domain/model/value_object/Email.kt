@@ -1,5 +1,7 @@
 package advertisement.domain.model.value_object
 
+import advertisement.domain.exceptions.InvalidEmailException
+
 class Email(private var value: String) {
 
     init {
@@ -14,7 +16,7 @@ class Email(private var value: String) {
         val regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"
 
         if (!value.matches(regex.toRegex())) {
-            throw IllegalArgumentException("Invalid email")
+            throw InvalidEmailException.withEmail(value)
         }
     }
 }

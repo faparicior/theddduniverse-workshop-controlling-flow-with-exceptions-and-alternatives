@@ -7,5 +7,6 @@ data class FrameworkResponse(val statusCode: Int, val content: Map<String, Strin
         const val STATUS_CREATED = 201
         const val STATUS_BAD_REQUEST = 400
         const val STATUS_NOT_FOUND = 404
+        const val STATUS_INTERNAL_SERVER_ERROR = 500
     }
 }

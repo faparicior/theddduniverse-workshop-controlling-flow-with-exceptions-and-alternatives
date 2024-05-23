@@ -1,5 +1,8 @@
 package advertisement.domain.model.value_object
 
+import advertisement.domain.exceptions.DescriptionEmptyException
+import advertisement.domain.exceptions.DescriptionTooLongException
+
 class Description(private var value: String) {
 
     init {
@@ -12,11 +15,11 @@ class Description(private var value: String) {
 
     private fun validate(value: String) {
         if (value.isEmpty()) {
-            throw IllegalArgumentException("Description is empty")
+            throw DescriptionEmptyException.build()
         }
 
         if (value.length > 200) {
-            throw IllegalArgumentException("Description is too long")
+            throw DescriptionTooLongException.withLongitudeMessage(value)
         }
     }
 }

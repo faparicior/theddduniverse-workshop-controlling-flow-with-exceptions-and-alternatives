@@ -1,5 +1,7 @@
 package advertisement.domain.model.value_object
 
+import advertisement.domain.exceptions.InvalidUniqueIdentifierException
+
 class AdvertisementId(private var value: String) {
 
     init {
@@ -14,7 +16,7 @@ class AdvertisementId(private var value: String) {
         val regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 
         if (!value.matches(regex.toRegex())) {
-            throw IllegalArgumentException("Invalid unique identifier format for " + value)
+            throw InvalidUniqueIdentifierException.withId(value)
         }
     }
 }

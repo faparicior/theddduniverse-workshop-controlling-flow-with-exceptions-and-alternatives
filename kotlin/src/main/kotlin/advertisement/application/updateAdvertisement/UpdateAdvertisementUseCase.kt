@@ -1,5 +1,7 @@
 package advertisement.application.updateAdvertisement
 
+import advertisement.application.exceptions.AdvertisementNotFoundException
+import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Description
@@ -11,11 +13,11 @@ class UpdateAdvertisementUseCase(private val advertisementRepository: Advertisem
         val advertisement = advertisementRepository.findById(advertisementId)
 
         if (null === advertisement) {
-            throw NoSuchElementException("Advertisement not found with Id ${advertisementId.value()}")
+            throw AdvertisementNotFoundException.withId(advertisementId.value())
         }
 
         if (!advertisement.password.isValidatedWith(updateAdvertisementCommand.password))
-            throw IllegalArgumentException("Invalid password")
+            throw InvalidPasswordException.build()
 
         advertisement.update(
             Description(updateAdvertisementCommand.description),
