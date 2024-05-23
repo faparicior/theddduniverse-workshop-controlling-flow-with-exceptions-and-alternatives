@@ -3,27 +3,40 @@ package advertisement.application.publishAdvertisement
 import advertisement.application.exceptions.AdvertisementAlreadyExistsException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
-import advertisement.domain.model.value_object.AdvertisementDate
 import advertisement.domain.model.value_object.AdvertisementId
-import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 import java.time.LocalDateTime
 
 class PublishAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(publishAdvertisementCommand: PublishAdvertisementCommand) {
-        val advertisementId = AdvertisementId(publishAdvertisementCommand.id)
+    fun execute(publishAdvertisementCommand: PublishAdvertisementCommand): Result<Any> {
+        val advertisementIdResult = AdvertisementId.build(publishAdvertisementCommand.id)
 
-        if (null !== advertisementRepository.findById(advertisementId)) {
-            throw AdvertisementAlreadyExistsException.withId(advertisementId.value())
+        if (advertisementIdResult.isFailure) {
+            return advertisementIdResult
+        }
+        val advertisementId = advertisementIdResult.getOrThrow()
+
+        if (advertisementRepository.findById(advertisementId).isSuccess) {
+            return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()))
         }
 
-        val advertisement = Advertisement(
-            advertisementId,
-            Description(publishAdvertisementCommand.description),
-            Password.fromPlainPassword(publishAdvertisementCommand.password),
-            AdvertisementDate(LocalDateTime.now())
+        val passwordResult = Password.fromPlainPassword(publishAdvertisementCommand.password)
+
+        if (passwordResult.isFailure) {
+            return passwordResult
+        }
+
+        val advertisementResult = Advertisement.build(
+            advertisementId.value(),
+            publishAdvertisementCommand.description,
+            passwordResult.getOrThrow(),
+            LocalDateTime.now()
         )
 
-        advertisementRepository.save(advertisement)
+        if (advertisementResult.isFailure) {
+            return advertisementResult
+        }
+
+        return advertisementRepository.save(advertisementResult.getOrThrow())
     }
 }
