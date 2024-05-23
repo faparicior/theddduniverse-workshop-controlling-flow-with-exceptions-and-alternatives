@@ -6,14 +6,14 @@ import java.security.MessageDigest
 class Password private constructor(private val value: String) {
 
     companion object {
-        fun fromPlainPassword(password: String): Password {
+        fun fromPlainPassword(password: String): Result<Password> {
             val encryptedPassword = Argon2Factory.create().hash(1, 1024, 1, password.toCharArray())
 
-            return Password(encryptedPassword)
+            return Result.success(Password(encryptedPassword))
         }
 
-        fun fromEncryptedPassword(encryptedPassword: String): Password {
-            return Password(encryptedPassword)
+        fun fromEncryptedPassword(encryptedPassword: String): Result<Password> {
+            return Result.success(Password(encryptedPassword))
         }
     }
 

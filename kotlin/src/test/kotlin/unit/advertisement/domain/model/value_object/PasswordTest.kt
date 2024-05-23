@@ -22,31 +22,32 @@ class PasswordTest
 
     @Test
     fun testShouldBeCreatedWithAStrongHash() {
-        val password = Password.fromPlainPassword("password")
+        val result = Password.fromPlainPassword("password")
 
-        Assertions.assertTrue(password.value().startsWith("\$argon2i\$"))
+        Assertions.assertTrue(result.isSuccess)
+        Assertions.assertTrue(result.getOrNull()!!.value().startsWith("\$argon2i\$"))
     }
 
     @Test
     fun testShouldBeCreatedWithEncryptedValueWithoutChangeTheOriginalHash() {
-        val strongPassword = Password.fromEncryptedPassword(STRONG_ALGORITHM_PASSWORD)
-        val weakPassword = Password.fromEncryptedPassword(MD5_ALGORITHM_PASSWORD)
+        val strongPasswordResult = Password.fromEncryptedPassword(STRONG_ALGORITHM_PASSWORD)
+        val weakPasswordResult = Password.fromEncryptedPassword(MD5_ALGORITHM_PASSWORD)
 
-        Assertions.assertEquals(STRONG_ALGORITHM_PASSWORD, strongPassword.value())
-        Assertions.assertEquals(MD5_ALGORITHM_PASSWORD, weakPassword.value())
+        Assertions.assertEquals(STRONG_ALGORITHM_PASSWORD, strongPasswordResult.getOrNull()!!.value())
+        Assertions.assertEquals(MD5_ALGORITHM_PASSWORD, weakPasswordResult.getOrNull()!!.value())
     }
 
     @Test
     fun testShouldValidatePasswordsWithAStrongAlgorithm() {
-        val password = Password.fromEncryptedPassword(STRONG_ALGORITHM_PASSWORD)
+        val result = Password.fromEncryptedPassword(STRONG_ALGORITHM_PASSWORD)
 
-        Assertions.assertTrue(password.isValidatedWith("myPassword"))
+        Assertions.assertTrue(result.getOrNull()!!.isValidatedWith("myPassword"))
     }
 
     @Test
     fun testShouldValidatePasswordsWithAWeakAlgorithm() {
-        val password = Password.fromEncryptedPassword(MD5_ALGORITHM_PASSWORD)
+        val result = Password.fromEncryptedPassword(MD5_ALGORITHM_PASSWORD)
 
-        Assertions.assertTrue(password.isValidatedWith("myPassword"))
+        Assertions.assertTrue(result.getOrNull()!!.isValidatedWith("myPassword"))
     }
 }

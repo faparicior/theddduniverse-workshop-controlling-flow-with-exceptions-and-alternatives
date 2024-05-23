@@ -3,17 +3,26 @@ package unit.advertisement.domain.model.value_object
 import advertisement.domain.model.value_object.AdvertisementDate
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.lang.reflect.Modifier
 import java.time.LocalDateTime
 
 
 class AdvertisementDateTest
 {
     @Test
+    fun testShouldNotBeInstantiatedWithTheConstructor() {
+        Assertions.assertThrows(NoSuchMethodException::class.java) {
+            Assertions.assertTrue(Modifier.isPrivate(AdvertisementDate::class.java.getDeclaredConstructor().modifiers))
+        }
+    }
+
+    @Test
     fun testShouldCreateADate() {
         val dateNow = LocalDateTime.now()
 
-        val advertisementDate = AdvertisementDate(dateNow)
+        val result = AdvertisementDate.build(dateNow)
 
-        Assertions.assertEquals(dateNow, advertisementDate.value())
+        Assertions.assertTrue(result.isSuccess)
+        Assertions.assertEquals(dateNow, result.getOrNull()!!.value())
     }
 }

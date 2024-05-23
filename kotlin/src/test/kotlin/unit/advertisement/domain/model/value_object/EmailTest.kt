@@ -4,7 +4,7 @@ import advertisement.domain.exceptions.InvalidEmailException
 import advertisement.domain.model.value_object.Email
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-
+import java.lang.reflect.Modifier
 
 class EmailTest
 {
@@ -14,16 +14,25 @@ class EmailTest
     }
 
     @Test
-    fun testShouldCreateAnEmail() {
-        val email = Email(VALID_EMAIL)
+    fun testShouldNotBeInstantiatedWithTheConstructor() {
+        Assertions.assertThrows(NoSuchMethodException::class.java) {
+            Assertions.assertTrue(Modifier.isPrivate(Email::class.java.getDeclaredConstructor().modifiers))
+        }
+    }
 
-        Assertions.assertEquals(VALID_EMAIL, email.value())
+    @Test
+    fun testShouldCreateAnEmail() {
+        val result = Email.build(VALID_EMAIL)
+
+        Assertions.assertTrue(result.isSuccess)
+        Assertions.assertEquals(VALID_EMAIL, result.getOrNull()!!.value())
     }
 
     @Test
     fun testShouldThrowAnExceptionWhenEmailIsInvalid() {
-        Assertions.assertThrows(InvalidEmailException::class.java) {
-            Email(INVALID_EMAIL)
-        }
+        val result = Email.build(INVALID_EMAIL)
+
+        Assertions.assertTrue(result.isFailure)
+        Assertions.assertEquals(InvalidEmailException::class.java, result.exceptionOrNull()!!.javaClass)
     }
 }

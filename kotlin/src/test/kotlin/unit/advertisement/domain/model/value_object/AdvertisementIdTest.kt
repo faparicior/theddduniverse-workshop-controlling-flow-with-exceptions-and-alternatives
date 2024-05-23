@@ -4,6 +4,7 @@ import advertisement.domain.exceptions.InvalidUniqueIdentifierException
 import advertisement.domain.model.value_object.AdvertisementId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.lang.reflect.Modifier
 
 
 class AdvertisementIdTest
@@ -14,16 +15,25 @@ class AdvertisementIdTest
     }
 
     @Test
-    fun testShouldCreateADescription() {
-        val description = AdvertisementId(ID)
-
-        Assertions.assertEquals(ID, description.value())
+    fun testShouldNotBeInstantiatedWithTheConstructor() {
+        Assertions.assertThrows(NoSuchMethodException::class.java) {
+            Assertions.assertTrue(Modifier.isPrivate(AdvertisementId::class.java.getDeclaredConstructor().modifiers))
+        }
     }
 
     @Test
-    fun testShouldThrowAnExceptionWhenIdHasNotUuidV4Standards() {
-        Assertions.assertThrows(InvalidUniqueIdentifierException::class.java) {
-            AdvertisementId(INVALID_ID)
-        }
+    fun testShouldCreateAnAdvertisementId() {
+        val result = AdvertisementId.build(ID)
+
+        Assertions.assertTrue(result.isSuccess)
+        Assertions.assertEquals(ID, result.getOrNull()!!.value())
+    }
+
+    @Test
+    fun testShouldReturnErrorResultIfHasNotUuidV4Standards() {
+        val result = AdvertisementId.build(INVALID_ID)
+
+        Assertions.assertTrue(result.isFailure)
+        Assertions.assertEquals(InvalidUniqueIdentifierException::class.java, result.exceptionOrNull()!!.javaClass)
     }
 }

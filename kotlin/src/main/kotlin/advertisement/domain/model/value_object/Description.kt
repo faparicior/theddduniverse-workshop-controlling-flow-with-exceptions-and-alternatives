@@ -3,23 +3,23 @@ package advertisement.domain.model.value_object
 import advertisement.domain.exceptions.DescriptionEmptyException
 import advertisement.domain.exceptions.DescriptionTooLongException
 
-class Description(private var value: String) {
+class Description private constructor (private val value: String) {
 
-    init {
-        this.validate(value)
+    companion object {
+        fun build(value: String): Result<Description> {
+            if (value.isEmpty()) {
+                return Result.failure(DescriptionEmptyException.build())
+            }
+
+            if (value.length > 200) {
+                return Result.failure(DescriptionTooLongException.withLongitudeMessage(value))
+            }
+
+            return Result.success(Description(value))
+        }
     }
 
     fun value(): String {
         return value
-    }
-
-    private fun validate(value: String) {
-        if (value.isEmpty()) {
-            throw DescriptionEmptyException.build()
-        }
-
-        if (value.length > 200) {
-            throw DescriptionTooLongException.withLongitudeMessage(value)
-        }
     }
 }
