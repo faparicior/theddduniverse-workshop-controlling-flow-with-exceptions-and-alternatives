@@ -27,7 +27,7 @@ final class UpdateAdvertisementUseCase
     public function execute(UpdateAdvertisementCommand $command): Result
     {
         $advertisementIdResult = AdvertisementId::build($command->id);
-        if ($advertisementIdResult->isError()) {
+        if ($advertisementIdResult->isFailure()) {
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
@@ -35,8 +35,8 @@ final class UpdateAdvertisementUseCase
 
         $advertisementResult = $this->advertisementRepository->findById($advertisementId);
 
-        if ($advertisementResult->isError()) {
-            if ($advertisementResult->getError() instanceof ZeroRecordsException) {
+        if ($advertisementResult->isFailure()) {
+            if ($advertisementResult->exception() instanceof ZeroRecordsException) {
                 return Result::failure(AdvertisementNotFoundException::withId($command->id));
             }
         }
@@ -44,12 +44,12 @@ final class UpdateAdvertisementUseCase
         $advertisement = $advertisementResult->unwrap();
 
         $passwordMatchResult = $this->validatePasswordMatch($command->password, $advertisement);
-        if ($passwordMatchResult->isError()) {
+        if ($passwordMatchResult->isFailure()) {
             return $passwordMatchResult;
         }
 
         $newPasswordResult = Password::fromPlainPassword($command->password);
-        if ($newPasswordResult->isError()) {
+        if ($newPasswordResult->isFailure()) {
             return $newPasswordResult;
         }
         /** @var Password $newPassword */

@@ -36,7 +36,7 @@ class AdvertisementIdTest extends TestCase
         $result = AdvertisementId::build(self::INVALID_ID);
 
         self::assertFalse($result->isSuccess());
-        self::assertInstanceOf(InvalidUniqueIdentifierException::class, $result->getError());
-        self::assertEquals('Invalid unique identifier format for ' . self::INVALID_ID, $result->getError()->getMessage());
+        self::assertInstanceOf(InvalidUniqueIdentifierException::class, $result->exception());
+        self::assertEquals('Invalid unique identifier format for ' . self::INVALID_ID, $result->exception()->getMessage());
     }
 }

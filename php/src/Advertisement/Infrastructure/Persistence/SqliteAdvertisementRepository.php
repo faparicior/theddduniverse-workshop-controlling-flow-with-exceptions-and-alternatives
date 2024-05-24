@@ -46,7 +46,7 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
         $row = $result[0];
 
         $passwordResult = Password::fromEncryptedPassword($row['password']);
-        if ($passwordResult->isError()) {
+        if ($passwordResult->isFailure()) {
             return $passwordResult;
         }
         /** @var Password $password */

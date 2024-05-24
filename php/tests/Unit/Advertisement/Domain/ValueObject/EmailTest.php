@@ -36,7 +36,7 @@ class EmailTest extends TestCase
         $result = Email::build(self::INVALID_EMAIL);
 
         self::assertFalse($result->isSuccess());
-        self::assertInstanceOf(InvalidEmailException::class, $result->getError());
-        self::assertEquals('Invalid email format ' . self::INVALID_EMAIL, $result->getError()->getMessage());
+        self::assertInstanceOf(InvalidEmailException::class, $result->exception());
+        self::assertEquals('Invalid email format ' . self::INVALID_EMAIL, $result->exception()->getMessage());
     }
 }

@@ -36,7 +36,7 @@ final readonly class Result
         return $this->isSuccess;
     }
 
-    public function isError(): bool
+    public function isFailure(): bool
     {
         return !$this->isSuccess;
     }
@@ -54,7 +54,7 @@ final readonly class Result
         return $this->data;
     }
 
-    public function getError(): ?Throwable
+    public function exception(): ?Throwable
     {
         if ($this->isSuccess) {
             throw new RuntimeException('Result is successful, error is unavailable.');

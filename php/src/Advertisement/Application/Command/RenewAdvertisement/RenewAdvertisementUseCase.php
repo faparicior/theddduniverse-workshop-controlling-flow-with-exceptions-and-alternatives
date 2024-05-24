@@ -25,15 +25,15 @@ final class RenewAdvertisementUseCase
     public function execute(RenewAdvertisementCommand $command): Result
     {
         $advertisementIdResult = $this->validateAdvertisementId($command);
-        if ($advertisementIdResult->isError()) {
+        if ($advertisementIdResult->isFailure()) {
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
         $advertisementId = $advertisementIdResult->unwrap();
 
         $advertisementResult = $this->advertisementRepository->findById($advertisementId);
-        if ($advertisementResult->isError()) {
-            if ($advertisementResult->getError() instanceof ZeroRecordsException) {
+        if ($advertisementResult->isFailure()) {
+            if ($advertisementResult->exception() instanceof ZeroRecordsException) {
                 return Result::failure(AdvertisementNotFoundException::withId($advertisementId->value()));
             }
             return $advertisementResult;
@@ -42,19 +42,19 @@ final class RenewAdvertisementUseCase
         $advertisement = $advertisementResult->unwrap();
 
         $passwordMatchResult = $this->validatePasswordMatch($command->password, $advertisement);
-        if ($passwordMatchResult->isError()) {
+        if ($passwordMatchResult->isFailure()) {
             return $passwordMatchResult;
         }
 
         $newPasswordResult = Password::fromPlainPassword($command->password);
-        if ($newPasswordResult->isError()) {
+        if ($newPasswordResult->isFailure()) {
             return $newPasswordResult;
         }
         /** @var Password $newPassword */
         $newPassword = $newPasswordResult->unwrap();
 
         $renewResult = $advertisement->renew($newPassword);
-        if ($renewResult->isError()) {
+        if ($renewResult->isFailure()) {
             return $renewResult;
         }
 

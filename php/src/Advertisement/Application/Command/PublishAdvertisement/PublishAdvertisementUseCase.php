@@ -18,7 +18,7 @@ final class PublishAdvertisementUseCase
     public function execute(PublishAdvertisementCommand $command): Result
     {
         $advertisementResult = $this->validateAdvertisement($command);
-        if ($advertisementResult->isError()) {
+        if ($advertisementResult->isFailure()) {
             return $advertisementResult;
         }
         /** @var Advertisement $advertisement */
@@ -37,7 +37,7 @@ final class PublishAdvertisementUseCase
     private function validateAdvertisement(PublishAdvertisementCommand $command): Result
     {
         $passwordResult = Password::fromPlainPassword($command->password);
-        if ($passwordResult->isError()) {
+        if ($passwordResult->isFailure()) {
             return $passwordResult;
         }
         /** @var Password $password */

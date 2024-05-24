@@ -33,9 +33,9 @@ abstract class CommonController
         return new FrameworkResponse(
             FrameworkResponse::STATUS_BAD_REQUEST,
             [
-                'errors' => $result->getError()->getMessage(),
+                'errors' => $result->exception()->getMessage(),
                 'code' => FrameworkResponse::STATUS_BAD_REQUEST,
-                'message' => $result->getError()->getMessage(),
+                'message' => $result->exception()->getMessage(),
             ]
         );
     }
@@ -45,9 +45,9 @@ abstract class CommonController
         return new FrameworkResponse(
             FrameworkResponse::STATUS_NOT_FOUND,
             [
-                'errors' => $result->getError()->getMessage(),
+                'errors' => $result->exception()->getMessage(),
                 'code' => FrameworkResponse::STATUS_NOT_FOUND,
-                'message' => $result->getError()->getMessage(),
+                'message' => $result->exception()->getMessage(),
             ]
         );
     }

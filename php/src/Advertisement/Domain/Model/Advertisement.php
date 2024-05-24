@@ -23,28 +23,28 @@ final class Advertisement
     public static function build(string $id, string $description, string $email, Password $password, \DateTime $date): Result
     {
         $advertisementIdResult = AdvertisementId::build($id);
-        if ($advertisementIdResult->isError()) {
+        if ($advertisementIdResult->isFailure()) {
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
         $advertisementId = $advertisementIdResult->unwrap();
 
         $descriptionResult = Description::build($description);
-        if ($descriptionResult->isError()) {
+        if ($descriptionResult->isFailure()) {
             return $descriptionResult;
         }
         /** @var Description $description */
         $description = $descriptionResult->unwrap();
 
         $emailResult = Email::build($email);
-        if ($emailResult->isError()) {
+        if ($emailResult->isFailure()) {
             return $emailResult;
         }
         /** @var Email $email */
         $email = $emailResult->unwrap();
 
         $advertisementDateResult = AdvertisementDate::build($date);
-        if ($advertisementDateResult->isError()) {
+        if ($advertisementDateResult->isFailure()) {
             return $advertisementDateResult;
         }
 
@@ -59,7 +59,7 @@ final class Advertisement
         $this->password = $password;
         $result = $this->updateDate();
 
-        if ($result->isError()) {
+        if ($result->isFailure()) {
             return $result;
         }
 
@@ -69,14 +69,14 @@ final class Advertisement
     public function update(string $description, string $email, Password $password): Result
     {
         $descriptionResult = Description::build($description);
-        if ($descriptionResult->isError()) {
+        if ($descriptionResult->isFailure()) {
             return $descriptionResult;
         }
         /** @var Description $description */
         $description = $descriptionResult->unwrap();
 
         $emailResult = Email::build($email);
-        if ($emailResult->isError()) {
+        if ($emailResult->isFailure()) {
             return $emailResult;
         }
         /** @var Email $email */
@@ -87,7 +87,7 @@ final class Advertisement
         $this->password = $password;
         $result = $this->updateDate();
 
-        if ($result->isError()) {
+        if ($result->isFailure()) {
             return $result;
         }
 
@@ -122,7 +122,7 @@ final class Advertisement
     private function updateDate(): Result
     {
         $result = AdvertisementDate::build(new \DateTime());
-        if ($result->isError()) {
+        if ($result->isFailure()) {
             return $result;
         }
 
