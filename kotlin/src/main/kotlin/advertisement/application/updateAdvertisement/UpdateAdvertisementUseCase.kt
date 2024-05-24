@@ -1,29 +1,47 @@
 package advertisement.application.updateAdvertisement
 
-import advertisement.application.exceptions.AdvertisementNotFoundException
 import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
+import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 
 class UpdateAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand) {
-//        val advertisementId = AdvertisementId(updateAdvertisementCommand.id)
-//        val advertisement = advertisementRepository.findById(advertisementId)
-//
-//        if (null === advertisement) {
-//            throw AdvertisementNotFoundException.withId(advertisementId.value())
-//        }
-//
-//        if (!advertisement.password.isValidatedWith(updateAdvertisementCommand.password))
-//            throw InvalidPasswordException.build()
-//
-//        advertisement.update(
-//            Description(updateAdvertisementCommand.description),
-//            Password.fromPlainPassword(updateAdvertisementCommand.password)
-//        )
-//
-//        advertisementRepository.save(advertisement)
+    fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Result<Any> {
+        val advertisementIdResult = AdvertisementId.build(updateAdvertisementCommand.id)
+
+        if (advertisementIdResult.isFailure) {
+            return advertisementIdResult
+        }
+        val advertisementId = advertisementIdResult.getOrThrow()
+
+        val descriptionResult = Description.build(updateAdvertisementCommand.description)
+
+        if (descriptionResult.isFailure) {
+            return descriptionResult
+        }
+
+        val advertisementResult = advertisementRepository.findById(advertisementId)
+        if (advertisementResult.isFailure) {
+            return advertisementResult
+        }
+
+        val advertisement: Advertisement = advertisementResult.getOrThrow() as Advertisement
+
+        if (!advertisement.password.isValidatedWith(updateAdvertisementCommand.password))
+            return Result.failure(InvalidPasswordException.build())
+
+        val passwordResult = Password.fromPlainPassword(updateAdvertisementCommand.password)
+        if (passwordResult.isFailure) {
+            return passwordResult
+        }
+
+        val updateResult = advertisement.update(descriptionResult.getOrThrow(), passwordResult.getOrThrow())
+        if (updateResult.isFailure) {
+            return updateResult
+        }
+
+        return advertisementRepository.save(advertisement)
     }
 }

@@ -2,7 +2,6 @@ package advertisement.ui.http
 
 import advertisement.application.renewAdvertisement.RenewAdvertisementCommand
 import advertisement.application.renewAdvertisement.RenewAdvertisementUseCase
-import common.application.ApplicationException
 import common.application.ElementNotFoundException
 import common.ui.http.CommonController
 import framework.FrameworkRequest
@@ -12,18 +11,19 @@ class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCas
 
     fun execute(request: FrameworkRequest): FrameworkResponse {
         try {
-            useCase.execute(
+            val result = useCase.execute(
                 RenewAdvertisementCommand(
                     request.getIdPath(),
                     request.content["password"]!!,
                 )
             )
+            if (result.isFailure) {
+                return processApplicationOrDomainException(result.exceptionOrNull()!!)
+            }
 
             return processSuccessfulCommand()
         } catch (e: ElementNotFoundException) {
             return processNotFoundCommand(e)
-        } catch (e: ApplicationException) {
-            return processApplicationOrDomainException(e)
         } catch (e: Exception) {
             return processGenericException(e)
         }

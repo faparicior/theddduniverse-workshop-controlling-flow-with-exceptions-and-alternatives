@@ -1,25 +1,37 @@
 package advertisement.application.renewAdvertisement
 
-import advertisement.application.exceptions.AdvertisementNotFoundException
 import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
+import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
 
 class RenewAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(renewAdvertisementCommand: RenewAdvertisementCommand) {
-//        val advertisementId = AdvertisementId(renewAdvertisementCommand.id)
-//        val advertisement = advertisementRepository.findById(advertisementId)
-//
-//        if (null === advertisement) {
-//            throw AdvertisementNotFoundException.withId(advertisementId.value())
-//        }
-//
-//        if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
-//            throw InvalidPasswordException.build()
-//
-//        advertisement.renew(Password.fromPlainPassword(renewAdvertisementCommand.password))
-//
-//        advertisementRepository.save(advertisement)
+    fun execute(renewAdvertisementCommand: RenewAdvertisementCommand): Result<Any>{
+        val advertisementIdResult = AdvertisementId.build(renewAdvertisementCommand.id)
+
+        if (advertisementIdResult.isFailure) {
+            return advertisementIdResult
+        }
+        val advertisementId = advertisementIdResult.getOrThrow()
+
+        val advertisementResult = advertisementRepository.findById(advertisementId)
+        if (advertisementResult.isFailure) {
+            return advertisementResult
+        }
+
+        val advertisement: Advertisement = advertisementResult.getOrThrow() as Advertisement
+
+        if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
+            return Result.failure(InvalidPasswordException.build())
+
+        val passwordResult = Password.fromPlainPassword(renewAdvertisementCommand.password)
+        if (passwordResult.isFailure) {
+            return passwordResult
+        }
+
+        advertisement.renew(passwordResult.getOrThrow())
+
+        return advertisementRepository.save(advertisement)
     }
 }

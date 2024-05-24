@@ -1,10 +1,9 @@
 package advertisement.infrastructure.persistence
 
+import advertisement.application.exceptions.AdvertisementNotFoundException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
-import advertisement.domain.model.value_object.AdvertisementDate
 import advertisement.domain.model.value_object.AdvertisementId
-import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 import framework.database.DatabaseConnection
 import java.time.LocalDateTime
@@ -27,7 +26,7 @@ class SqLiteAdvertisementRepository(private val connection: DatabaseConnection):
         )
 
         if (!result.next()) {
-            return Result.failure(Exception("Advertisement not found"))
+            return Result.failure(AdvertisementNotFoundException.withId(id.value()))
         }
 
         val passwordResult = Password.fromEncryptedPassword(result.getString("password"))
