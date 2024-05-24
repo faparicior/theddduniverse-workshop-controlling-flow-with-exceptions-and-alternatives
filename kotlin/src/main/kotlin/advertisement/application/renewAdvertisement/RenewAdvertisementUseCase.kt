@@ -1,10 +1,12 @@
 package advertisement.application.renewAdvertisement
 
+import advertisement.application.exceptions.AdvertisementNotFoundException
 import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
+import advertisement.infrastructure.exceptions.ZeroRecordsException
 
 class RenewAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(renewAdvertisementCommand: RenewAdvertisementCommand): Result<Any>{
@@ -17,6 +19,9 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
 
         val advertisementResult = advertisementRepository.findById(advertisementId)
         if (advertisementResult.isFailure) {
+            if  (advertisementResult.exceptionOrNull() is ZeroRecordsException)
+                return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))
+
             return advertisementResult
         }
 

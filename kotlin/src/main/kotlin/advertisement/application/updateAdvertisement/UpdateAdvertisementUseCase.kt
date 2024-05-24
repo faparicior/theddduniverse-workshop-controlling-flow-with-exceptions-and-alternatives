@@ -1,11 +1,13 @@
 package advertisement.application.updateAdvertisement
 
+import advertisement.application.exceptions.AdvertisementNotFoundException
 import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
+import advertisement.infrastructure.exceptions.ZeroRecordsException
 
 class UpdateAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Result<Any> {
@@ -23,8 +25,8 @@ class UpdateAdvertisementUseCase(private val advertisementRepository: Advertisem
         }
 
         val advertisementResult = advertisementRepository.findById(advertisementId)
-        if (advertisementResult.isFailure) {
-            return advertisementResult
+        if (advertisementResult.isFailure && advertisementResult.exceptionOrNull() is ZeroRecordsException) {
+            return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))
         }
 
         val advertisement: Advertisement = advertisementResult.getOrThrow() as Advertisement
