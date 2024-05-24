@@ -1,11 +1,10 @@
 package common.ui.http
 
 import framework.FrameworkResponse
-import java.lang.Exception
 
 abstract class CommonController {
 
-    protected fun processGenericException(exception: Exception): FrameworkResponse {
+    protected fun processGenericException(exception: Throwable): FrameworkResponse {
         return FrameworkResponse(
             FrameworkResponse.STATUS_INTERNAL_SERVER_ERROR,
             mapOf(
@@ -16,7 +15,7 @@ abstract class CommonController {
         )
     }
 
-    protected fun processApplicationOrDomainException(exception: Exception): FrameworkResponse {
+    protected fun processApplicationOrDomainException(exception: Throwable): FrameworkResponse {
         return FrameworkResponse(
             FrameworkResponse.STATUS_BAD_REQUEST,
             mapOf(
@@ -49,7 +48,7 @@ abstract class CommonController {
         )
     }
 
-    protected fun processNotFoundCommand(exception: Exception): FrameworkResponse {
+    protected fun processNotFoundCommand(exception: Throwable): FrameworkResponse {
         val message = exception.message.toString()
 
         return FrameworkResponse(
