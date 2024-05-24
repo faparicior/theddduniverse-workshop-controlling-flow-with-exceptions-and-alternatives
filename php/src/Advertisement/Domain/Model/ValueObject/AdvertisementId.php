@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use Demo\App\Advertisement\Domain\Errors\InvalidUniqueIdentifierError;
+use Demo\App\Advertisement\Domain\Exceptions\InvalidUniqueIdentifierException;
 use Demo\App\Common\Result;
 
 final readonly class AdvertisementId
@@ -13,7 +13,7 @@ final readonly class AdvertisementId
     public static function build(string $value): Result
     {
         if (!self::validate($value)) {
-            return InvalidUniqueIdentifierError::build($value);
+            return Result::failure(InvalidUniqueIdentifierException::withId($value));
         }
 
         return Result::success(new self($value));

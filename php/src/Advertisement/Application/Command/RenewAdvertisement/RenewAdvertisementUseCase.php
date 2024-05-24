@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 
-use Demo\App\Advertisement\Application\Errors\AdvertisementNotFoundError;
-use Demo\App\Advertisement\Application\Errors\PasswordDoesNotMatchError;
+use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
+use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
-use Demo\App\Advertisement\Infrastructure\Errors\ZeroRecordsError;
+use Demo\App\Advertisement\Infrastructure\Exceptions\ZeroRecordsException;
 use Demo\App\Common\Result;
 use Exception;
 
@@ -33,8 +33,8 @@ final class RenewAdvertisementUseCase
 
         $advertisementResult = $this->advertisementRepository->findById($advertisementId);
         if ($advertisementResult->isError()) {
-            if ($advertisementResult instanceof ZeroRecordsError) {
-                return AdvertisementNotFoundError::build($advertisementId->value());
+            if ($advertisementResult->getError() instanceof ZeroRecordsException) {
+                return Result::failure(AdvertisementNotFoundException::withId($advertisementId->value()));
             }
             return $advertisementResult;
         }
@@ -73,7 +73,7 @@ final class RenewAdvertisementUseCase
     private function validatePasswordMatch(string $password, Advertisement $advertisement): Result
     {
         if (!$advertisement->password()->isValidatedWith($password)) {
-            return PasswordDoesNotMatchError::build();
+            return Result::failure(InvalidPasswordException::build());
         }
         return Result::success();
     }

@@ -4,15 +4,16 @@ declare(strict_types=1);
 namespace Demo\App\Common;
 
 use RuntimeException;
+use Throwable;
 
 final readonly class Result
 {
     private bool $isSuccess;
     private ?object $data;
-    private ?string $error;
+    private ?Throwable $error;
     private ?string $errorCode;
 
-    private function __construct(bool $isSuccess, ?object $data = null, ?string $error = null, ?string $errorCode = null)
+    private function __construct(bool $isSuccess, ?object $data = null, ?Throwable $error = null, ?string $errorCode = null)
     {
         $this->isSuccess = $isSuccess;
         $this->data = $data;
@@ -25,7 +26,7 @@ final readonly class Result
         return new self(true, $data);
     }
 
-    public static function failure(string $error, string $errorCode = null): self
+    public static function failure(Throwable $error, string $errorCode = null): self
     {
         return new self(false, null, $error, $errorCode);
     }
@@ -53,7 +54,7 @@ final readonly class Result
         return $this->data;
     }
 
-    public function getError(): ?string
+    public function getError(): ?Throwable
     {
         if ($this->isSuccess) {
             throw new RuntimeException('Result is successful, error is unavailable.');

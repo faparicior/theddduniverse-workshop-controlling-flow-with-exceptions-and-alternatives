@@ -29,9 +29,9 @@ final class PublishAdvertisementController extends CommonController
             $result = $this->useCase->execute($command);
             if ($result->isSuccess()) {
                 return $this->processSuccessfulCreateCommand();
-            } else {
-                return $this->processFailedCommand($result);
             }
+
+            return $this->processFailedCommand($result);
         } catch (Exception $exception) {
             return $this->processGenericException($exception);
         }

@@ -7,7 +7,7 @@ use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
-use Demo\App\Advertisement\Infrastructure\Errors\ZeroRecordsError;
+use Demo\App\Advertisement\Infrastructure\Exceptions\ZeroRecordsException;
 use Demo\App\Common\Result;
 use Demo\App\Framework\Database\DatabaseConnection;
 use Demo\App\Framework\database\SqliteConnection;
@@ -20,7 +20,7 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
         $this->dbConnection = $connection;
     }
 
-    public function save(Advertisement $advertisement): void
+    public function save(Advertisement $advertisement): Result
     {
         $this->dbConnection->execute(sprintf('
             INSERT INTO advertisements (id, description, email, password, advertisement_date) VALUES (\'%1$s\', \'%2$s\', \'%3$s\', \'%4$s\', \'%5$s\') 
@@ -32,13 +32,15 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
                 $advertisement->date()->value()->format('Y-m-d H:i:s')
             )
         );
+
+        return Result::success();
     }
 
     public function findById(AdvertisementId $id): Result
     {
         $result = $this->dbConnection->query(sprintf('SELECT * FROM advertisements WHERE id = \'%s\'', $id->value()));
         if(!$result) {
-            return ZeroRecordsError::build($id->value());
+            return Result::failure(ZeroRecordsException::build());
         }
 
         $row = $result[0];

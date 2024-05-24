@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Demo\App\Unit\Advertisement\Domain\ValueObject;
 
+use Demo\App\Advertisement\Domain\Exceptions\InvalidEmailException;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Email;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -35,6 +36,7 @@ class EmailTest extends TestCase
         $result = Email::build(self::INVALID_EMAIL);
 
         self::assertFalse($result->isSuccess());
-        self::assertEquals('Invalid email format ' . self::INVALID_EMAIL, $result->getError());
+        self::assertInstanceOf(InvalidEmailException::class, $result->getError());
+        self::assertEquals('Invalid email format ' . self::INVALID_EMAIL, $result->getError()->getMessage());
     }
 }

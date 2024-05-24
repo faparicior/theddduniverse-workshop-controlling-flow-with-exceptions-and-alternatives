@@ -4,17 +4,18 @@ declare(strict_types=1);
 namespace Demo\App\Common\UI;
 
 use Demo\App\Common\Application\ApplicationException;
-use Demo\App\Common\Domain\DomainException;
+use Demo\App\Common\Infrastructure\InfrastructureException;
 use Demo\App\Common\Result;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
 use Exception;
+use function PHPUnit\Framework\isInstanceOf;
 
 abstract class CommonController
 {
     public abstract function request(FrameworkRequest $request): FrameworkResponse;
 
-    protected function processDomainOrApplicationExceptionResponse(ApplicationException|DomainException|Exception $e): FrameworkResponse
+    protected function processDomainOrApplicationExceptionResponse(ApplicationException|InfrastructureException|Exception $e): FrameworkResponse
     {
         $responseCode = $e->getCode() == 404 ? FrameworkResponse::STATUS_NOT_FOUND : FrameworkResponse::STATUS_BAD_REQUEST;
         return new FrameworkResponse(
@@ -29,13 +30,24 @@ abstract class CommonController
 
     protected function processFailedCommand(Result $result): FrameworkResponse
     {
-        $statusCode = $result->getErrorCode() === 'NOT_FOUND' ? FrameworkResponse::STATUS_NOT_FOUND : FrameworkResponse::STATUS_BAD_REQUEST;
         return new FrameworkResponse(
-            $statusCode,
+            FrameworkResponse::STATUS_BAD_REQUEST,
             [
-                'errors' => $result->getError(),
-                'code' => $statusCode,
-                'message' => $result->getError(),
+                'errors' => $result->getError()->getMessage(),
+                'code' => FrameworkResponse::STATUS_BAD_REQUEST,
+                'message' => $result->getError()->getMessage(),
+            ]
+        );
+    }
+
+    protected function processNotFoundCommand(Result $result): FrameworkResponse
+    {
+        return new FrameworkResponse(
+            FrameworkResponse::STATUS_NOT_FOUND,
+            [
+                'errors' => $result->getError()->getMessage(),
+                'code' => FrameworkResponse::STATUS_NOT_FOUND,
+                'message' => $result->getError()->getMessage(),
             ]
         );
     }

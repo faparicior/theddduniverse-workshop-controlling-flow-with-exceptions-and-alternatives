@@ -66,8 +66,22 @@ final class Advertisement
         return Result::success($this);
     }
 
-    public function update(Description $description, Email $email, Password $password): Result
+    public function update(string $description, string $email, Password $password): Result
     {
+        $descriptionResult = Description::build($description);
+        if ($descriptionResult->isError()) {
+            return $descriptionResult;
+        }
+        /** @var Description $description */
+        $description = $descriptionResult->unwrap();
+
+        $emailResult = Email::build($email);
+        if ($emailResult->isError()) {
+            return $emailResult;
+        }
+        /** @var Email $email */
+        $email = $emailResult->unwrap();
+
         $this->description = $description;
         $this->email = $email;
         $this->password = $password;

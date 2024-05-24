@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Demo\App\Unit\Advertisement\Domain\ValueObject;
 
+use Demo\App\Advertisement\Domain\Exceptions\InvalidUniqueIdentifierException;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -35,6 +36,7 @@ class AdvertisementIdTest extends TestCase
         $result = AdvertisementId::build(self::INVALID_ID);
 
         self::assertFalse($result->isSuccess());
-        self::assertEquals('Invalid unique identifier format for ' . self::INVALID_ID, $result->getError());
+        self::assertInstanceOf(InvalidUniqueIdentifierException::class, $result->getError());
+        self::assertEquals('Invalid unique identifier format for ' . self::INVALID_ID, $result->getError()->getMessage());
     }
 }

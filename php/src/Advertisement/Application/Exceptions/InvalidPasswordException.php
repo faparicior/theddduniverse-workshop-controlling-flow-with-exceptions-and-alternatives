@@ -8,7 +8,7 @@ use Throwable;
 
 final class InvalidPasswordException extends ApplicationException
 {
-    public const string INVALID_PASSWORD_MESSAGE = 'Invalid password';
+    private const string INVALID_PASSWORD_MESSAGE = 'Invalid password';
 
     private function __construct(string $message)
     {

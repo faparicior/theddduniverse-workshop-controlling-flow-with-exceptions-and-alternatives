@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Demo\App\Unit\Advertisement\Domain\ValueObject;
 
+use Demo\App\Advertisement\Domain\Exceptions\DescriptionEmptyException;
+use Demo\App\Advertisement\Domain\Exceptions\DescriptionTooLongException;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -34,7 +36,8 @@ class DescriptionTest extends TestCase
         $result = Description::build($randomString);
 
         self::assertFalse($result->isSuccess());
-        self::assertEquals('Description has more than 200 characters: Has 201 characters', $result->getError());
+        self::assertInstanceOf(DescriptionTooLongException::class, $result->getError());
+        self::assertEquals('Description has more than 200 characters: Has 201 characters', $result->getError()->getMessage());
     }
 
     public function testShouldReturnErrorResultWhenDescriptionIsEmpty()
@@ -42,6 +45,7 @@ class DescriptionTest extends TestCase
         $result = Description::build('');
 
         self::assertFalse($result->isSuccess());
-        self::assertEquals('Description empty', $result->getError());
+        self::assertInstanceOf(DescriptionEmptyException::class, $result->getError());
+        self::assertEquals('Description empty', $result->getError()->getMessage());
     }
 }

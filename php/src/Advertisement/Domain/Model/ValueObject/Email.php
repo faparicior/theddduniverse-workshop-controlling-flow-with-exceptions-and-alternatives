@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use Demo\App\Advertisement\Domain\Errors\InvalidEmailFormatError;
+use Demo\App\Advertisement\Domain\Exceptions\InvalidEmailException;
 use Demo\App\Common\Result;
 
 final readonly class Email
@@ -13,7 +13,7 @@ final readonly class Email
     public static function build(string $value): Result
     {
         if (!self::validate($value)) {
-            return InvalidEmailFormatError::build($value);
+            return Result::failure(InvalidEmailException::withEmail($value));
         }
 
         return Result::success(new self($value));

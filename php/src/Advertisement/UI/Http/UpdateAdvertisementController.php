@@ -5,8 +5,7 @@ namespace Demo\App\Advertisement\UI\Http;
 
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\UpdateAdvertisement\UpdateAdvertisementUseCase;
-use Demo\App\Common\Application\ApplicationException;
-use Demo\App\Common\Domain\DomainException;
+use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
@@ -28,11 +27,16 @@ final class UpdateAdvertisementController extends CommonController
                 ($request->content())['password'],
             );
 
-            $this->useCase->execute($command);
+            $result = $this->useCase->execute($command);
 
-            return $this->processSuccessfulCommand();
-        } catch (DomainException|ApplicationException $exception) {
-            return $this->processDomainOrApplicationExceptionResponse($exception);
+            if ($result->isSuccess()) {
+                return $this->processSuccessfulCommand();
+            }
+            if ($result->getError() instanceof AdvertisementNotFoundException){
+                return $this->processNotFoundCommand($result);
+            }
+
+            return $this->processFailedCommand($result);
         } catch (Exception $exception) {
             return $this->processGenericException($exception);
         }
