@@ -10,7 +10,6 @@ import advertisement.infrastructure.exceptions.ZeroRecordsException
 
 class RenewAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(renewAdvertisementCommand: RenewAdvertisementCommand): Result<Any>{
-
         val advertisementResult = getAdvertisement(renewAdvertisementCommand)
         if (advertisementResult.isFailure) {
             return advertisementResult
