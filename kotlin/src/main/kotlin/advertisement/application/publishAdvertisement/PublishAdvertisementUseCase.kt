@@ -9,8 +9,31 @@ import java.time.LocalDateTime
 
 class PublishAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(publishAdvertisementCommand: PublishAdvertisementCommand): Result<Any> {
-        val advertisementIdResult = AdvertisementId.build(publishAdvertisementCommand.id)
+        val advertisementIsUniqueResult = ensureThatAdvertisementIsUnique(publishAdvertisementCommand)
+        if (advertisementIsUniqueResult.isFailure) {
+            return advertisementIsUniqueResult
+        }
 
+        val passwordResult = Password.fromPlainPassword(publishAdvertisementCommand.password)
+        if (passwordResult.isFailure) {
+            return passwordResult
+        }
+
+        val advertisementResult = Advertisement.build(
+            publishAdvertisementCommand.id,
+            publishAdvertisementCommand.description,
+            passwordResult.getOrThrow(),
+            LocalDateTime.now()
+        )
+        if (advertisementResult.isFailure) {
+            return advertisementResult
+        }
+
+        return advertisementRepository.save(advertisementResult.getOrThrow())
+    }
+
+    private fun ensureThatAdvertisementIsUnique(publishAdvertisementCommand: PublishAdvertisementCommand): Result<Any> {
+        val advertisementIdResult = AdvertisementId.build(publishAdvertisementCommand.id)
         if (advertisementIdResult.isFailure) {
             return advertisementIdResult
         }
@@ -20,23 +43,6 @@ class PublishAdvertisementUseCase(private val advertisementRepository: Advertise
             return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()))
         }
 
-        val passwordResult = Password.fromPlainPassword(publishAdvertisementCommand.password)
-
-        if (passwordResult.isFailure) {
-            return passwordResult
-        }
-
-        val advertisementResult = Advertisement.build(
-            advertisementId.value(),
-            publishAdvertisementCommand.description,
-            passwordResult.getOrThrow(),
-            LocalDateTime.now()
-        )
-
-        if (advertisementResult.isFailure) {
-            return advertisementResult
-        }
-
-        return advertisementRepository.save(advertisementResult.getOrThrow())
+        return Result.success(Unit)
     }
 }

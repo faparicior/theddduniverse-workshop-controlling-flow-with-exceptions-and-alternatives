@@ -11,24 +11,15 @@ import advertisement.infrastructure.exceptions.ZeroRecordsException
 
 class UpdateAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Result<Any> {
-        val advertisementIdResult = AdvertisementId.build(updateAdvertisementCommand.id)
-
-        if (advertisementIdResult.isFailure) {
-            return advertisementIdResult
-        }
-        val advertisementId = advertisementIdResult.getOrThrow()
-
         val descriptionResult = Description.build(updateAdvertisementCommand.description)
-
         if (descriptionResult.isFailure) {
             return descriptionResult
         }
 
-        val advertisementResult = advertisementRepository.findById(advertisementId)
-        if (advertisementResult.isFailure && advertisementResult.exceptionOrNull() is ZeroRecordsException) {
-            return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))
+        val advertisementResult = getAdvertisement(updateAdvertisementCommand)
+        if (advertisementResult.isFailure) {
+            return advertisementResult
         }
-
         val advertisement: Advertisement = advertisementResult.getOrThrow() as Advertisement
 
         if (!advertisement.password.isValidatedWith(updateAdvertisementCommand.password))
@@ -45,5 +36,22 @@ class UpdateAdvertisementUseCase(private val advertisementRepository: Advertisem
         }
 
         return advertisementRepository.save(advertisement)
+    }
+
+    private fun getAdvertisement(updateAdvertisementCommand: UpdateAdvertisementCommand): Result<Any>{
+        val advertisementIdResult = AdvertisementId.build(updateAdvertisementCommand.id)
+
+        if (advertisementIdResult.isFailure) {
+            return advertisementIdResult
+        }
+        val advertisementId = advertisementIdResult.getOrThrow()
+
+        val advertisementResult = advertisementRepository.findById(advertisementId)
+        if (advertisementResult.isFailure) {
+            if  (advertisementResult.exceptionOrNull() is ZeroRecordsException)
+                return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))
+        }
+
+        return advertisementResult
     }
 }
