@@ -1,6 +1,6 @@
 package advertisement.ui.http
 
-import advertisement.application.exceptions.AdvertisementNotFoundException
+import advertisement.domain.exceptions.AdvertisementNotFoundException
 import advertisement.application.updateAdvertisement.UpdateAdvertisementCommand
 import advertisement.application.updateAdvertisement.UpdateAdvertisementUseCase
 import common.ui.http.CommonController

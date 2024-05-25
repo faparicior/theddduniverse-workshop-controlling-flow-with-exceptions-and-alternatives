@@ -1,6 +1,6 @@
 package advertisement.application.publishAdvertisement
 
-import advertisement.application.exceptions.AdvertisementAlreadyExistsException
+import advertisement.domain.exceptions.AdvertisementAlreadyExistsException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId

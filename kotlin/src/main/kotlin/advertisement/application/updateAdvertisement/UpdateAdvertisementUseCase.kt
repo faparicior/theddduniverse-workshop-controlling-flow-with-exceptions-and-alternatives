@@ -1,6 +1,6 @@
 package advertisement.application.updateAdvertisement
 
-import advertisement.application.exceptions.AdvertisementNotFoundException
+import advertisement.domain.exceptions.AdvertisementNotFoundException
 import advertisement.application.exceptions.InvalidPasswordException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
