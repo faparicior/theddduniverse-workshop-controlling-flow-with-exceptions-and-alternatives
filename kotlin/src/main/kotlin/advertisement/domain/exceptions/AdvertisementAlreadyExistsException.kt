@@ -1,4 +1,4 @@
-package advertisement.application.exceptions
+package advertisement.domain.exceptions
 
 import common.application.ApplicationException
 
