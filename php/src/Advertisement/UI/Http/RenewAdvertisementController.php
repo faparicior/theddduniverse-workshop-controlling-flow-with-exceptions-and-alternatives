@@ -5,7 +5,7 @@ namespace Demo\App\Advertisement\UI\Http;
 
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementUseCase;
-use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
+use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;

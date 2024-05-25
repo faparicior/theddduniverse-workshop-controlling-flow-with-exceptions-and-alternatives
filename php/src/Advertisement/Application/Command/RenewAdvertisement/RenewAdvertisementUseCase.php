@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 
-use Demo\App\Advertisement\Application\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;

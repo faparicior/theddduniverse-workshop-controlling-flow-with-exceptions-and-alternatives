@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\PublishAdvertisement;
 
-use Demo\App\Advertisement\Application\Exceptions\AdvertisementAlreadyExistsException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Exceptions\AdvertisementAlreadyExistsException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Demo\App\Common\Result;
