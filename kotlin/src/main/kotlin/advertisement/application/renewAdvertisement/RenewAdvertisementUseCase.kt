@@ -23,10 +23,10 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
             }
         )
 
-        validatePassword(advertisement, renewAdvertisementCommand.password).map { it }.fold(
-            onSuccess = {  },
-            onFailure = { return Result.failure(it) }
-        )
+//        validatePassword(advertisement, renewAdvertisementCommand.password).map { it }.fold(
+//            onSuccess = {  },
+//            onFailure = { return Result.failure(it) }
+//        )
 
         if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
             return Result.failure(PasswordDoesNotMatchException.build())
@@ -41,10 +41,10 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
         return advertisementRepository.save(advertisement)
     }
 
-    private fun validatePassword(advertisement: Advertisement, password: String): Result<Any> {
-        return advertisement.password.isValidatedWithResult(password).map { it }.fold(
-            onSuccess = { Result.success(it) },
-            onFailure = { Result.failure(it) }
-        )
-    }
+//    private fun validatePassword(advertisement: Advertisement, password: String): Result<Any> {
+//        return advertisement.password.isValidatedWithResult(password).map { it }.fold(
+//            onSuccess = { Result.success(it) },
+//            onFailure = { Result.failure(it) }
+//        )
+//    }
 }
