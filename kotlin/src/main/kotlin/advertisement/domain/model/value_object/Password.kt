@@ -29,6 +29,18 @@ class Password private constructor(private val value: String) {
         return password.md5() == value
     }
 
+    fun isValidatedWithResult(password: String): Result<Boolean> {
+        return try {
+            if (value.startsWith("\$argon2i\$")) {
+                Result.success(Argon2Factory.create().verify(value, password.toCharArray()))
+            } else {
+                Result.success(password.md5() == value)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     private fun String.md5(): String {
         val md = MessageDigest.getInstance("MD5")
         val digest = md.digest(this.toByteArray())
