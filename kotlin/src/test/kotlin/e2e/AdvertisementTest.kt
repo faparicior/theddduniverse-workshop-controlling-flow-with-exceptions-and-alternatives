@@ -278,9 +278,9 @@ class AdvertisementTest {
 
     private fun invalidPasswordCommandResponse(): Map<String, String> {
         return mapOf(
-            "errors" to "Invalid password",
+            "errors" to "Password does not match",
             "code" to HTTP_BAD_REQUEST,
-            "message" to "Invalid password"
+            "message" to "Password does not match"
         )
     }
 

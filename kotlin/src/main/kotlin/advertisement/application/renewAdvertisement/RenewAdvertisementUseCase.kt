@@ -14,7 +14,7 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
         }
 
         if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
-            throw IllegalArgumentException("Invalid password")
+            throw IllegalArgumentException("Password does not match")
 
         advertisement.renew(Password.fromPlainPassword(renewAdvertisementCommand.password))
 

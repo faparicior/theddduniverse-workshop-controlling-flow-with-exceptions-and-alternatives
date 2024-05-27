@@ -15,7 +15,7 @@ class UpdateAdvertisementUseCase(private val advertisementRepository: Advertisem
         }
 
         if (!advertisement.password.isValidatedWith(updateAdvertisementCommand.password))
-            throw IllegalArgumentException("Invalid password")
+            throw IllegalArgumentException("Password does not match")
 
         advertisement.update(
             Description(updateAdvertisementCommand.description),
