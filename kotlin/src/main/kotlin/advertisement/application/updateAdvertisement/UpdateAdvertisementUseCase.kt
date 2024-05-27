@@ -1,6 +1,6 @@
 package advertisement.application.updateAdvertisement
 
-import advertisement.application.exceptions.InvalidPasswordException
+import advertisement.application.exceptions.PasswordDoesNotMatchException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.exceptions.AdvertisementNotFoundException
 import advertisement.domain.model.Advertisement
@@ -35,7 +35,7 @@ class UpdateAdvertisementUseCase(private val advertisementRepository: Advertisem
 
     private fun validatePassword(advertisement: Advertisement, password: String): Result<Unit>{
         if (advertisement.password.isValidatedWith(password).not())
-            return Result.failure(InvalidPasswordException.build())
+            return Result.failure(PasswordDoesNotMatchException.build())
 
         return Result.success(Unit)
     }
