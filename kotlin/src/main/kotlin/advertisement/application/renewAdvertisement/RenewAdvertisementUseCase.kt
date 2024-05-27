@@ -1,7 +1,7 @@
 package advertisement.application.renewAdvertisement
 
 import advertisement.domain.exceptions.AdvertisementNotFoundException
-import advertisement.application.exceptions.InvalidPasswordException
+import advertisement.application.exceptions.PasswordDoesNotMatchException
 import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
@@ -16,7 +16,7 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
         }
 
         if (!advertisement.password.isValidatedWith(renewAdvertisementCommand.password))
-            throw InvalidPasswordException.build()
+            throw PasswordDoesNotMatchException.build()
 
         advertisement.renew(Password.fromPlainPassword(renewAdvertisementCommand.password))
 
