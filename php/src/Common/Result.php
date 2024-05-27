@@ -42,16 +42,16 @@ final readonly class Result
     }
 
     /**
-     * @throws RuntimeException
+     * @throws Throwable
      * @return object
      */
-    public function unwrap(): object
+    public function getOrThrow(): object
     {
-        if (!$this->isSuccess) {
-            throw new RuntimeException('Result is not successful, data is unavailable.');
+        if ($this->isSuccess) {
+            return $this->data;
         }
 
-        return $this->data;
+        throw $this->error;
     }
 
     public function exception(): ?Throwable

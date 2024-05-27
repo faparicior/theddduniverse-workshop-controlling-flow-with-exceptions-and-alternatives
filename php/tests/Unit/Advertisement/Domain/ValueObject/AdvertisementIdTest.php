@@ -26,7 +26,7 @@ class AdvertisementIdTest extends TestCase
         $result = AdvertisementId::build(self::ID);
         self::assertTrue($result->isSuccess());
 
-        $advertisementId = $result->unwrap();
+        $advertisementId = $result->getOrThrow();
         self::assertInstanceOf(AdvertisementId::class, $advertisementId);
         self::assertEquals(self::ID, $advertisementId->value());
     }

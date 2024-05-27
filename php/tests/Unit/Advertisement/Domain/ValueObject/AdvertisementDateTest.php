@@ -22,7 +22,7 @@ class AdvertisementDateTest extends TestCase
     public function testShouldBeCreatedWithADate(): void
     {
         $result = AdvertisementDate::build(new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
-        $advertisementDate = $result->unwrap();
+        $advertisementDate = $result->getOrThrow();
 
         self::assertEquals(new \DateTime(self::ADVERTISEMENT_CREATION_DATE), $advertisementDate->value());
     }

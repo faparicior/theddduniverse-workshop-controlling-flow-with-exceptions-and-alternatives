@@ -24,7 +24,7 @@ class PasswordTest extends TestCase
     public function testShouldBeCreatedWithAStrongHash(): void
     {
         $result = Password::fromPlainPassword('plain-password');
-        $password = $result->unwrap();
+        $password = $result->getOrThrow();
 
         self::assertInstanceOf(Password::class, $password);
         self::assertStringStartsWith('$argon2i$', $password->value());
@@ -33,11 +33,11 @@ class PasswordTest extends TestCase
     public function testShouldBeCreatedWithEncryptedValueWithoutChangeTheOriginalHash(): void
     {
         $result = Password::fromEncryptedPassword(self::STRONG_ALGORITHM_PASSWORD);
-        $strongPassword = $result->unwrap();
+        $strongPassword = $result->getOrThrow();
         self::assertInstanceOf(Password::class, $strongPassword);
 
         $result = Password::fromEncryptedPassword(self::MD5_ALGORITHM_PASSWORD);
-        $weakPassword = $result->unwrap();
+        $weakPassword = $result->getOrThrow();
         self::assertInstanceOf(Password::class, $weakPassword);
 
         self::assertEquals(self::STRONG_ALGORITHM_PASSWORD, $strongPassword->value());
@@ -47,7 +47,7 @@ class PasswordTest extends TestCase
     public function testShouldValidatePasswordsWithAStrongAlgorithm(): void
     {
         $result = Password::fromEncryptedPassword(self::STRONG_ALGORITHM_PASSWORD);
-        $password = $result->unwrap();
+        $password = $result->getOrThrow();
 
         self::assertTrue($password->isValidatedWith(self::PLAIN_PASSWORD));
     }
@@ -55,7 +55,7 @@ class PasswordTest extends TestCase
     public function testShouldValidatePasswordsWithAWeakAlgorithm(): void
     {
         $result = Password::fromEncryptedPassword(self::MD5_ALGORITHM_PASSWORD);
-        $password = $result->unwrap();
+        $password = $result->getOrThrow();
 
         self::assertTrue($password->isValidatedWith(self::PLAIN_PASSWORD));
     }

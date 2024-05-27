@@ -29,7 +29,7 @@ final class UpdateAdvertisementUseCase
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
-        $advertisementId = $advertisementIdResult->unwrap();
+        $advertisementId = $advertisementIdResult->getOrThrow();
 
         $advertisementResult = $this->advertisementRepository->findById($advertisementId);
 
@@ -39,7 +39,7 @@ final class UpdateAdvertisementUseCase
             }
         }
         /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->unwrap();
+        $advertisement = $advertisementResult->getOrThrow();
 
         $passwordMatchResult = $this->validatePasswordMatch($command->password, $advertisement);
         if ($passwordMatchResult->isFailure()) {
@@ -51,7 +51,7 @@ final class UpdateAdvertisementUseCase
             return $newPasswordResult;
         }
         /** @var Password $newPassword */
-        $newPassword = $newPasswordResult->unwrap();
+        $newPassword = $newPasswordResult->getOrThrow();
 
         $advertisement->update(
             $command->description,

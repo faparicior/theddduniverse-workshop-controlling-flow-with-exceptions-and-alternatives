@@ -25,7 +25,7 @@ class EmailTest extends TestCase
     {
         $result = Email::build(self::EMAIL);
 
-        $email = $result->unwrap();
+        $email = $result->getOrThrow();
 
         self::assertInstanceOf(Email::class, $email);
         self::assertEquals(self::EMAIL, $email->value());

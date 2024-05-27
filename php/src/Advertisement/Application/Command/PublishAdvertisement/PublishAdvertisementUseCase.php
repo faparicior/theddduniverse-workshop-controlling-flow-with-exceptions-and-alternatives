@@ -22,7 +22,7 @@ final class PublishAdvertisementUseCase
             return $advertisementResult;
         }
         /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->unwrap();
+        $advertisement = $advertisementResult->getOrThrow();
 
         $findAdvertisementResult = $this->advertisementRepository->findById($advertisement->id());
         if ($findAdvertisementResult->isSuccess()) {
@@ -41,7 +41,7 @@ final class PublishAdvertisementUseCase
             return $passwordResult;
         }
         /** @var Password $password */
-        $password = $passwordResult->unwrap();
+        $password = $passwordResult->getOrThrow();
 
         return Advertisement::build(
             $command->id,

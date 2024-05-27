@@ -50,7 +50,7 @@ class SqliteAdvertisementRepository implements AdvertisementRepository
             return $passwordResult;
         }
         /** @var Password $password */
-        $password = $passwordResult->unwrap();
+        $password = $passwordResult->getOrThrow();
 
         return Advertisement::build(
             $row['id'],

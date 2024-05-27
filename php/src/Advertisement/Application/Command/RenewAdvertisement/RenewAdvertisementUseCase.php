@@ -29,7 +29,7 @@ final class RenewAdvertisementUseCase
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
-        $advertisementId = $advertisementIdResult->unwrap();
+        $advertisementId = $advertisementIdResult->getOrThrow();
 
         $advertisementResult = $this->advertisementRepository->findById($advertisementId);
         if ($advertisementResult->isFailure()) {
@@ -39,7 +39,7 @@ final class RenewAdvertisementUseCase
             return $advertisementResult;
         }
         /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->unwrap();
+        $advertisement = $advertisementResult->getOrThrow();
 
         $passwordMatchResult = $this->validatePasswordMatch($command->password, $advertisement);
         if ($passwordMatchResult->isFailure()) {
@@ -51,7 +51,7 @@ final class RenewAdvertisementUseCase
             return $newPasswordResult;
         }
         /** @var Password $newPassword */
-        $newPassword = $newPasswordResult->unwrap();
+        $newPassword = $newPasswordResult->getOrThrow();
 
         $renewResult = $advertisement->renew($newPassword);
         if ($renewResult->isFailure()) {
@@ -59,7 +59,7 @@ final class RenewAdvertisementUseCase
         }
 
         /** @var Advertisement $advertisement */
-        $advertisement = $renewResult->unwrap();
+        $advertisement = $renewResult->getOrThrow();
 
         $this->advertisementRepository->save($advertisement);
         return Result::success();

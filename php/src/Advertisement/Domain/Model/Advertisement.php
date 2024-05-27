@@ -27,21 +27,21 @@ final class Advertisement
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
-        $advertisementId = $advertisementIdResult->unwrap();
+        $advertisementId = $advertisementIdResult->getOrThrow();
 
         $descriptionResult = Description::build($description);
         if ($descriptionResult->isFailure()) {
             return $descriptionResult;
         }
         /** @var Description $description */
-        $description = $descriptionResult->unwrap();
+        $description = $descriptionResult->getOrThrow();
 
         $emailResult = Email::build($email);
         if ($emailResult->isFailure()) {
             return $emailResult;
         }
         /** @var Email $email */
-        $email = $emailResult->unwrap();
+        $email = $emailResult->getOrThrow();
 
         $advertisementDateResult = AdvertisementDate::build($date);
         if ($advertisementDateResult->isFailure()) {
@@ -49,7 +49,7 @@ final class Advertisement
         }
 
         /** @var AdvertisementDate $date */
-        $date = $advertisementDateResult->unwrap();
+        $date = $advertisementDateResult->getOrThrow();
 
         return Result::success(new self($advertisementId, $description, $email, $password, $date));
     }
@@ -73,14 +73,14 @@ final class Advertisement
             return $descriptionResult;
         }
         /** @var Description $description */
-        $description = $descriptionResult->unwrap();
+        $description = $descriptionResult->getOrThrow();
 
         $emailResult = Email::build($email);
         if ($emailResult->isFailure()) {
             return $emailResult;
         }
         /** @var Email $email */
-        $email = $emailResult->unwrap();
+        $email = $emailResult->getOrThrow();
 
         $this->description = $description;
         $this->email = $email;
@@ -127,7 +127,7 @@ final class Advertisement
         }
 
         /** @var AdvertisementDate $date */
-        $date = $result->unwrap();
+        $date = $result->getOrThrow();
         $this->date = $date;
 
         return Result::success();

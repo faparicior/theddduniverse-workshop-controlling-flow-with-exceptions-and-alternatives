@@ -25,7 +25,7 @@ class DescriptionTest extends TestCase
     {
         $result = Description::build(self::DESCRIPTION);
 
-        $description = $result->unwrap();
+        $description = $result->getOrThrow();
         self::assertInstanceOf(Description::class, $description);
         self::assertEquals(self::DESCRIPTION, $description->value());
     }
