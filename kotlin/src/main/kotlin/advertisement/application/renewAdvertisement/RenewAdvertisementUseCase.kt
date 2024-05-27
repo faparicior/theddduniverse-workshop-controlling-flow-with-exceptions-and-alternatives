@@ -10,12 +10,12 @@ import advertisement.infrastructure.exceptions.ZeroRecordsException
 
 class RenewAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
     fun execute(renewAdvertisementCommand: RenewAdvertisementCommand): Result<Any>{
-        val advertisementId: AdvertisementId = AdvertisementId.build(renewAdvertisementCommand.id).map { it }.fold(
+        val advertisementId = AdvertisementId.build(renewAdvertisementCommand.id).map { it }.fold(
             onSuccess = { it },
             onFailure = { return Result.failure(it) }
         )
 
-        val advertisement: Advertisement = advertisementRepository.findById(advertisementId).map { it as Advertisement }.fold(
+        val advertisement = advertisementRepository.findById(advertisementId).map { it as Advertisement }.fold(
             onSuccess = { it },
             onFailure = {
                 if  (it is ZeroRecordsException) return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))

@@ -1,5 +1,6 @@
 package advertisement.domain.model.value_object
 
+import advertisement.application.exceptions.InvalidPasswordException
 import de.mkammerer.argon2.Argon2Factory
 import java.security.MessageDigest
 
@@ -35,6 +36,20 @@ class Password private constructor(private val value: String) {
                 Result.success(Argon2Factory.create().verify(value, password.toCharArray()))
             } else {
                 Result.success(password.md5() == value)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun isValidatedWithResultUnit(password: String): Result<Unit> {
+        return try {
+            if (value.startsWith("\$argon2i\$")) {
+                if (Argon2Factory.create().verify(value, password.toCharArray())) return Result.success(Unit)
+                Result.failure(InvalidPasswordException.build())
+            } else {
+                if (password.md5() == value) return Result.success(Unit)
+                Result.failure(InvalidPasswordException.build())
             }
         } catch (e: Exception) {
             Result.failure(e)
