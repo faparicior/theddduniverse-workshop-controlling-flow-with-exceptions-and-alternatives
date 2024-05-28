@@ -43,9 +43,8 @@ final readonly class Result
 
     /**
      * @throws Throwable
-     * @return object
      */
-    public function getOrThrow(): object
+    public function getOrThrow(): ?object
     {
         if ($this->isSuccess) {
             return $this->data;
@@ -61,6 +60,15 @@ final readonly class Result
         }
 
         return $this->error;
+    }
+
+    public static function runCatching($object, \Closure $block) {
+        try {
+            $result = $block($object);
+            return self::success($result);
+        } catch (Throwable $e) {
+            return self::failure($e);
+        }
     }
 
     public function getErrorCode(): ?string

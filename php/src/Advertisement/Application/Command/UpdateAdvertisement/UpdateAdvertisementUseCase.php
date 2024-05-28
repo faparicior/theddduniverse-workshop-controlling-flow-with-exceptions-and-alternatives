@@ -24,44 +24,40 @@ final class UpdateAdvertisementUseCase
      */
     public function execute(UpdateAdvertisementCommand $command): Result
     {
-        $advertisementIdResult = AdvertisementId::build($command->id);
-        if ($advertisementIdResult->isFailure()) {
-            return $advertisementIdResult;
-        }
-        /** @var AdvertisementId $advertisementId */
-        $advertisementId = $advertisementIdResult->getOrThrow();
+        return Result::runCatching($command, function ($command) {
+            /** @var AdvertisementId $advertisementId */
+            $advertisementId = AdvertisementId::build($command->id)->getOrThrow();
 
-        $advertisementResult = $this->advertisementRepository->findById($advertisementId);
+            /** @var Advertisement $advertisement */
+            $advertisement = $this->getAdvertisement($advertisementId)->getOrThrow();
 
-        if ($advertisementResult->isFailure()) {
-            if ($advertisementResult->exception() instanceof ZeroRecordsException) {
-                return Result::failure(AdvertisementNotFoundException::withId($command->id));
+            $this->validatePasswordMatch($command->password, $advertisement)->getOrThrow();
+
+            /** @var Password $newPassword */
+            $newPassword = Password::fromPlainPassword($command->password)->getOrThrow();
+            $advertisement->update(
+                $command->description,
+                $command->email,
+                $newPassword,
+            );
+
+            $this->advertisementRepository->save($advertisement);
+
+            return Result::success();
+        });
+    }
+
+    public function getAdvertisement(AdvertisementId $advertisementId): Result
+    {
+        try {
+            $advertisement = $this->advertisementRepository->findById($advertisementId)->getOrThrow();
+            return Result::success($advertisement);
+        } catch (\Throwable $e) {
+            if ($e instanceof ZeroRecordsException) {
+                return Result::failure(AdvertisementNotFoundException::withId($advertisementId->value()));
             }
+            return Result::failure($e);
         }
-        /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->getOrThrow();
-
-        $passwordMatchResult = $this->validatePasswordMatch($command->password, $advertisement);
-        if ($passwordMatchResult->isFailure()) {
-            return $passwordMatchResult;
-        }
-
-        $newPasswordResult = Password::fromPlainPassword($command->password);
-        if ($newPasswordResult->isFailure()) {
-            return $newPasswordResult;
-        }
-        /** @var Password $newPassword */
-        $newPassword = $newPasswordResult->getOrThrow();
-
-        $advertisement->update(
-            $command->description,
-            $command->email,
-            $newPassword,
-        );
-
-        $this->advertisementRepository->save($advertisement);
-
-        return Result::success();
     }
 
     private function validatePasswordMatch(string $password, Advertisement $advertisement): Result
