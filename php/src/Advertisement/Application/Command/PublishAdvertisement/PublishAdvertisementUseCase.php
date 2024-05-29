@@ -15,6 +15,9 @@ final class PublishAdvertisementUseCase
     {
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function execute(PublishAdvertisementCommand $command): Result
     {
         $advertisementResult = $this->validateAdvertisement($command);
