@@ -15,7 +15,7 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
             onFailure = { return Result.failure(it) }
         )
 
-        val advertisement = advertisementRepository.findById(advertisementId).map { it as Advertisement }.fold(
+        var advertisement = advertisementRepository.findById(advertisementId).map { it as Advertisement }.fold(
             onSuccess = { it },
             onFailure = {
                 if  (it is ZeroRecordsException) return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))
@@ -36,7 +36,10 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
             onFailure = { return Result.failure(it) }
         )
 
-        advertisement.renew(password)
+        advertisement = advertisement.renew(password).map { it }.fold(
+            onSuccess = { it },
+            onFailure = { return Result.failure(it) }
+        )
 
         return advertisementRepository.save(advertisement)
     }
