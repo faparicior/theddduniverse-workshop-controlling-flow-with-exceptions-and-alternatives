@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.8.22"
     application
 }
 
@@ -16,6 +16,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
     implementation("org.xerial:sqlite-jdbc:3.44.1.0")
     implementation("de.mkammerer:argon2-jvm:2.11")
+    implementation("io.arrow-kt:arrow-core:1.2.4")
 
     testImplementation(kotlin("test"))
 }
