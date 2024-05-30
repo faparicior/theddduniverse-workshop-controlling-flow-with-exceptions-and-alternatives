@@ -5,7 +5,7 @@ class DescriptionTooLongException private constructor(message: String) : Excepti
     companion object {
         fun withLongitudeMessage(description: String): DescriptionTooLongException {
             val length = description.length
-            return DescriptionTooLongException("DDescription has more than 200 characters: Has $length characters")
+            return DescriptionTooLongException("Description has more than 200 characters: Has $length characters")
         }
     }
 }
