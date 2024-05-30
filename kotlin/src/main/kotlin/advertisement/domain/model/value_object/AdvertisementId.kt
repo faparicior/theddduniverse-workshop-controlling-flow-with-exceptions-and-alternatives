@@ -1,26 +1,22 @@
 package advertisement.domain.model.value_object
 
-import advertisement.domain.exceptions.InvalidUniqueIdentifierException
+import advertisement.domain.errors.AdvertisementIdError
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import common.Errors
 
-class AdvertisementId private constructor (private val value: String) {
+class AdvertisementId private constructor(private val value: String) {
 
     companion object {
-        fun build(value: String): Result<AdvertisementId> {
-            if (!validate(value)) {
-                return Result.failure(InvalidUniqueIdentifierException.withId(value))
+        private val regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$".toRegex()
+
+        fun build(value: String): Either<Errors, AdvertisementId> =
+            when {
+                !value.matches(regex) -> AdvertisementIdError.InvalidUniqueIdIdentifier.withId(value).left()
+                else -> AdvertisementId(value).right()
             }
-
-            return Result.success(AdvertisementId(value))
-        }
-
-        private fun validate(value: String): Boolean {
-            val regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-
-            return value.matches(regex.toRegex())
-        }
     }
 
-    fun value(): String {
-        return value
-    }
+    fun value(): String = value
 }
