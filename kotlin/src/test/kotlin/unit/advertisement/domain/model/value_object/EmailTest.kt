@@ -1,6 +1,5 @@
 package unit.advertisement.domain.model.value_object
 
-import advertisement.domain.errors.EmailError
 import advertisement.domain.model.value_object.Email
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -36,8 +35,7 @@ class EmailTest
 
         result.fold(
             { error ->
-                Assertions.assertTrue(error is EmailError.InvalidEmailFormat)
-                Assertions.assertEquals("Invalid email format $INVALID_EMAIL", error.errorMessage)
+                Assertions.assertEquals("Invalid email format $INVALID_EMAIL", error.message)
             },
             { description -> Assertions.fail("Expected an error, but got a valid email: ${description.value()}") }
         )

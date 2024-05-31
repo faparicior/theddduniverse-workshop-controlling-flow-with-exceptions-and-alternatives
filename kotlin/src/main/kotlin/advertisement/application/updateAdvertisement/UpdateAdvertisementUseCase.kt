@@ -1,17 +1,18 @@
 package advertisement.application.updateAdvertisement
 
-import advertisement.application.exceptions.PasswordDoesNotMatchException
+import advertisement.application.errors.PasswordDoesNotMatchError
 import advertisement.domain.AdvertisementRepository
-import advertisement.domain.exceptions.AdvertisementNotFoundException
+import advertisement.domain.errors.AdvertisementNotFoundError
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 import arrow.core.Either
 import arrow.core.raise.either
+import common.BoundedContextError
 
 class UpdateAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Either<Any, Any> {
+    fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Either<BoundedContextError, Unit> {
         return either {
             val advertisementId = AdvertisementId.build(updateAdvertisementCommand.id).bind()
             val description = Description.build(updateAdvertisementCommand.description).bind()
@@ -26,18 +27,18 @@ class UpdateAdvertisementUseCase(private val advertisementRepository: Advertisem
         }
     }
 
-    private fun getAdvertisement(advertisementId: AdvertisementId): Either<AdvertisementNotFoundException, Advertisement> {
+    private fun getAdvertisement(advertisementId: AdvertisementId): Either<BoundedContextError, Advertisement> {
         val advertisement = advertisementRepository.findById(advertisementId)
         if (advertisement.isLeft()) {
-            return Either.Left(AdvertisementNotFoundException.withId(advertisementId.value()))
+            return Either.Left(AdvertisementNotFoundError.withId(advertisementId.value()))
         }
 
-        return Either.Right(advertisement.orNull()!!)
+        return Either.Right(advertisement.getOrNull()!!)
     }
 
-    private fun validatePassword(advertisement: Advertisement, password: String): Either<PasswordDoesNotMatchException, Unit> {
+    private fun validatePassword(advertisement: Advertisement, password: String): Either<BoundedContextError, Unit> {
         if (advertisement.password.isValidatedWith(password).not())
-            return Either.Left(PasswordDoesNotMatchException.build())
+            return Either.Left(PasswordDoesNotMatchError.build())
 
         return Either.Right(Unit)
     }

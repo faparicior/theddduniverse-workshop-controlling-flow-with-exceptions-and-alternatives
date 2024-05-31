@@ -4,14 +4,15 @@ import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
-import advertisement.infrastructure.exceptions.ZeroRecordsException
+import advertisement.infrastructure.errors.ZeroRecordsError
 import arrow.core.Either
 import arrow.core.flatMap
+import common.BoundedContextError
 import framework.database.DatabaseConnection
 import java.time.LocalDateTime
 
 class SqLiteAdvertisementRepository(private val connection: DatabaseConnection): AdvertisementRepository {
-    override fun save(advertisement: Advertisement): Either<Any, Advertisement> {
+    override fun save(advertisement: Advertisement): Either<BoundedContextError, Advertisement> {
         val passwordHash = advertisement.password.value()
         connection.execute(
             "INSERT INTO advertisements (id, description, password, advertisement_date) VALUES ('" +
@@ -22,13 +23,13 @@ class SqLiteAdvertisementRepository(private val connection: DatabaseConnection):
         return Either.Right(advertisement)
     }
 
-    override fun findById(id: AdvertisementId): Either<Any, Advertisement> {
+    override fun findById(id: AdvertisementId): Either<BoundedContextError, Advertisement> {
         val result = connection.query(
             "SELECT * FROM advertisements WHERE id = '${id.value()}'"
         )
 
         if (!result.next()) {
-            return Either.Left(ZeroRecordsException.withId(id.value()))
+            return Either.Left(ZeroRecordsError.withId(id.value()))
         }
 
         return Password.fromEncryptedPassword(result.getString("password")).flatMap {

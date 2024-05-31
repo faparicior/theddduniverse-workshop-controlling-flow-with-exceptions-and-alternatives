@@ -1,7 +1,8 @@
 package common.ui.http
 
 import arrow.core.Either
-import arrow.core.left
+import common.BoundedContextError
+import common.domain.EntityNotFoundDomainError
 import framework.FrameworkResponse
 
 abstract class CommonController {
@@ -17,13 +18,13 @@ abstract class CommonController {
         )
     }
 
-    protected fun processApplicationOrDomainException(exception: Either<Any, Unit>): FrameworkResponse {
+    protected fun processError(error: BoundedContextError): FrameworkResponse {
         return FrameworkResponse(
             FrameworkResponse.STATUS_BAD_REQUEST,
             mapOf(
-                "errors" to exception.left().toString(),
+                "errors" to error.message,
                 "code" to FrameworkResponse.STATUS_BAD_REQUEST.toString(),
-                "message" to exception.left().toString(),
+                "message" to error.message,
             ),
         )
     }
@@ -50,8 +51,8 @@ abstract class CommonController {
         )
     }
 
-    protected fun processNotFoundCommand(exception: Throwable): FrameworkResponse {
-        val message = exception.message.toString()
+    protected fun processNotFoundCommand(error: EntityNotFoundDomainError): FrameworkResponse {
+        val message = error.message
 
         return FrameworkResponse(
             FrameworkResponse.STATUS_NOT_FOUND,
@@ -61,5 +62,19 @@ abstract class CommonController {
                 "message" to message,
             ),
         )
+    }
+
+    protected fun processResult(result: Either<BoundedContextError, Any>): FrameworkResponse {
+        return when (result) {
+            is Either.Left -> processTypeOfError(result.value)
+            is Either.Right -> processSuccessfulCommand()
+        }
+    }
+
+    private fun processTypeOfError(error: BoundedContextError): FrameworkResponse {
+        return when (error) {
+            is EntityNotFoundDomainError -> processNotFoundCommand(error)
+            else -> processError(error)
+        }
     }
 }

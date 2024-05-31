@@ -1,6 +1,7 @@
 package unit.advertisement.domain.model.value_object
 
-import advertisement.domain.errors.DescriptionError
+import advertisement.domain.errors.DescriptionEmptyError
+import advertisement.domain.errors.DescriptionTooLongError
 import advertisement.domain.model.value_object.Description
 import arrow.core.*
 import org.junit.jupiter.api.Assertions
@@ -40,8 +41,8 @@ class DescriptionTest
         Assertions.assertTrue(result is Either.Left)
         result.fold(
             { error ->
-                Assertions.assertTrue(error is DescriptionError.Empty)
-                Assertions.assertEquals("Description empty", error.errorMessage)
+                Assertions.assertTrue(error is DescriptionEmptyError)
+                Assertions.assertEquals("Description empty", error.message)
             },
             { description -> Assertions.fail("Expected an error, but got a valid description: ${description.value()}") }
         )
@@ -54,8 +55,8 @@ class DescriptionTest
         Assertions.assertTrue(result is Either.Left)
         result.fold(
             { error ->
-                Assertions.assertTrue(error is DescriptionError.TooLong)
-                Assertions.assertEquals("Description has more than 200 characters: Has ${LONG_DESCRIPTION.length}", error.errorMessage)
+                Assertions.assertTrue(error is DescriptionTooLongError)
+                Assertions.assertEquals("Description has more than 200 characters: Has ${LONG_DESCRIPTION.length}", error.message)
             },
             { description -> Assertions.fail("Expected an error, but got a valid description: ${description.value()}") }
         )

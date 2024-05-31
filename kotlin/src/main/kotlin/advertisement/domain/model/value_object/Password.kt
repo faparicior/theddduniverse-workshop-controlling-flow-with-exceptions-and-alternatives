@@ -2,19 +2,20 @@ package advertisement.domain.model.value_object
 
 import arrow.core.Either
 import arrow.core.right
+import common.BoundedContextError
 import de.mkammerer.argon2.Argon2Factory
 import java.security.MessageDigest
 
 class Password private constructor(private val value: String) {
 
     companion object {
-        fun fromPlainPassword(password: String): Either<Unit, Password> {
+        fun fromPlainPassword(password: String): Either<BoundedContextError, Password> {
             val encryptedPassword = Argon2Factory.create().hash(1, 1024, 1, password.toCharArray())
 
             return Password(encryptedPassword).right()
         }
 
-        fun fromEncryptedPassword(encryptedPassword: String): Either<Unit, Password> {
+        fun fromEncryptedPassword(encryptedPassword: String): Either<BoundedContextError, Password> {
             return Password(encryptedPassword).right()
         }
     }

@@ -1,6 +1,5 @@
 package unit.advertisement.domain.model.value_object
 
-import advertisement.domain.errors.AdvertisementIdError
 import advertisement.domain.model.value_object.AdvertisementId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -37,8 +36,7 @@ class AdvertisementIdTest
 
         result.fold(
             { error ->
-                Assertions.assertTrue(error is AdvertisementIdError.InvalidFormat)
-                Assertions.assertEquals("Invalid unique identifier format for $INVALID_ID", error.errorMessage)
+                Assertions.assertEquals("Invalid unique identifier format for $INVALID_ID", error.message)
             },
             { id -> Assertions.fail("Expected an error, but got a valid id: ${id.value()}") }
         )

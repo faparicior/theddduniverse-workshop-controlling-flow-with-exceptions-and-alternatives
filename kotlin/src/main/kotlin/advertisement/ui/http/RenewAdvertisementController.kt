@@ -1,6 +1,5 @@
 package advertisement.ui.http
 
-import advertisement.domain.exceptions.AdvertisementNotFoundException
 import advertisement.application.renewAdvertisement.RenewAdvertisementCommand
 import advertisement.application.renewAdvertisement.RenewAdvertisementUseCase
 import common.ui.http.CommonController
@@ -17,14 +16,7 @@ class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCas
                     request.content["password"]!!,
                 )
             )
-            if (result.isFailure) {
-                if (result.exceptionOrNull() is AdvertisementNotFoundException) {
-                    return processNotFoundCommand(result.exceptionOrNull()!!)
-                }
-                return processApplicationOrDomainException(result.exceptionOrNull()!!)
-            }
-
-            return processSuccessfulCommand()
+            return processResult(result)
         } catch (e: Exception) {
             return processGenericException(e)
         }

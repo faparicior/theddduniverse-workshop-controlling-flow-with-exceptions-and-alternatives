@@ -1,16 +1,17 @@
 package advertisement.application.publishAdvertisement
 
-import advertisement.domain.exceptions.AdvertisementAlreadyExistsException
 import advertisement.domain.AdvertisementRepository
+import advertisement.domain.errors.AdvertisementAlreadyExistsError
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
 import arrow.core.Either
 import arrow.core.raise.either
+import common.BoundedContextError
 import java.time.LocalDateTime
 
 class PublishAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(publishAdvertisementCommand: PublishAdvertisementCommand): Either<Any, Unit> {
+    fun execute(publishAdvertisementCommand: PublishAdvertisementCommand): Either<BoundedContextError, Unit> {
         return either {
             val advertisementId = AdvertisementId.build(publishAdvertisementCommand.id).bind()
             ensureThatAdvertisementIsUnique(advertisementId).bind()
@@ -28,9 +29,9 @@ class PublishAdvertisementUseCase(private val advertisementRepository: Advertise
         }
     }
 
-    private fun ensureThatAdvertisementIsUnique(advertisementId: AdvertisementId): Either<AdvertisementAlreadyExistsException, Unit> {
+    private fun ensureThatAdvertisementIsUnique(advertisementId: AdvertisementId): Either<BoundedContextError, Unit> {
         if (advertisementRepository.findById(advertisementId).isRight()) {
-            return Either.Left(AdvertisementAlreadyExistsException.withId(advertisementId.value()))
+            return Either.Left(AdvertisementAlreadyExistsError.withId(advertisementId.value()))
         }
 
         return Either.Right(Unit)

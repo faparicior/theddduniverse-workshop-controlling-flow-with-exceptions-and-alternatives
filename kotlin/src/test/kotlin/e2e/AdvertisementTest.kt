@@ -203,7 +203,6 @@ class AdvertisementTest {
                 )
             )
 
-
             Assertions.assertEquals(FrameworkResponse.STATUS_BAD_REQUEST, result.statusCode)
             Assertions.assertEquals(invalidPasswordCommandResponse(), result.content)
             val resultSet = this.connection.query("SELECT * from advertisements;")
@@ -223,11 +222,11 @@ class AdvertisementTest {
 
         val result = server.route(FrameworkRequest(
             FrameworkRequest.METHOD_PATCH,
-            "advertisement/$NON_EXISTENT_ADVERTISEMENT_ID",
-            mapOf(
-                "password" to PASSWORD,
+                "advertisement/$NON_EXISTENT_ADVERTISEMENT_ID",
+                mapOf(
+                    "password" to PASSWORD,
+                )
             )
-        )
         )
 
         Assertions.assertEquals(FrameworkResponse.STATUS_NOT_FOUND, result.statusCode)
@@ -240,12 +239,12 @@ class AdvertisementTest {
 
         val result = server.route(FrameworkRequest(
             FrameworkRequest.METHOD_PUT,
-            "advertisement/$NON_EXISTENT_ADVERTISEMENT_ID",
-            mapOf(
-                "description" to DESCRIPTION,
-                "password" to PASSWORD,
+                "advertisement/$NON_EXISTENT_ADVERTISEMENT_ID",
+                mapOf(
+                    "description" to DESCRIPTION,
+                    "password" to PASSWORD,
+                )
             )
-        )
         )
 
         Assertions.assertEquals(FrameworkResponse.STATUS_NOT_FOUND, result.statusCode)

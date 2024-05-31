@@ -6,13 +6,16 @@ import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
 import arrow.core.Either
 import arrow.core.flatMap
+import common.BoundedContextError
 import java.time.LocalDateTime
 
 class Advertisement private constructor(val id: AdvertisementId, var description: Description, var password: Password, var date: AdvertisementDate)
 {
+    // We use flatmap instead of Bind to show the difference
+
     companion object
     {
-        fun build(id: String, description: String, password: Password, date: LocalDateTime): Either<Any, Advertisement>
+        fun build(id: String, description: String, password: Password, date: LocalDateTime): Either<BoundedContextError, Advertisement>
         {
             return AdvertisementId.build(id).flatMap {
                 advertisementId -> Description.build(description).flatMap {
@@ -24,7 +27,7 @@ class Advertisement private constructor(val id: AdvertisementId, var description
         }
     }
 
-    fun update(description: Description, password: Password): Either<Any, Advertisement> {
+    fun update(description: Description, password: Password): Either<BoundedContextError, Advertisement> {
         this.description = description
         this.password = password
 
@@ -33,7 +36,7 @@ class Advertisement private constructor(val id: AdvertisementId, var description
         }
     }
 
-    fun renew(password: Password): Either<Any, Advertisement>
+    fun renew(password: Password): Either<BoundedContextError, Advertisement>
     {
         this.password = password
 
@@ -42,7 +45,7 @@ class Advertisement private constructor(val id: AdvertisementId, var description
         }
     }
 
-    private fun updateDate():  Either<Any, AdvertisementDate>
+    private fun updateDate():  Either<BoundedContextError, AdvertisementDate>
     {
         return AdvertisementDate.build(LocalDateTime.now()).map {
             this.date = it

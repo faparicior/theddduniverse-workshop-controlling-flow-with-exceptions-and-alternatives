@@ -1,6 +1,6 @@
 package common.domain
 
-import common.GenericErrors
+import common.BoundedContextError
 
-open class DomainError(message: String) : GenericErrors(message) {
+open class DomainError(message: String) : BoundedContextError(message) {
 }
