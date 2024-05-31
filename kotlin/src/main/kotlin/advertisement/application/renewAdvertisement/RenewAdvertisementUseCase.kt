@@ -6,6 +6,7 @@ import advertisement.domain.errors.AdvertisementNotFoundError
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
+import advertisement.infrastructure.errors.ZeroRecordsError
 import arrow.core.Either
 import arrow.core.raise.either
 import common.BoundedContextError
@@ -27,11 +28,16 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
 
     private fun getAdvertisement(advertisementId: AdvertisementId): Either<BoundedContextError, Advertisement> {
         val advertisement = advertisementRepository.findById(advertisementId)
-        if (advertisement.isLeft()) {
-            return Either.Left(AdvertisementNotFoundError.withId(advertisementId.value()))
-        }
-
-        return Either.Right(advertisement.getOrNull()!!)
+        return advertisement.fold(
+            { error ->
+                if (error is ZeroRecordsError) {
+                    Either.Left(AdvertisementNotFoundError.withId(advertisementId.value()))
+                } else {
+                    Either.Left(error)
+                }
+            },
+            { ad -> Either.Right(ad) }
+        )
     }
 
     private fun validatePassword(advertisement: Advertisement, password: String): Either<BoundedContextError, Unit> {
