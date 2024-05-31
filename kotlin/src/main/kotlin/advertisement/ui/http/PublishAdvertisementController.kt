@@ -17,7 +17,7 @@ class PublishAdvertisementController(private val useCase: PublishAdvertisementUs
                     request.content["password"]!!,
                 )
             )
-            return processResult(result)
+            return processResult(result, FrameworkResponse.STATUS_CREATED)
         } catch (e: Exception) {
             return processGenericException(e)
         }

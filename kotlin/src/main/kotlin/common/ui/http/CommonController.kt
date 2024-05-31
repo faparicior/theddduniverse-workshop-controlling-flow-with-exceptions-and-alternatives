@@ -29,23 +29,12 @@ abstract class CommonController {
         )
     }
 
-    protected fun processSuccessfulCreateCommand(): FrameworkResponse {
+    protected fun processSuccessfulCommand(statusCode: Int): FrameworkResponse {
         return FrameworkResponse(
-            FrameworkResponse.STATUS_CREATED,
+            statusCode,
             mapOf(
                 "errors" to "",
-                "code" to FrameworkResponse.STATUS_CREATED.toString(),
-                "message" to "",
-            ),
-        )
-    }
-
-    protected fun processSuccessfulCommand(): FrameworkResponse {
-        return FrameworkResponse(
-            FrameworkResponse.STATUS_OK,
-            mapOf(
-                "errors" to "",
-                "code" to FrameworkResponse.STATUS_OK.toString(),
+                "code" to statusCode.toString(),
                 "message" to "",
             ),
         )
@@ -64,10 +53,10 @@ abstract class CommonController {
         )
     }
 
-    protected fun processResult(result: Either<BoundedContextError, Any>): FrameworkResponse {
+    protected fun processResult(result: Either<BoundedContextError, Any>, okStatusCode: Int = FrameworkResponse.STATUS_OK): FrameworkResponse {
         return when (result) {
             is Either.Left -> processTypeOfError(result.value)
-            is Either.Right -> processSuccessfulCommand()
+            is Either.Right -> processSuccessfulCommand(okStatusCode)
         }
     }
 
