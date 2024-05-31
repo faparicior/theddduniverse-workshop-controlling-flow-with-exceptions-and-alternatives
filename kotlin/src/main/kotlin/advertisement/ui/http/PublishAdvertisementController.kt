@@ -2,6 +2,7 @@ package advertisement.ui.http
 
 import advertisement.application.publishAdvertisement.PublishAdvertisementCommand
 import advertisement.application.publishAdvertisement.PublishAdvertisementUseCase
+import arrow.core.Either
 import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
@@ -17,11 +18,10 @@ class PublishAdvertisementController(private val useCase: PublishAdvertisementUs
                     request.content["password"]!!,
                 )
             )
-            if (result.isFailure) {
-                return processApplicationOrDomainException(result.exceptionOrNull()!!)
+            return when (result) {
+                is Either.Left -> processApplicationOrDomainException(result.value)
+                is Either.Right -> processSuccessfulCreateCommand()
             }
-
-            return processSuccessfulCreateCommand()
         } catch (e: Exception) {
             return processGenericException(e)
         }

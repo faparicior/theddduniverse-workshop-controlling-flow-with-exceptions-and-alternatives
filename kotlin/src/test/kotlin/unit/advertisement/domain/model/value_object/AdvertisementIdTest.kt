@@ -1,6 +1,6 @@
 package unit.advertisement.domain.model.value_object
 
-import advertisement.domain.exceptions.InvalidUniqueIdentifierException
+import advertisement.domain.errors.AdvertisementIdError
 import advertisement.domain.model.value_object.AdvertisementId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -25,15 +25,22 @@ class AdvertisementIdTest
     fun testShouldCreateAnAdvertisementId() {
         val result = AdvertisementId.build(ID)
 
-        Assertions.assertTrue(result.isSuccess)
-        Assertions.assertEquals(ID, result.getOrNull()!!.value())
+        result.fold(
+            { error -> Assertions.fail("Expected a valid id, but got error: $error") },
+            { id -> Assertions.assertEquals(ID, id.value()) }
+        )
     }
 
     @Test
     fun testShouldReturnErrorResultIfHasNotUuidV4Standards() {
         val result = AdvertisementId.build(INVALID_ID)
 
-        Assertions.assertTrue(result.isFailure)
-        Assertions.assertEquals(InvalidUniqueIdentifierException::class.java, result.exceptionOrNull()!!.javaClass)
+        result.fold(
+            { error ->
+                Assertions.assertTrue(error is AdvertisementIdError.InvalidFormat)
+                Assertions.assertEquals("Invalid unique identifier format for $INVALID_ID", error.errorMessage)
+            },
+            { id -> Assertions.fail("Expected an error, but got a valid id: ${id.value()}") }
+        )
     }
 }

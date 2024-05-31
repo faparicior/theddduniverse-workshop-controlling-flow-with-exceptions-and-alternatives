@@ -1,6 +1,6 @@
 package unit.advertisement.domain.model.value_object
 
-import advertisement.domain.exceptions.InvalidEmailException
+import advertisement.domain.errors.EmailError
 import advertisement.domain.model.value_object.Email
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -24,15 +24,22 @@ class EmailTest
     fun testShouldCreateAnEmail() {
         val result = Email.build(VALID_EMAIL)
 
-        Assertions.assertTrue(result.isSuccess)
-        Assertions.assertEquals(VALID_EMAIL, result.getOrNull()!!.value())
+        result.fold(
+            { error -> Assertions.fail("Expected a valid email, but got error: $error") },
+            { id -> Assertions.assertEquals(VALID_EMAIL, id.value()) }
+        )
     }
 
     @Test
     fun testShouldThrowAnExceptionWhenEmailIsInvalid() {
         val result = Email.build(INVALID_EMAIL)
 
-        Assertions.assertTrue(result.isFailure)
-        Assertions.assertEquals(InvalidEmailException::class.java, result.exceptionOrNull()!!.javaClass)
+        result.fold(
+            { error ->
+                Assertions.assertTrue(error is EmailError.InvalidEmailFormat)
+                Assertions.assertEquals("Invalid email format $INVALID_EMAIL", error.errorMessage)
+            },
+            { description -> Assertions.fail("Expected an error, but got a valid email: ${description.value()}") }
+        )
     }
 }

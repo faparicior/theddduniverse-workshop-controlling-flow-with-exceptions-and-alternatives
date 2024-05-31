@@ -1,6 +1,6 @@
 package common.domain
 
-import common.Errors
+import common.GenericErrors
 
-open class DomainError(message: String) : Errors(message) {
+open class DomainError(message: String) : GenericErrors(message) {
 }

@@ -5,44 +5,34 @@ import advertisement.domain.AdvertisementRepository
 import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
+import arrow.core.Either
+import arrow.core.raise.either
 import java.time.LocalDateTime
 
 class PublishAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(publishAdvertisementCommand: PublishAdvertisementCommand): Result<Any> {
-        val advertisementIsUniqueResult = ensureThatAdvertisementIsUnique(publishAdvertisementCommand)
-        if (advertisementIsUniqueResult.isFailure) {
-            return advertisementIsUniqueResult
-        }
+    fun execute(publishAdvertisementCommand: PublishAdvertisementCommand): Either<Any, Unit> {
+        return either {
+            val advertisementId = AdvertisementId.build(publishAdvertisementCommand.id).bind()
+            ensureThatAdvertisementIsUnique(advertisementId).bind()
 
-        val passwordResult = Password.fromPlainPassword(publishAdvertisementCommand.password)
-        if (passwordResult.isFailure) {
-            return passwordResult
-        }
+            val password = Password.fromPlainPassword(publishAdvertisementCommand.password).bind()
 
-        val advertisementResult = Advertisement.build(
-            publishAdvertisementCommand.id,
-            publishAdvertisementCommand.description,
-            passwordResult.getOrThrow(),
-            LocalDateTime.now()
-        )
-        if (advertisementResult.isFailure) {
-            return advertisementResult
-        }
+            val advertisement = Advertisement.build(
+                publishAdvertisementCommand.id,
+                publishAdvertisementCommand.description,
+                password,
+                LocalDateTime.now()
+            ).bind()
 
-        return advertisementRepository.save(advertisementResult.getOrThrow())
+            advertisementRepository.save(advertisement).bind()
+        }
     }
 
-    private fun ensureThatAdvertisementIsUnique(publishAdvertisementCommand: PublishAdvertisementCommand): Result<Any> {
-        val advertisementIdResult = AdvertisementId.build(publishAdvertisementCommand.id)
-        if (advertisementIdResult.isFailure) {
-            return advertisementIdResult
-        }
-        val advertisementId = advertisementIdResult.getOrThrow()
-
-        if (advertisementRepository.findById(advertisementId).isSuccess) {
-            return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()))
+    private fun ensureThatAdvertisementIsUnique(advertisementId: AdvertisementId): Either<AdvertisementAlreadyExistsException, Unit> {
+        if (advertisementRepository.findById(advertisementId).isRight()) {
+            return Either.Left(AdvertisementAlreadyExistsException.withId(advertisementId.value()))
         }
 
-        return Result.success(Unit)
+        return Either.Right(Unit)
     }
 }

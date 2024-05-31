@@ -2,7 +2,6 @@ package unit.advertisement.domain.model.value_object
 
 import advertisement.domain.errors.DescriptionError
 import advertisement.domain.model.value_object.Description
-import advertisement.domain.model.value_object.DescriptionEither
 import arrow.core.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -26,7 +25,7 @@ class DescriptionTest
 
     @Test
     fun testShouldCreateADescription() {
-        val result = DescriptionEither.build(VALID_DESCRIPTION)
+        val result = Description.build(VALID_DESCRIPTION)
 
         result.fold(
             { error -> Assertions.fail("Expected a valid description, but got error: $error") },
@@ -36,7 +35,7 @@ class DescriptionTest
 
     @Test
     fun testShouldReturnErrorForEmptyDescription() {
-        val result = DescriptionEither.build(EMPTY_DESCRIPTION)
+        val result = Description.build(EMPTY_DESCRIPTION)
 
         Assertions.assertTrue(result is Either.Left)
         result.fold(
@@ -50,7 +49,7 @@ class DescriptionTest
 
     @Test
     fun testShouldReturnErrorForTooLongDescription() {
-        val result = DescriptionEither.build(LONG_DESCRIPTION)
+        val result = Description.build(LONG_DESCRIPTION)
 
         Assertions.assertTrue(result is Either.Left)
         result.fold(

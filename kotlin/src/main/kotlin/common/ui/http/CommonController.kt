@@ -1,5 +1,7 @@
 package common.ui.http
 
+import arrow.core.Either
+import arrow.core.left
 import framework.FrameworkResponse
 
 abstract class CommonController {
@@ -15,13 +17,13 @@ abstract class CommonController {
         )
     }
 
-    protected fun processApplicationOrDomainException(exception: Throwable): FrameworkResponse {
+    protected fun processApplicationOrDomainException(exception: Either<Any, Unit>): FrameworkResponse {
         return FrameworkResponse(
             FrameworkResponse.STATUS_BAD_REQUEST,
             mapOf(
-                "errors" to exception.message.toString(),
+                "errors" to exception.left().toString(),
                 "code" to FrameworkResponse.STATUS_BAD_REQUEST.toString(),
-                "message" to exception.message.toString(),
+                "message" to exception.left().toString(),
             ),
         )
     }

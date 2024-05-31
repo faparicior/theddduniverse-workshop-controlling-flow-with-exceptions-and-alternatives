@@ -1,25 +1,20 @@
 package advertisement.domain.model.value_object
 
-import advertisement.domain.exceptions.DescriptionEmptyException
-import advertisement.domain.exceptions.DescriptionTooLongException
+import advertisement.domain.errors.DescriptionError
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 
 class Description private constructor (private val value: String) {
 
     companion object {
-        fun build(value: String): Result<Description> {
-            if (value.isEmpty()) {
-                return Result.failure(DescriptionEmptyException.build())
+        fun build(value: String): Either<DescriptionError, Description> =
+            when {
+                value.isEmpty() -> DescriptionError.Empty(value).left()
+                value.length > 200 -> DescriptionError.TooLong.withLongitudeMessage(value).left()
+                else -> Description(value).right()
             }
-
-            if (value.length > 200) {
-                return Result.failure(DescriptionTooLongException.withLongitudeMessage(value))
-            }
-
-            return Result.success(Description(value))
-        }
     }
 
-    fun value(): String {
-        return value
-    }
+    fun value(): String = value
 }

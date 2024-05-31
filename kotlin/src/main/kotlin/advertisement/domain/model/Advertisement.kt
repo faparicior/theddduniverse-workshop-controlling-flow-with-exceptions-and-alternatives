@@ -4,69 +4,49 @@ import advertisement.domain.model.value_object.AdvertisementDate
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
+import arrow.core.Either
+import arrow.core.flatMap
 import java.time.LocalDateTime
 
 class Advertisement private constructor(val id: AdvertisementId, var description: Description, var password: Password, var date: AdvertisementDate)
 {
-
     companion object
     {
-        fun build(id: String, description: String, password: Password, date: LocalDateTime): Result<Advertisement>
+        fun build(id: String, description: String, password: Password, date: LocalDateTime): Either<Any, Advertisement>
         {
-            val advertisementIdResult = AdvertisementId.build(id)
-            if (advertisementIdResult.isFailure)
-                return Result.failure(advertisementIdResult.exceptionOrNull()!!)
-
-            val descriptionResult = Description.build(description)
-            if (descriptionResult.isFailure)
-                return Result.failure(descriptionResult.exceptionOrNull()!!)
-
-            val advertisementDateResult = AdvertisementDate.build(date)
-            if (advertisementDateResult.isFailure)
-                return Result.failure(advertisementDateResult.exceptionOrNull()!!)
-
-            return Result.success(
-                Advertisement(
-                    advertisementIdResult.getOrThrow(),
-                    descriptionResult.getOrThrow(),
-                    password,
-                    advertisementDateResult.getOrThrow(),
-                )
-            )
+            return AdvertisementId.build(id).flatMap {
+                advertisementId -> Description.build(description).flatMap {
+                    description -> AdvertisementDate.build(date).map {
+                        advertisementDate -> Advertisement(advertisementId, description, password, advertisementDate)
+                    }
+                }
+            }
         }
     }
 
-    fun update(description: Description, password: Password):  Result<Advertisement>
-    {
+    fun update(description: Description, password: Password): Either<Any, Advertisement> {
         this.description = description
         this.password = password
 
-        val result = updateDate()
-        if (result.isFailure)
-            return Result.failure(result.exceptionOrNull()!!)
-
-        return Result.success(this)
+        return updateDate().map {
+            this
+        }
     }
 
-    fun renew(password: Password): Result<Advertisement>
+    fun renew(password: Password): Either<Any, Advertisement>
     {
         this.password = password
 
-        val result = updateDate()
-        if (result.isFailure)
-            return Result.failure(result.exceptionOrNull()!!)
-
-        return Result.success(this)
+        return updateDate().map {
+            this
+        }
     }
 
-    private fun updateDate():  Result<Advertisement>
+    private fun updateDate():  Either<Any, AdvertisementDate>
     {
-        val result = AdvertisementDate.build(LocalDateTime.now())
-
-        if (result.isFailure)
-            return Result.failure(result.exceptionOrNull()!!)
-        this.date = result.getOrThrow()
-
-        return Result.success(this)
+        return AdvertisementDate.build(LocalDateTime.now()).map {
+            this.date = it
+            it
+        }
     }
 }

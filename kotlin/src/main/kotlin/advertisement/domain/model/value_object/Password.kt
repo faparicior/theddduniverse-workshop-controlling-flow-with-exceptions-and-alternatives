@@ -1,20 +1,21 @@
 package advertisement.domain.model.value_object
 
-import advertisement.application.exceptions.PasswordDoesNotMatchException
+import arrow.core.Either
+import arrow.core.right
 import de.mkammerer.argon2.Argon2Factory
 import java.security.MessageDigest
 
 class Password private constructor(private val value: String) {
 
     companion object {
-        fun fromPlainPassword(password: String): Result<Password> {
+        fun fromPlainPassword(password: String): Either<Unit, Password> {
             val encryptedPassword = Argon2Factory.create().hash(1, 1024, 1, password.toCharArray())
 
-            return Result.success(Password(encryptedPassword))
+            return Password(encryptedPassword).right()
         }
 
-        fun fromEncryptedPassword(encryptedPassword: String): Result<Password> {
-            return Result.success(Password(encryptedPassword))
+        fun fromEncryptedPassword(encryptedPassword: String): Either<Unit, Password> {
+            return Password(encryptedPassword).right()
         }
     }
 
@@ -28,32 +29,6 @@ class Password private constructor(private val value: String) {
         }
 
         return password.md5() == value
-    }
-
-    fun isValidatedWithResult(password: String): Result<Boolean> {
-        return try {
-            if (value.startsWith("\$argon2i\$")) {
-                Result.success(Argon2Factory.create().verify(value, password.toCharArray()))
-            } else {
-                Result.success(password.md5() == value)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    fun isValidatedWithResultUnit(password: String): Result<Unit> {
-        return try {
-            if (value.startsWith("\$argon2i\$")) {
-                if (Argon2Factory.create().verify(value, password.toCharArray())) return Result.success(Unit)
-                Result.failure(PasswordDoesNotMatchException.build())
-            } else {
-                if (password.md5() == value) return Result.success(Unit)
-                Result.failure(PasswordDoesNotMatchException.build())
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
     }
 
     private fun String.md5(): String {

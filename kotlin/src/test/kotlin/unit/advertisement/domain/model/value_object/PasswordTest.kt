@@ -24,8 +24,10 @@ class PasswordTest
     fun testShouldBeCreatedWithAStrongHash() {
         val result = Password.fromPlainPassword("password")
 
-        Assertions.assertTrue(result.isSuccess)
-        Assertions.assertTrue(result.getOrNull()!!.value().startsWith("\$argon2i\$"))
+        result.fold(
+            { error -> Assertions.fail("Expected a valid id, but got error: $error") },
+            { password -> Assertions.assertTrue(password.value().startsWith("\$argon2i\$")) }
+        )
     }
 
     @Test

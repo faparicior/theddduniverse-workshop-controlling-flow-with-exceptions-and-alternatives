@@ -7,36 +7,38 @@ import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Description
 import advertisement.domain.model.value_object.Password
-import advertisement.infrastructure.exceptions.ZeroRecordsException
+import arrow.core.Either
+import arrow.core.raise.either
 
 class UpdateAdvertisementUseCase(private val advertisementRepository: AdvertisementRepository) {
-    fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Result<Any> = runCatching {
-        val advertisementId = AdvertisementId.build(updateAdvertisementCommand.id).getOrThrow()
-        val description = Description.build(updateAdvertisementCommand.description).getOrThrow()
+    fun execute(updateAdvertisementCommand: UpdateAdvertisementCommand): Either<Any, Any> {
+        return either {
+            val advertisementId = AdvertisementId.build(updateAdvertisementCommand.id).bind()
+            val description = Description.build(updateAdvertisementCommand.description).bind()
+            val advertisement = getAdvertisement(advertisementId).bind()
 
-        var advertisement: Advertisement = getAdvertisement(advertisementId).getOrThrow()
-        
-        validatePassword(advertisement, updateAdvertisementCommand.password).getOrThrow()
+            validatePassword(advertisement, updateAdvertisementCommand.password).bind()
 
-        val password = Password.fromPlainPassword(updateAdvertisementCommand.password).getOrThrow()
-        advertisement = advertisement.update(description, password).getOrThrow()
+            val password = Password.fromPlainPassword(updateAdvertisementCommand.password).bind()
+            val updatedAdvertisement = advertisement.update(description, password).bind()
 
-        return advertisementRepository.save(advertisement)
-    }
-
-    private fun getAdvertisement(advertisementId: AdvertisementId): Result<Advertisement> {
-        try {
-            val advertisement = advertisementRepository.findById(advertisementId).getOrThrow() as Advertisement
-            return Result.success(advertisement)
-        } catch (e: ZeroRecordsException) {
-            return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))
+            advertisementRepository.save(updatedAdvertisement).bind()
         }
     }
 
-    private fun validatePassword(advertisement: Advertisement, password: String): Result<Unit>{
-        if (advertisement.password.isValidatedWith(password).not())
-            return Result.failure(PasswordDoesNotMatchException.build())
+    private fun getAdvertisement(advertisementId: AdvertisementId): Either<AdvertisementNotFoundException, Advertisement> {
+        val advertisement = advertisementRepository.findById(advertisementId)
+        if (advertisement.isLeft()) {
+            return Either.Left(AdvertisementNotFoundException.withId(advertisementId.value()))
+        }
 
-        return Result.success(Unit)
+        return Either.Right(advertisement.orNull()!!)
+    }
+
+    private fun validatePassword(advertisement: Advertisement, password: String): Either<PasswordDoesNotMatchException, Unit> {
+        if (advertisement.password.isValidatedWith(password).not())
+            return Either.Left(PasswordDoesNotMatchException.build())
+
+        return Either.Right(Unit)
     }
 }

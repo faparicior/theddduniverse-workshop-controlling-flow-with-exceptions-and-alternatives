@@ -22,7 +22,9 @@ class AdvertisementDateTest
 
         val result = AdvertisementDate.build(dateNow)
 
-        Assertions.assertTrue(result.isSuccess)
-        Assertions.assertEquals(dateNow, result.getOrNull()!!.value())
+        result.fold(
+            { error -> Assertions.fail("Expected a valid date, but got error: $error") },
+            { id -> Assertions.assertEquals(dateNow, id.value()) }
+        )
     }
 }
