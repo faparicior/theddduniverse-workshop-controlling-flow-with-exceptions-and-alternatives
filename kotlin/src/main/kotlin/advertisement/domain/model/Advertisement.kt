@@ -12,17 +12,14 @@ import java.time.LocalDateTime
 class Advertisement private constructor(val id: AdvertisementId, var description: Description, var password: Password, var date: AdvertisementDate)
 {
     // We use flatmap instead of Bind to show the difference
-
     companion object
     {
         fun build(id: String, description: String, password: Password, date: LocalDateTime): Either<BoundedContextError, Advertisement>
         {
-            return AdvertisementId.build(id).flatMap {
-                advertisementId -> Description.build(description).flatMap {
-                    description -> AdvertisementDate.build(date).map {
-                        advertisementDate -> Advertisement(advertisementId, description, password, advertisementDate)
-                    }
-                }
+            return AdvertisementId.build(id)
+                .flatMap { advertisementId -> Description.build(description)
+                .flatMap { description -> AdvertisementDate.build(date)
+                .map { advertisementDate -> Advertisement(advertisementId, description, password, advertisementDate) }}
             }
         }
     }
