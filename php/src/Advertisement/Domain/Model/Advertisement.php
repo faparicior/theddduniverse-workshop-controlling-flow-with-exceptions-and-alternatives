@@ -55,44 +55,44 @@ final class Advertisement
         return Either::right(new self($advertisementId, $description, $email, $password, $date));
     }
 
-    public function renew(Password $password): Result
+    public function renew(Password $password): Either
     {
         $this->password = $password;
         $result = $this->updateDate();
 
-        if ($result->isFailure()) {
+        if ($result->isLeft()) {
             return $result;
         }
 
-        return Result::success($this);
+        return Either::right($this);
     }
 
-    public function update(string $description, string $email, Password $password): Result
+    public function update(string $description, string $email, Password $password): Either
     {
         $descriptionResult = Description::build($description);
-        if ($descriptionResult->isFailure()) {
+        if ($descriptionResult->isLeft()) {
             return $descriptionResult;
         }
         /** @var Description $description */
-        $description = $descriptionResult->getOrThrow();
+        $description = $descriptionResult->getRight();
 
         $emailResult = Email::build($email);
-        if ($emailResult->isFailure()) {
+        if ($emailResult->isLeft()) {
             return $emailResult;
         }
         /** @var Email $email */
-        $email = $emailResult->getOrThrow();
+        $email = $emailResult->getRight();
 
         $this->description = $description;
         $this->email = $email;
         $this->password = $password;
         $result = $this->updateDate();
 
-        if ($result->isFailure()) {
+        if ($result->isLeft()) {
             return $result;
         }
 
-        return Result::success($this);
+        return Either::right($this);
     }
 
     public function id(): AdvertisementId
@@ -120,17 +120,17 @@ final class Advertisement
         return $this->date;
     }
 
-    private function updateDate(): Result
+    private function updateDate(): Either
     {
         $result = AdvertisementDate::build(new \DateTime());
-        if ($result->isFailure()) {
+        if ($result->isLeft()) {
             return $result;
         }
 
         /** @var AdvertisementDate $date */
-        $date = $result->getOrThrow();
+        $date = $result->getRight();
         $this->date = $date;
 
-        return Result::success();
+        return Either::right(null);
     }
 }

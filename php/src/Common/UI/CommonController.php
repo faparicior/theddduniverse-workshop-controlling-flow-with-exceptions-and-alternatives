@@ -41,14 +41,14 @@ abstract class CommonController
         );
     }
 
-    protected function processNotFoundCommand(Result $result): FrameworkResponse
+    protected function processNotFoundCommand(Either $result): FrameworkResponse
     {
         return new FrameworkResponse(
             FrameworkResponse::STATUS_NOT_FOUND,
             [
-                'errors' => $result->exception()->getMessage(),
+                'errors' => $result->getLeft()->getMessage(),
                 'code' => FrameworkResponse::STATUS_NOT_FOUND,
-                'message' => $result->exception()->getMessage(),
+                'message' => $result->getLeft()->getMessage(),
             ]
         );
     }

@@ -5,13 +5,10 @@ namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 
 use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
-use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
-use Demo\App\Advertisement\Infrastructure\Exceptions\ZeroRecordsException;
-use Demo\App\Common\Result;
-use Exception;
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 
 final class RenewAdvertisementUseCase
 {
@@ -19,62 +16,32 @@ final class RenewAdvertisementUseCase
     {
     }
 
-    /**
-     * @throws Exception
-     */
-    public function execute(RenewAdvertisementCommand $command): Result
+    public function execute(RenewAdvertisementCommand $command): Either
     {
-        $advertisementIdResult = $this->validateAdvertisementId($command);
-        if ($advertisementIdResult->isFailure()) {
-            return $advertisementIdResult;
-        }
-        /** @var AdvertisementId $advertisementId */
-        $advertisementId = $advertisementIdResult->getOrThrow();
-
-        $advertisementResult = $this->advertisementRepository->findById($advertisementId);
-        if ($advertisementResult->isFailure()) {
-            if ($advertisementResult->exception() instanceof ZeroRecordsException) {
-                return Result::failure(AdvertisementNotFoundException::withId($advertisementId->value()));
-            }
-            return $advertisementResult;
-        }
-        /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->getOrThrow();
-
-        $passwordMatchResult = $this->validatePasswordMatch($command->password, $advertisement);
-        if ($passwordMatchResult->isFailure()) {
-            return $passwordMatchResult;
-        }
-
-        $newPasswordResult = Password::fromPlainPassword($command->password);
-        if ($newPasswordResult->isFailure()) {
-            return $newPasswordResult;
-        }
-        /** @var Password $newPassword */
-        $newPassword = $newPasswordResult->getOrThrow();
-
-        $renewResult = $advertisement->renew($newPassword);
-        if ($renewResult->isFailure()) {
-            return $renewResult;
-        }
-
-        /** @var Advertisement $advertisement */
-        $advertisement = $renewResult->getOrThrow();
-
-        $this->advertisementRepository->save($advertisement);
-        return Result::success();
+        return AdvertisementId::build($command->id)
+            ->flatMap(function($advertisementId) use ($command) {
+                return $this->advertisementRepository->findById($advertisementId)
+                    ->flatMap(function($advertisement) use ($command) {
+                        $passwordValidation = $this->validatePasswordMatch($command->password, $advertisement);
+                        if ($passwordValidation->isLeft()) {
+                            return $passwordValidation;
+                        }
+                        return Password::fromPlainPassword($command->password)
+                            ->flatMap(function($newPassword) use ($advertisement) {
+                                return $advertisement->renew($newPassword);
+                            })
+                            ->map(function($advertisement) {
+                                $this->advertisementRepository->save($advertisement);
+                                return Either::right(null);
+                            });
+                    });
+            });
     }
 
-    private function validateAdvertisementId(RenewAdvertisementCommand $command): Result
+    private function validatePasswordMatch(string $password, Advertisement $advertisement): Either
     {
-        return AdvertisementId::build($command->id);
-    }
-
-    private function validatePasswordMatch(string $password, Advertisement $advertisement): Result
-    {
-        if (!$advertisement->password()->isValidatedWith($password)) {
-            return Result::failure(InvalidPasswordException::build());
-        }
-        return Result::success();
+        return $advertisement->password()->isValidatedWith($password)
+            ? Either::right($advertisement)
+            : Either::left(InvalidPasswordException::build());
     }
 }
