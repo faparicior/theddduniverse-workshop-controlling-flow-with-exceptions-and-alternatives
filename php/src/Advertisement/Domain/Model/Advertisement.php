@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model;
 
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementDate;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Description;
@@ -20,38 +21,38 @@ final class Advertisement
         private AdvertisementDate $date
     ) {}
 
-    public static function build(string $id, string $description, string $email, Password $password, \DateTime $date): Result
+    public static function build(string $id, string $description, string $email, Password $password, \DateTime $date): Either
     {
         $advertisementIdResult = AdvertisementId::build($id);
-        if ($advertisementIdResult->isFailure()) {
+        if ($advertisementIdResult->isLeft()) {
             return $advertisementIdResult;
         }
         /** @var AdvertisementId $advertisementId */
-        $advertisementId = $advertisementIdResult->getOrThrow();
+        $advertisementId = $advertisementIdResult->getRight();
 
         $descriptionResult = Description::build($description);
-        if ($descriptionResult->isFailure()) {
+        if ($descriptionResult->isLeft()) {
             return $descriptionResult;
         }
         /** @var Description $description */
-        $description = $descriptionResult->getOrThrow();
+        $description = $descriptionResult->getRight();
 
         $emailResult = Email::build($email);
-        if ($emailResult->isFailure()) {
+        if ($emailResult->isLeft()) {
             return $emailResult;
         }
         /** @var Email $email */
-        $email = $emailResult->getOrThrow();
+        $email = $emailResult->getRight();
 
         $advertisementDateResult = AdvertisementDate::build($date);
-        if ($advertisementDateResult->isFailure()) {
+        if ($advertisementDateResult->isLeft()) {
             return $advertisementDateResult;
         }
 
         /** @var AdvertisementDate $date */
-        $date = $advertisementDateResult->getOrThrow();
+        $date = $advertisementDateResult->getRight();
 
-        return Result::success(new self($advertisementId, $description, $email, $password, $date));
+        return Either::right(new self($advertisementId, $description, $email, $password, $date));
     }
 
     public function renew(Password $password): Result

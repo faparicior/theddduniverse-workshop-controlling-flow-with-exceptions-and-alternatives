@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0afd2b115c0949808e9c5eb60a9f2b1c",
+    "content-hash": "5e18d7786a88ebfe6dfc84d181c4ef2a",
     "packages": [
         {
             "name": "brick/math",
@@ -60,6 +60,187 @@
                 }
             ],
             "time": "2023-01-15T23:15:59+00:00"
+        },
+        {
+            "name": "chemem/bingo-functional",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ace411/bingo-functional.git",
+                "reference": "0dd5e5e066af5c97c48b32634264dcb8ea549e79"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ace411/bingo-functional/zipball/0dd5e5e066af5c97c48b32634264dcb8ea549e79",
+                "reference": "0dd5e5e066af5c97c48b32634264dcb8ea549e79",
+                "shasum": ""
+            },
+            "require": {
+                "functional-php/pattern-matching": "^1",
+                "php": "^7 || ^8"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2",
+                "friendsofphp/php-cs-fixer": "^3",
+                "giorgiosironi/eris": "^0",
+                "phpunit/phpunit": "^8 || ^9"
+            },
+            "suggest": {
+                "chemem/bingo-functional-repl": "A simple REPL for the bingo-functional library",
+                "ext-apcu": "In-memory key-value PHP userland store",
+                "ext-mbstring": "PHP extension for accurately determining byte-length of strings",
+                "ext-readline": "An interface to the GNU readline library"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Functional/index.php",
+                    "src/Functors/Applicative/index.php",
+                    "src/Functors/Lens/index.php",
+                    "src/Functors/Monads/index.php",
+                    "src/PatternMatching/index.php"
+                ],
+                "psr-4": {
+                    "Chemem\\Bingo\\Functional\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Lochemem Bruno Michael",
+                    "email": "lochbm@gmail.com",
+                    "homepage": "https://chemem.site"
+                }
+            ],
+            "description": "A simple functional programming library.",
+            "keywords": [
+                "Applicative",
+                "IO monad",
+                "Pattern Matching",
+                "Reader monad",
+                "State monad",
+                "Writer monad",
+                "applicative functor",
+                "applicative laws",
+                "applicatives",
+                "bingo",
+                "collections",
+                "compose",
+                "composition",
+                "curry",
+                "either",
+                "either monad",
+                "fantasy land",
+                "filter",
+                "filterM",
+                "fold",
+                "foldM",
+                "fp",
+                "functional",
+                "functional programming",
+                "functor",
+                "functors",
+                "helpers",
+                "higher-order functions",
+                "identity functor",
+                "immutability",
+                "immutable lists",
+                "input-output",
+                "lens",
+                "lenses",
+                "map",
+                "maybe",
+                "maybe monad",
+                "memoize",
+                "monad laws",
+                "monads",
+                "over",
+                "partial",
+                "partial application",
+                "persistent data structures",
+                "pure functions",
+                "reduce",
+                "referential transparency",
+                "transduce",
+                "transducers",
+                "tuples",
+                "union types",
+                "unzip",
+                "zip"
+            ],
+            "support": {
+                "issues": "https://github.com/ace411/bingo-functional/issues",
+                "source": "https://github.com/ace411/bingo-functional/tree/v2.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/chemem/bingo-functional",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-08-15T08:08:49+00:00"
+        },
+        {
+            "name": "functional-php/pattern-matching",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/functional-php/pattern-matching.git",
+                "reference": "ffd1266087e33fea1b12c00a0ecb39c54ebec3b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/functional-php/pattern-matching/zipball/ffd1266087e33fea1b12c00a0ecb39c54ebec3b6",
+                "reference": "ffd1266087e33fea1b12c00a0ecb39c54ebec3b6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "atoum/atoum": "^3 || ^4",
+                "atoum/reports-extension": "^3 || ^4",
+                "friendsofphp/php-cs-fixer": "~2 || ~3"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "FunctionalPHP\\PatternMatching\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Gilles Crettenand",
+                    "email": "gilles@crettenand.info"
+                }
+            ],
+            "description": "Pattern matching for PHP with automatic destructuring.",
+            "keywords": [
+                "Pattern Matching",
+                "destructuring",
+                "functional",
+                "pattern"
+            ],
+            "support": {
+                "issues": "https://github.com/functional-php/pattern-matching/issues",
+                "source": "https://github.com/functional-php/pattern-matching/tree/1.0.0"
+            },
+            "time": "2021-07-11T07:23:26+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -1865,7 +2046,9 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-pdo": "*"
+        "php": "^8.2.8",
+        "ext-pdo": "*",
+        "ext-mbstring": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"

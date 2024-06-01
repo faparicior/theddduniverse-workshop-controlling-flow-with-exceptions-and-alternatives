@@ -27,7 +27,7 @@ final class PublishAdvertisementController extends CommonController
             );
 
             $result = $this->useCase->execute($command);
-            if ($result->isSuccess()) {
+            if ($result->isRight()) {
                 return $this->processSuccessfulCreateCommand();
             }
 

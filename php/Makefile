@@ -23,7 +23,7 @@ composer:
 	docker run --rm --interactive --tty \
 	  --volume $(current_dir):/app \
 	  -u $(UID):$(GID) \
-	  composer $(param)
+	  composer require chemem/bingo-functional
 .PHONY: composer
 
 composer-autoload:

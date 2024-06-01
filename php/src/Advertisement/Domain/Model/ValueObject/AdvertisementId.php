@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 use Demo\App\Advertisement\Domain\Exceptions\InvalidUniqueIdentifierException;
-use Demo\App\Common\Result;
 
 final readonly class AdvertisementId
 {
     private function __construct(private string $value) {}
 
-    public static function build(string $value): Result
+    public static function build(string $value): Either
     {
         if (!self::validate($value)) {
-            return Result::failure(InvalidUniqueIdentifierException::withId($value));
+            return Either::left(InvalidUniqueIdentifierException::withId($value));
         }
 
-        return Result::success(new self($value));
+        return Either::right(new self($value));
     }
 
     public function value(): string

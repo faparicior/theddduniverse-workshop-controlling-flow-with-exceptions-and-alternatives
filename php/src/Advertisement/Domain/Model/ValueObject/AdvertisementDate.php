@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-use Demo\App\Common\Result;
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 
 final readonly class AdvertisementDate
 {
@@ -11,9 +11,9 @@ final readonly class AdvertisementDate
     {
     }
 
-    public static function build(\DateTime $value): Result
+    public static function build(\DateTime $value): Either
     {
-        return Result::success(new self($value));
+        return Either::right(new self($value));
     }
 
     public function value(): \DateTime

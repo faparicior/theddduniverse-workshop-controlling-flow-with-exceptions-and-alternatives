@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Demo\App\Common\UI;
 
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Infrastructure\InfrastructureException;
 use Demo\App\Common\Result;
@@ -28,14 +29,14 @@ abstract class CommonController
         );
     }
 
-    protected function processFailedCommand(Result $result): FrameworkResponse
+    protected function processFailedCommand(Either $result): FrameworkResponse
     {
         return new FrameworkResponse(
             FrameworkResponse::STATUS_BAD_REQUEST,
             [
-                'errors' => $result->exception()->getMessage(),
+                'errors' => $result->getLeft()->getMessage(),
                 'code' => FrameworkResponse::STATUS_BAD_REQUEST,
-                'message' => $result->exception()->getMessage(),
+                'message' => $result->getLeft()->getMessage(),
             ]
         );
     }

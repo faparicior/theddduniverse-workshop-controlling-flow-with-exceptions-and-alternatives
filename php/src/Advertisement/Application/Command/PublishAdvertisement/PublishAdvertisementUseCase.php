@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Command\PublishAdvertisement;
 
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
 use Demo\App\Advertisement\Domain\Exceptions\AdvertisementAlreadyExistsException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
-use Demo\App\Common\Result;
 
 final class PublishAdvertisementUseCase
 {
@@ -18,33 +18,33 @@ final class PublishAdvertisementUseCase
     /**
      * @throws \Throwable
      */
-    public function execute(PublishAdvertisementCommand $command): Result
+    public function execute(PublishAdvertisementCommand $command): Either
     {
         $advertisementResult = $this->validateAdvertisement($command);
-        if ($advertisementResult->isFailure()) {
+        if ($advertisementResult->isLeft()) {
             return $advertisementResult;
         }
         /** @var Advertisement $advertisement */
-        $advertisement = $advertisementResult->getOrThrow();
+        $advertisement = $advertisementResult->getRight();
 
         $findAdvertisementResult = $this->advertisementRepository->findById($advertisement->id());
-        if ($findAdvertisementResult->isSuccess()) {
-            return Result::failure(AdvertisementAlreadyExistsException::withId($advertisement->id()->value()));
+        if ($findAdvertisementResult->isRight()) {
+            return Either::left(AdvertisementAlreadyExistsException::withId($advertisement->id()->value()));
         }
 
         $this->advertisementRepository->save($advertisement);
 
-        return Result::success();
+        return Either::right(null);
     }
 
-    private function validateAdvertisement(PublishAdvertisementCommand $command): Result
+    private function validateAdvertisement(PublishAdvertisementCommand $command): Either
     {
         $passwordResult = Password::fromPlainPassword($command->password);
-        if ($passwordResult->isFailure()) {
+        if ($passwordResult->isLeft()) {
             return $passwordResult;
         }
         /** @var Password $password */
-        $password = $passwordResult->getOrThrow();
+        $password = $passwordResult->getRight();
 
         return Advertisement::build(
             $command->id,

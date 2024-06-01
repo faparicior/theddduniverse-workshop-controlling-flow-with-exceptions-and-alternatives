@@ -3,11 +3,12 @@
     "description": "The DDD universe: The power of value objects workshop.",
     "keywords": ["ddd", "workshop", "hexagonal architecture", "the ddd universe"],
     "require": {
-        "php": "^8.3",
+        "php": "^8.2.8",
         "ext-pdo": "*",
         "ramsey/uuid": "^4.7",
         "phpunit/phpunit": "^10.0",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "chemem/bingo-functional": "^2.3"
     },
     "autoload": {
         "psr-4": {

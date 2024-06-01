@@ -3,25 +3,25 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
+use Chemem\Bingo\Functional\Functors\Monads\Either;
 use Demo\App\Advertisement\Domain\Exceptions\DescriptionEmptyException;
 use Demo\App\Advertisement\Domain\Exceptions\DescriptionTooLongException;
-use Demo\App\Common\Result;
 
 final class Description
 {
     private function __construct(private string $value) {}
 
-    public static function build(string $value): Result
+    public static function build(string $value): Either
     {
         if (!self::validateMinLength($value)) {
-            return Result::failure(DescriptionEmptyException::build());
+            return Either::left(DescriptionEmptyException::build());
         }
 
         if (!self::validateMaxLength($value)) {
-            return Result::failure(DescriptionTooLongException::withLongitudeMessage($value));
+            return Either::left(DescriptionTooLongException::withLongitudeMessage($value));
         }
 
-        return Result::success(new self($value));
+        return Either::right(new self($value));
     }
 
     public function value(): string

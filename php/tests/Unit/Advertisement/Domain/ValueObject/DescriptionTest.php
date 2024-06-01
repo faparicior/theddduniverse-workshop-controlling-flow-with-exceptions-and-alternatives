@@ -25,7 +25,7 @@ class DescriptionTest extends TestCase
     {
         $result = Description::build(self::DESCRIPTION);
 
-        $description = $result->getOrThrow();
+        $description = $result->getRight();
         self::assertInstanceOf(Description::class, $description);
         self::assertEquals(self::DESCRIPTION, $description->value());
     }
@@ -35,17 +35,17 @@ class DescriptionTest extends TestCase
         $randomString = str_repeat('a', 201);
         $result = Description::build($randomString);
 
-        self::assertFalse($result->isSuccess());
-        self::assertInstanceOf(DescriptionTooLongException::class, $result->exception());
-        self::assertEquals('Description has more than 200 characters: Has 201 characters', $result->exception()->getMessage());
+        $description = $result->getLeft();
+        self::assertInstanceOf(DescriptionTooLongException::class, $description);
+        self::assertEquals('Description has more than 200 characters: Has 201 characters', $description->getMessage());
     }
 
     public function testShouldReturnErrorResultWhenDescriptionIsEmpty()
     {
         $result = Description::build('');
 
-        self::assertFalse($result->isSuccess());
-        self::assertInstanceOf(DescriptionEmptyException::class, $result->exception());
-        self::assertEquals('Description empty', $result->exception()->getMessage());
+        $description = $result->getLeft();
+        self::assertInstanceOf(DescriptionEmptyException::class, $description);
+        self::assertEquals('Description empty', $description->getMessage());
     }
 }
