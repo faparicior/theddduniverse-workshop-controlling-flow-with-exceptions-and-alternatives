@@ -14,6 +14,7 @@ final class AdvertisementTest extends TestCase
     private const string ADVERTISEMENT_ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
     private const string NON_EXISTENT_ADVERTISEMENT_ID = '99999999-2930-483e-b610-d6b0e5b19b29';
     private const string ADVERTISEMENT_CREATION_DATE = '2024-02-03 13:30:23';
+    private const string INVALID_EMAIL = 'emailtest.com';
 
     private DependencyInjectionResolver $resolver;
     private Server $server;
@@ -107,6 +108,30 @@ final class AdvertisementTest extends TestCase
         self::assertEquals('Dream advertisement changed ', $resultSet[0]['description']);
         $diff = date_diff(new \DateTime($resultSet[0]['advertisement_date']), new \DateTime(self::ADVERTISEMENT_CREATION_DATE));
         self::assertGreaterThan(0, $diff->days);
+    }
+
+    public function testShouldFailPublishingAnAdvertisementWithInvalidEmail(): void
+    {
+        $request = new FrameworkRequest(
+            FrameworkRequest::METHOD_POST,
+            'advertisement',
+            [
+                'id' => self::ADVERTISEMENT_ID,
+                'description' => 'Dream advertisement ',
+                'password' => 'myPassword',
+                'email' => self::INVALID_EMAIL,
+            ]
+        );
+
+        $response = $this->server->route($request);
+        self::assertEquals(FrameworkResponse::STATUS_BAD_REQUEST, $response->statusCode());
+        self::assertEquals(
+            $this->errorCommandResponse(
+                FrameworkResponse::STATUS_BAD_REQUEST,
+                sprintf('Invalid email format %s', self::INVALID_EMAIL)
+            ),
+            $response->data(),
+        );
     }
 
     public function testShouldRenewAdvertisement(): void
