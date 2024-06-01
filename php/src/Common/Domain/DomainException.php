@@ -5,6 +5,6 @@ namespace Demo\App\Common\Domain;
 
 use Demo\App\Common\Exceptions\BoundedContextException;
 
-abstract class DomainBoundedContextException extends BoundedContextException
+abstract class DomainException extends BoundedContextException
 {
 }

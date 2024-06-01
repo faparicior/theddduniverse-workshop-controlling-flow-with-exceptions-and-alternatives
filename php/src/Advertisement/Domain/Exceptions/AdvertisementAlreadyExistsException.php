@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Exceptions;
 
-use Demo\App\Common\Application\ApplicationBoundedContextException;
+use Demo\App\Common\Application\ApplicationException;
 
-final class AdvertisementAlreadyExistsException extends ApplicationBoundedContextException
+final class AdvertisementAlreadyExistsException extends ApplicationException
 {
     private const string ADVERTISEMENT_WITH_ID_S_ALREADY_EXISTS_MESSAGE = 'Advertisement with id %s already exists';
 

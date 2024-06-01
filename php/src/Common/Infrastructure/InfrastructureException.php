@@ -5,6 +5,6 @@ namespace Demo\App\Common\Infrastructure;
 
 use Demo\App\Common\Exceptions\BoundedContextException;
 
-abstract class InfrastructureBoundedContextException extends BoundedContextException
+abstract class InfrastructureException extends BoundedContextException
 {
 }

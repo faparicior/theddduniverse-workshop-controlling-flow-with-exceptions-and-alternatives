@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Exceptions;
 
-use Demo\App\Common\Domain\DomainBoundedContextException;
+use Demo\App\Common\Domain\DomainException;
 
-final class DescriptionEmptyException extends DomainBoundedContextException
+final class DescriptionEmptyException extends DomainException
 {
     private const string DESCRIPTION_EMPTY_MESSAGE = 'Description empty';
 

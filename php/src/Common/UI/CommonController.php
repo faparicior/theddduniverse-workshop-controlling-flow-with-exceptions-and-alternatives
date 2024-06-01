@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Demo\App\Common\UI;
 
-use Demo\App\Common\Application\ApplicationBoundedContextException;
-use Demo\App\Common\Infrastructure\InfrastructureBoundedContextException;
+use Demo\App\Common\Application\ApplicationException;
+use Demo\App\Common\Infrastructure\InfrastructureException;
 use Demo\App\Common\Result;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
@@ -15,7 +15,7 @@ abstract class CommonController
 {
     public abstract function request(FrameworkRequest $request): FrameworkResponse;
 
-    protected function processDomainOrApplicationExceptionResponse(ApplicationBoundedContextException|InfrastructureBoundedContextException|Exception $e): FrameworkResponse
+    protected function processDomainOrApplicationExceptionResponse(ApplicationException|InfrastructureException|Exception $e): FrameworkResponse
     {
         $responseCode = $e->getCode() == 404 ? FrameworkResponse::STATUS_NOT_FOUND : FrameworkResponse::STATUS_BAD_REQUEST;
         return new FrameworkResponse(

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Exceptions;
 
-use Demo\App\Common\Application\ApplicationBoundedContextException;
+use Demo\App\Common\Application\ApplicationException;
 
-final class AdvertisementNotFoundException extends ApplicationBoundedContextException
+final class AdvertisementNotFoundException extends ApplicationException
 {
     private const string NOT_FOUND_WITH_ID_MESSAGE = 'Advertisement not found with ID: ';
     private const int NOT_FOUND_ERROR_CODE = 404;

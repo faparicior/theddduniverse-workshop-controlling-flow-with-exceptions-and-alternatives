@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Exceptions;
 
-use Demo\App\Common\Domain\DomainBoundedContextException;
+use Demo\App\Common\Domain\DomainException;
 
-final class DescriptionTooLongException extends DomainBoundedContextException
+final class DescriptionTooLongException extends DomainException
 {
     private const string DESCRIPTION_TOO_LONG_WITH_COUNTER_MESSAGE = 'Description has more than 200 characters: Has %s characters';
 
