@@ -52,14 +52,21 @@ abstract class CommonController
         );
     }
 
-    protected function processGenericException(Exception $exception): FrameworkResponse
+    protected function processGenericException(?Exception $exception): FrameworkResponse
     {
+        $errors = '';
+        $message = '';
+        if ($exception !== null) {
+            $errors = $exception->getMessage();
+            $message = $exception->getMessage();
+        }
+
         return new FrameworkResponse(
             FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
             [
-                'errors' => $exception->getMessage(),
+                'errors' => $errors,
                 'code' => FrameworkResponse::STATUS_INTERNAL_SERVER_ERROR,
-                'message' => $exception->getMessage(),
+                'message' => $message,
             ]
         );
     }

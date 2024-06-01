@@ -6,6 +6,7 @@ namespace Demo\App\Advertisement\UI\Http;
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementUseCase;
 use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
+use Demo\App\Common\Exceptions\BoundedContextException;
 use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
@@ -29,6 +30,11 @@ final class RenewAdvertisementController extends CommonController
             if ($result->isSuccess()) {
                 return $this->processSuccessfulCommand();
             }
+
+            if (!$result->exception() instanceof BoundedContextException){
+                return $this->processGenericException($result->exception());
+            }
+
             if ($result->exception() instanceof AdvertisementNotFoundException){
                 return $this->processNotFoundCommand($result);
             }

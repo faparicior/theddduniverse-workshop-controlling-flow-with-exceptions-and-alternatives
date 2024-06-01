@@ -5,6 +5,7 @@ namespace Demo\App\Advertisement\UI\Http;
 
 use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdvertisementCommand;
 use Demo\App\Advertisement\Application\Command\PublishAdvertisement\PublishAdvertisementUseCase;
+use Demo\App\Common\Exceptions\BoundedContextException;
 use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
@@ -27,8 +28,13 @@ final class PublishAdvertisementController extends CommonController
             );
 
             $result = $this->useCase->execute($command);
+
             if ($result->isSuccess()) {
                 return $this->processSuccessfulCreateCommand();
+            }
+
+            if (!$result->exception() instanceof BoundedContextException){
+                return $this->processGenericException($result->exception());
             }
 
             return $this->processFailedCommand($result);
