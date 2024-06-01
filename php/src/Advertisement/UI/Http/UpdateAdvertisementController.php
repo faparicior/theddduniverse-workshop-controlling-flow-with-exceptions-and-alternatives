@@ -29,10 +29,10 @@ final class UpdateAdvertisementController extends CommonController
 
             $result = $this->useCase->execute($command);
 
-            if ($result->isSuccess()) {
+            if ($result->isRight()) {
                 return $this->processSuccessfulCommand();
             }
-            if ($result->exception() instanceof AdvertisementNotFoundException){
+            if ($result->getLeft() instanceof AdvertisementNotFoundException){
                 return $this->processNotFoundCommand($result);
             }
 
