@@ -1,6 +1,6 @@
 package common.domain
 
-import common.exceptions.CustomException
+import common.exceptions.BoundedContextException
 
-open class DomainException(message: String) : CustomException(message)  {
+open class DomainException(message: String) : BoundedContextException(message)  {
 }
