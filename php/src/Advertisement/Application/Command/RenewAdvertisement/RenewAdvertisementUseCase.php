@@ -5,10 +5,12 @@ namespace Demo\App\Advertisement\Application\Command\RenewAdvertisement;
 
 use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Chemem\Bingo\Functional\Functors\Monads\Either;
+use Demo\App\Advertisement\Infrastructure\Exceptions\ZeroRecordsException;
 
 final class RenewAdvertisementUseCase
 {
@@ -19,29 +21,38 @@ final class RenewAdvertisementUseCase
     public function execute(RenewAdvertisementCommand $command): Either
     {
         return AdvertisementId::build($command->id)
-            ->flatMap(function($advertisementId) use ($command) {
-                return $this->advertisementRepository->findById($advertisementId)
-                    ->flatMap(function($advertisement) use ($command) {
-                        $passwordValidation = $this->validatePasswordMatch($command->password, $advertisement);
-                        if ($passwordValidation->isLeft()) {
-                            return $passwordValidation;
-                        }
-                        return Password::fromPlainPassword($command->password)
-                            ->flatMap(function($newPassword) use ($advertisement) {
-                                return $advertisement->renew($newPassword);
-                            })
-                            ->map(function($advertisement) {
-                                $this->advertisementRepository->save($advertisement);
-                                return Either::right(null);
-                            });
-                    });
-            });
+            ->flatMap(fn($advertisementId) => $this->findAdvertisement($advertisementId))
+            ->flatMap(fn($advertisement) => $this->validatePassword($command->password, $advertisement))
+            ->flatMap(fn($advertisement) => $this->renewAdvertisement($command->password, $advertisement))
+            ->map(fn($advertisement) => $this->saveAdvertisement($advertisement));
     }
 
-    private function validatePasswordMatch(string $password, Advertisement $advertisement): Either
+    private function findAdvertisement($advertisementId): Either
+    {
+        $advertisementResult = $this->advertisementRepository->findById($advertisementId);
+        if ($advertisementResult->isLeft() && $advertisementResult->getLeft() instanceof ZeroRecordsException) {
+            return Either::left(AdvertisementNotFoundException::withId($advertisementId->value()));
+        }
+
+        return $advertisementResult;
+    }
+
+    private function validatePassword(string $password, Advertisement $advertisement): Either
     {
         return $advertisement->password()->isValidatedWith($password)
             ? Either::right($advertisement)
             : Either::left(InvalidPasswordException::build());
+    }
+
+    private function renewAdvertisement(string $password, Advertisement $advertisement): Either
+    {
+        return Password::fromPlainPassword($password)
+            ->flatMap(fn($newPassword) => $advertisement->renew($newPassword));
+    }
+
+    private function saveAdvertisement(Advertisement $advertisement): Either
+    {
+        $this->advertisementRepository->save($advertisement);
+        return Either::right(null);
     }
 }
