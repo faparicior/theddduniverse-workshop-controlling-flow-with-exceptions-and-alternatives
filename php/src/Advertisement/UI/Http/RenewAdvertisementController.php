@@ -7,6 +7,7 @@ use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertise
 use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertisementUseCase;
 use Demo\App\Common\Application\ApplicationException;
 use Demo\App\Common\Domain\DomainException;
+use Demo\App\Common\Exceptions\BoundedContextException;
 use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
@@ -29,7 +30,7 @@ final class RenewAdvertisementController extends CommonController
             $this->useCase->execute($command);
 
             return $this->processSuccessfulCommand();
-        } catch (DomainException|ApplicationException $exception) {
+        } catch (BoundedContextException $exception) {
             return $this->processDomainOrApplicationExceptionResponse($exception);
         } catch (Exception $exception) {
             return $this->processGenericException($exception);
