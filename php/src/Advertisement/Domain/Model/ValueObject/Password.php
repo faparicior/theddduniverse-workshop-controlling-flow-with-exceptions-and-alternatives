@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Domain\Model\ValueObject;
 
-
 use Exception;
 use SensitiveParameter;
 
 final readonly class Password
 {
-
     private function __construct(
         #[SensitiveParameter]
         private string $value

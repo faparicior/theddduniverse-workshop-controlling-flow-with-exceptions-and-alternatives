@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Demo\App\Advertisement\Application\Exceptions;
 
 use Demo\App\Common\Application\ApplicationException;
-use Throwable;
 
 final class InvalidPasswordException extends ApplicationException
 {

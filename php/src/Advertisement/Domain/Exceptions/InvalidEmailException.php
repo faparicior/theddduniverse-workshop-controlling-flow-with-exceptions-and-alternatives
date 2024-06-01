@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Demo\App\Advertisement\Domain\Exceptions;
 
 use Demo\App\Common\Domain\DomainException;
-use Throwable;
 
 final class InvalidEmailException extends DomainException
 {
