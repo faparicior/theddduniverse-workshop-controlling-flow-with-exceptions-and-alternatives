@@ -2,8 +2,8 @@ package advertisement.ui.http
 
 import advertisement.application.renewAdvertisement.RenewAdvertisementCommand
 import advertisement.application.renewAdvertisement.RenewAdvertisementUseCase
-import common.application.ApplicationException
 import common.application.ElementNotFoundException
+import common.exceptions.BoundedContextException
 import common.ui.http.CommonController
 import framework.FrameworkRequest
 import framework.FrameworkResponse
@@ -22,7 +22,7 @@ class RenewAdvertisementController(private val useCase: RenewAdvertisementUseCas
             return processSuccessfulCommand()
         } catch (e: ElementNotFoundException) {
             return processNotFoundCommand(e)
-        } catch (e: ApplicationException) {
+        } catch (e: BoundedContextException) {
             return processApplicationOrDomainException(e)
         } catch (e: Exception) {
             return processGenericException(e)
