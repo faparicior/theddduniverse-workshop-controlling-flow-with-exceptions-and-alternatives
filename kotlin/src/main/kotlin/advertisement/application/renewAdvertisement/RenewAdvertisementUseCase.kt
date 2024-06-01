@@ -30,10 +30,9 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
         val advertisement = advertisementRepository.findById(advertisementId)
         return advertisement.fold(
             { error ->
-                if (error is ZeroRecordsError) {
-                    Either.Left(AdvertisementNotFoundError.withId(advertisementId.value()))
-                } else {
-                    Either.Left(error)
+                when (error) {
+                    is ZeroRecordsError -> Either.Left(AdvertisementNotFoundError.withId(advertisementId.value()))
+                    else -> Either.Left(error)
                 }
             },
             { ad -> Either.Right(ad) }

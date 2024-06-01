@@ -30,10 +30,9 @@ class PublishAdvertisementUseCase(private val advertisementRepository: Advertise
     }
 
     private fun ensureThatAdvertisementIsUnique(advertisementId: AdvertisementId): Either<BoundedContextError, Unit> {
-        if (advertisementRepository.findById(advertisementId).isRight()) {
-            return Either.Left(AdvertisementAlreadyExistsError.withId(advertisementId.value()))
-        }
-
-        return Either.Right(Unit)
+        return advertisementRepository.findById(advertisementId).fold(
+            { Either.Right(Unit) },
+            { Either.Left(AdvertisementAlreadyExistsError.withId(advertisementId.value())) } // If Right (success), return Left (error)
+        )
     }
 }
