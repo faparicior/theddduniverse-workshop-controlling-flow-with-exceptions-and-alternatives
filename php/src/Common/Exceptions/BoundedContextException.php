@@ -5,7 +5,7 @@ namespace Demo\App\Common\Exceptions;
 
 use Throwable;
 
-abstract class Exception extends \Exception
+abstract class BoundedContextException extends \Exception
 {
     protected function __construct(string $message = '', int $code = 0, Throwable $previous = null)
     {
