@@ -6,7 +6,7 @@ class ZeroRecordsException private constructor(message: String) : ElementNotFoun
 
     companion object {
         fun withId(id: String): ZeroRecordsException {
-            return ZeroRecordsException("Advertisement not found with Id $id")
+            return ZeroRecordsException("Register not found with Id $id")
         }
     }
 }
