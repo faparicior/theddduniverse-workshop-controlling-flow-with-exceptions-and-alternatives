@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Application\Exceptions;
 
-use Demo\App\Common\Application\ApplicationException;
+use Demo\App\Common\Application\ApplicationBoundedContextException;
 use Throwable;
 
-final class InvalidPasswordException extends ApplicationException
+final class InvalidPasswordException extends ApplicationBoundedContextException
 {
     private const string INVALID_PASSWORD_MESSAGE = 'Invalid password';
 

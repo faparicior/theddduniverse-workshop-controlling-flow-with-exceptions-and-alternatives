@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Demo\App\Advertisement\Infrastructure\Exceptions;
 
-use Demo\App\Common\Infrastructure\InfrastructureException;
+use Demo\App\Common\Infrastructure\InfrastructureBoundedContextException;
 
-final class ZeroRecordsException extends InfrastructureException
+final class ZeroRecordsException extends InfrastructureBoundedContextException
 {
     private const string NO_RECORDS_FOUND_MESSAGE = 'No records found';
 
