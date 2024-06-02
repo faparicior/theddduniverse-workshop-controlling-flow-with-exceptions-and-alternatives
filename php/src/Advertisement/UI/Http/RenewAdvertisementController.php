@@ -30,7 +30,7 @@ final class RenewAdvertisementController extends CommonController
             return $this->processSuccessfulCommand();
         } catch (BoundedContextException $exception) {
             return $this->processDomainOrApplicationExceptionResponse($exception);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->processGenericException($exception);
         }
     }

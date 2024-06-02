@@ -32,7 +32,7 @@ final class PublishAdvertisementController extends CommonController
             return $this->processSuccessfulCreateCommand();
         } catch (BoundedContextException $exception) {
             return $this->processDomainOrApplicationExceptionResponse($exception);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->processGenericException($exception);
         }
     }
