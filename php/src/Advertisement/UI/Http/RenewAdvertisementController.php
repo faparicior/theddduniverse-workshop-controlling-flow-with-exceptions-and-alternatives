@@ -34,7 +34,7 @@ final class RenewAdvertisementController extends CommonController
             }
 
             return $this->processFailedCommand($result);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->processGenericException($exception);
         }
     }
