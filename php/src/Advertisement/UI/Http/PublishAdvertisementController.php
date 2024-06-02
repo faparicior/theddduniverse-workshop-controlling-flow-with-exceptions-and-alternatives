@@ -29,7 +29,7 @@ final class PublishAdvertisementController extends CommonController
             $this->useCase->execute($command);
 
             return $this->processSuccessfulCreateCommand();
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->processGenericException($exception);
         }
     }

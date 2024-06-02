@@ -29,7 +29,7 @@ final class RenewAdvertisementController extends CommonController
             return $this->processSuccessfulCommand();
         } catch (\UnexpectedValueException $exception) {
             return $this->processNotFoundException($exception);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->processGenericException($exception);
         }
     }
