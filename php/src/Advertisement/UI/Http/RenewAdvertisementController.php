@@ -8,7 +8,6 @@ use Demo\App\Advertisement\Application\Command\RenewAdvertisement\RenewAdvertise
 use Demo\App\Common\UI\CommonController;
 use Demo\App\Framework\FrameworkRequest;
 use Demo\App\Framework\FrameworkResponse;
-use Exception;
 
 final class RenewAdvertisementController extends CommonController
 {
