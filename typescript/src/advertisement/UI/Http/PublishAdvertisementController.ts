@@ -19,14 +19,19 @@ export class PublishAdvertisementController {
   }
   async execute(req: AddAdvertisementRequest): Promise<FrameworkResponse> {
 
-    const command = new PublishAdvertisementCommand(
-      req.body.id,
-      req.body.description,
-      req.body.password
-    )
+    try {
+      const command = new PublishAdvertisementCommand(
+          req.body.id,
+          req.body.description,
+          req.body.password
+      )
 
-    await this.publishAdvertisementUseCase.execute(command)
+      await this.publishAdvertisementUseCase.execute(command)
 
-    return new FrameworkResponse(201)
+      return new FrameworkResponse(201)
+
+    } catch (error: any) {
+      return new FrameworkResponse(400, error.message)
+    }
   }
 }

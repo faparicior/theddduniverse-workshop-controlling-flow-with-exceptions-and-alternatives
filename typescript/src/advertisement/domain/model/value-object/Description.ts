@@ -1,19 +1,24 @@
+import {sprintf} from "sprintf-js";
 
 export class Description {
 
     constructor(
-        readonly _description: string,
+        readonly _value: string,
     ) {
-        this.validate(_description);
+        this.validate(_value);
     }
 
-    private validate(_description: string) {
-        if () {
-            throw new Error("Invalid unique identifier");
+    private validate(value: string) {
+        if (value.length === 0) {
+            throw new Error("Description empty");
+        }
+
+        if (value.length > 200) {
+            throw new Error(sprintf("Description has more than 200 characters: Has %d characters", this._value.length));
         }
     }
 
     public value(): string {
-        return this._description;
+        return this._value;
     }
 }

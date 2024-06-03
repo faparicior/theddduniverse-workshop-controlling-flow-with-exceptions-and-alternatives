@@ -2,6 +2,9 @@ import { AdvertisementRepository } from '../domain/AdvertisementRepository';
 import { Advertisement } from '../domain/model/Advertisement';
 import { DatabaseConnection } from '../../framework/database/DatabaseConnection';
 import {Password} from "../domain/model/value-object/Password";
+import {AdvertisementDate} from "../domain/model/value-object/AdvertisementDate";
+import {Description} from "../domain/model/value-object/Description";
+import {AdvertisementId} from "../domain/model/value-object/AdvertisementId";
 
 export class SqliteAdvertisementRepository implements AdvertisementRepository {
 
@@ -9,20 +12,20 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
     private connection: DatabaseConnection) {
   }
 
-  async findById(id: string): Promise<Advertisement> {
+  async findById(id: AdvertisementId): Promise<Advertisement | null> {
 
-    const result = await this.connection.query(`SELECT * FROM advertisements WHERE id = ? `, [id])
+    const result = await this.connection.query(`SELECT * FROM advertisements WHERE id = ? `, [id.value()])
 
     if (!result || result.length < 1) {
-      throw new Error('Advertisement not found');
+      return null
     }
 
     const row = result[0] as any;
     return new Advertisement(
-      row.id,
-      row.description,
+      new AdvertisementId(row.id),
+      new Description(row.description),
       Password.fromEncryptedPassword(row.password),
-      new Date(row.advertisement_date)
+      new AdvertisementDate(new Date(row.advertisement_date))
     )
 
   }
@@ -34,10 +37,10 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
       VALUES (?, ?, ?, ?) 
       ON CONFLICT(id) DO UPDATE 
       SET description = excluded.description, password = excluded.password, advertisement_date = excluded.advertisement_date`, [
-      advertisement.id(),
-      advertisement.description(),
+      advertisement.id().value(),
+      advertisement.description().value(),
       advertisement.password().value(),
-      advertisement.date().toISOString(),
+      advertisement.date().value().toISOString(),
     ]);
   }
 }

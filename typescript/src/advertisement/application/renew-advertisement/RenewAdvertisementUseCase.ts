@@ -1,6 +1,7 @@
 import { AdvertisementRepository } from "../../domain/AdvertisementRepository"
 import { RenewAdvertisementCommand } from "./RenewAdvertisementCommand"
 import {Password} from "../../domain/model/value-object/Password";
+import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 
 export class RenewAdvertisementUseCase {
 
@@ -11,7 +12,12 @@ export class RenewAdvertisementUseCase {
   }
 
   async execute(command: RenewAdvertisementCommand): Promise<void> {
-    const advertisement = await this.advertisementRepository.findById(command.id)
+    const advertisementId = new AdvertisementId(command.id)
+    const advertisement = await this.advertisementRepository.findById(advertisementId)
+
+    if (!advertisement) {
+      throw new ReferenceError('Advertisement not found')
+    }
 
     if (!await advertisement.password().isValid(command.password)) {
       return

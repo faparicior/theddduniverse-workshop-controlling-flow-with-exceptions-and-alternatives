@@ -1,16 +1,19 @@
 import {Password} from "./value-object/Password";
+import {Description} from "./value-object/Description";
+import {AdvertisementId} from "./value-object/AdvertisementId";
+import {AdvertisementDate} from "./value-object/AdvertisementDate";
 
 export class Advertisement {
 
   constructor(
-    private readonly _id: string,
-    private _description: string,
+    private readonly _id: AdvertisementId,
+    private _description: Description,
     private _password: Password,
-    private _date: Date
+    private _date: AdvertisementDate
   ) {
   }
 
-  public update(description: string, password: Password): void {
+  public update(description: Description, password: Password): void {
     this._description = description;
     this._password = password;
     this.updateDate();
@@ -21,11 +24,11 @@ export class Advertisement {
     this.updateDate();
   }
 
-  public id(): string {
+  public id(): AdvertisementId {
     return this._id
   }
 
-  public description(): string {
+  public description(): Description {
     return this._description
   }
 
@@ -33,11 +36,11 @@ export class Advertisement {
     return this._password
   }
 
-  public date(): Date {
+  public date(): AdvertisementDate {
     return this._date
   }
 
   private updateDate(): void {
-    this._date = new Date();
+    this._date = new AdvertisementDate(new Date());
   }
 }

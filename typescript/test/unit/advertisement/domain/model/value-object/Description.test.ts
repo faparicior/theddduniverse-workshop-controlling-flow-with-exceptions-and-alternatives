@@ -1,7 +1,9 @@
-import {AdvertisementId} from "../../../../../../src/advertisement/domain/model/value-object/AdvertisementId";
+import {Description} from "../../../../../../src/advertisement/domain/model/value-object/Description";
 
 
 describe("Advertisement password", () => {
+
+    const DESCRIPTION = "my description";
 
     beforeAll(async () => {
     })
@@ -10,15 +12,21 @@ describe("Advertisement password", () => {
     })
 
     it("Should be created with a valid unique description", async () => {
-        let advertisementId = new Description();
+        let description = new Description(DESCRIPTION);
 
-        // expect value
-        expect(advertisementId.value()).toBe(VALID_UUID);
+        expect(description.value()).toBe(DESCRIPTION);
     });
 
-    it("Should throw an exception when has not uuid 4 standards", async () => {
+    it("Should throw an exception when is empty", async () => {
         expect(() => {
-            new AdvertisementId("invalid");
-        }).toThrow("Invalid unique identifier");
+            new Description("");
+        }).toThrow("Description empty");
+    });
+
+    it("Should throw an exception when hs more than 200 characters", async () => {
+        expect(() => {
+            let rep = "a".repeat(201);
+            new Description(rep);
+        }).toThrow("Description has more than 200 characters: Has 201 characters");
     });
 });

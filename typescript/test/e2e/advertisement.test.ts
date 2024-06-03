@@ -42,6 +42,17 @@ describe("Advertisement", () => {
         expect(dbData[0].advertisement_date).toBeDefined;
     });
 
+    it("Should fail publishing an advertisement with an existing id", async () => {
+        const request = new FrameworkRequest(Method.POST, '/advertisement',
+            { id: ID, description: DESCRIPTION, password: PASSWORD }
+        )
+
+        const response = await server.route(request)
+        expect(response.statusCode).toBe(201);
+
+        const response2 = await server.route(request)
+        expect(response2.statusCode).toBe(400);
+    });
 
     it("Should change an advertisement", async () => {
         await withAnAdvertisementCreated()
@@ -64,6 +75,17 @@ describe("Advertisement", () => {
         expect(diff).toBeLessThan(1)
     })
 
+    it("Should fail changing an non existent advertisement", async () => {
+        const request = new FrameworkRequest(Method.PUT, `/advertisements/${ID}`,
+            { description: NEW_DESCRIPTION, password: PASSWORD }
+        )
+
+        const response = await server.route(request)
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body).toBeUndefined;
+    })
+
     it("Should renew an advertisement", async () => {
         await withAnAdvertisementCreated()
 
@@ -82,6 +104,17 @@ describe("Advertisement", () => {
         const newDate = new Date(dbData[0].advertisement_date)
         const diff = getHourDifference(newDate)
         expect(diff).toBeLessThan(1)
+    })
+
+    it("Should fail renewing an non existent advertisement", async () => {
+        const request = new FrameworkRequest(Method.PATCH, `/advertisements/${ID}`,
+            { password: PASSWORD }
+        )
+
+        const response = await server.route(request)
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body).toBeUndefined;
     })
 
     it("Should not change an advertisement with incorrect password", async () => {

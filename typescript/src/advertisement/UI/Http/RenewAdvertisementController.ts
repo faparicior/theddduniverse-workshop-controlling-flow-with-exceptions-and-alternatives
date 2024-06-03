@@ -18,14 +18,20 @@ export class RenewAdvertisementController {
   ) {
   }
   async execute(req: AddAdvertisementRequest): Promise<FrameworkResponse> {
+    try {
+      const command = new RenewAdvertisementCommand(
+          req.param,
+          req.body.password
+      )
 
-    const command = new RenewAdvertisementCommand(
-      req.param,
-      req.body.password
-    )
+      await this.renewAdvertisementUseCase.execute(command)
 
-    await this.renewAdvertisementUseCase.execute(command)
+      return new FrameworkResponse(200)
+    } catch (error: any) {
+      if (error instanceof ReferenceError)
+        return new FrameworkResponse(404, error.message)
 
-    return new FrameworkResponse(200)
+      return new FrameworkResponse(400, error.message)
+    }
   }
 }
