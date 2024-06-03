@@ -9,6 +9,7 @@ let server: FrameworkServer
 const ID = '6fa00b21-2930-483e-b610-d6b0e5b19b29';
 const ADVERTISEMENT_CREATION_DATE = '2024-02-03 13:30:23';
 const DESCRIPTION = 'Dream advertisement';
+const EMAIL = 'test@test.com';
 const PASSWORD = 'myPassword';
 const NEW_DESCRIPTION = 'Dream advertisement changed';
 const INCORRECT_PASSWORD = 'myBadPassword';
@@ -26,7 +27,7 @@ describe("Advertisement", () => {
 
     it("Should publish an advertisement", async () => {
         const request = new FrameworkRequest(Method.POST, '/advertisement',
-            { id: ID, description: DESCRIPTION, password: PASSWORD }
+            { id: ID, description: DESCRIPTION, email: EMAIL, password: PASSWORD }
         )
 
         const response = await server.route(request)
@@ -44,7 +45,7 @@ describe("Advertisement", () => {
 
     it("Should fail publishing an advertisement with an existing id", async () => {
         const request = new FrameworkRequest(Method.POST, '/advertisement',
-            { id: ID, description: DESCRIPTION, password: PASSWORD }
+            { id: ID, description: DESCRIPTION, email: EMAIL, password: PASSWORD }
         )
 
         const response = await server.route(request)
@@ -58,7 +59,7 @@ describe("Advertisement", () => {
         await withAnAdvertisementCreated()
 
         const request = new FrameworkRequest(Method.PUT, `/advertisements/${ID}`,
-            { description: NEW_DESCRIPTION, password: PASSWORD }
+            { description: NEW_DESCRIPTION, email: EMAIL, password: PASSWORD }
         )
 
         const response = await server.route(request)
@@ -77,7 +78,7 @@ describe("Advertisement", () => {
 
     it("Should fail changing an non existent advertisement", async () => {
         const request = new FrameworkRequest(Method.PUT, `/advertisements/${ID}`,
-            { description: NEW_DESCRIPTION, password: PASSWORD }
+            { description: NEW_DESCRIPTION, email: EMAIL, password: PASSWORD }
         )
 
         const response = await server.route(request)
@@ -121,7 +122,7 @@ describe("Advertisement", () => {
         await withAnAdvertisementCreated()
 
         const request = new FrameworkRequest(Method.PUT, `/advertisements/${ID}`,
-            { description: NEW_DESCRIPTION, password: INCORRECT_PASSWORD }
+            { description: NEW_DESCRIPTION, email: EMAIL, password: INCORRECT_PASSWORD }
         )
 
         const response = await server.route(request)

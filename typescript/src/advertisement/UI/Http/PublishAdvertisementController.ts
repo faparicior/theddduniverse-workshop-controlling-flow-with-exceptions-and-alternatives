@@ -23,6 +23,7 @@ export class PublishAdvertisementController {
       const command = new PublishAdvertisementCommand(
           req.body.id,
           req.body.description,
+          req.body.email,
           req.body.password
       )
 

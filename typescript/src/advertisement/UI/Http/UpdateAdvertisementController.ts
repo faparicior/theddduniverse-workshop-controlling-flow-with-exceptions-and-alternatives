@@ -23,6 +23,7 @@ export class UpdateAdvertisementController {
       const command = new UpdateAdvertisementCommand(
           req.param,
           req.body.description,
+          req.body.email,
           req.body.password
       )
 
