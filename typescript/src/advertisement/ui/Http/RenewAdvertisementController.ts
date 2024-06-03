@@ -2,6 +2,7 @@ import { FrameworkRequest } from '../../../framework/FrameworkRequest';
 import { FrameworkResponse } from '../../../framework/FrameworkResponse';
 import {RenewAdvertisementUseCase} from "../../application/renew-advertisement/RenewAdvertisementUseCase";
 import {RenewAdvertisementCommand} from "../../application/renew-advertisement/RenewAdvertisementCommand";
+import {CommonController} from "../../../common/ui/CommonController";
 
 type AddAdvertisementRequest = FrameworkRequest & {
   body: {
@@ -11,11 +12,12 @@ type AddAdvertisementRequest = FrameworkRequest & {
   };
 };
 
-export class RenewAdvertisementController {
+export class RenewAdvertisementController extends CommonController {
 
   constructor(
     private renewAdvertisementUseCase: RenewAdvertisementUseCase
   ) {
+    super();
   }
   async execute(req: AddAdvertisementRequest): Promise<FrameworkResponse> {
     try {
@@ -26,12 +28,12 @@ export class RenewAdvertisementController {
 
       await this.renewAdvertisementUseCase.execute(command)
 
-      return new FrameworkResponse(200)
+      return this.processSuccessfulCommand()
     } catch (error: any) {
       if (error instanceof ReferenceError)
-        return new FrameworkResponse(404, error.message)
+        return this.processNotFoundException(error)
 
-      return new FrameworkResponse(400, error.message)
+      return this.processFailedCommand(error)
     }
   }
 }

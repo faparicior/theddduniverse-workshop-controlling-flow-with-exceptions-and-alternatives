@@ -2,6 +2,7 @@ import { AdvertisementRepository } from "../../domain/AdvertisementRepository"
 import { RenewAdvertisementCommand } from "./RenewAdvertisementCommand"
 import {Password} from "../../domain/model/value-object/Password";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
+import {sprintf} from "sprintf-js";
 
 export class RenewAdvertisementUseCase {
 
@@ -16,11 +17,11 @@ export class RenewAdvertisementUseCase {
     const advertisement = await this.advertisementRepository.findById(advertisementId)
 
     if (!advertisement) {
-      throw new ReferenceError('Advertisement not found')
+      throw new ReferenceError(sprintf('Advertisement not found with Id: %s', advertisementId.value()))
     }
 
     if (!await advertisement.password().isValid(command.password)) {
-      return
+      throw new Error('Invalid password')
     }
 
     advertisement.renew(await Password.fromPlainPassword(command.password))

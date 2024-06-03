@@ -1,12 +1,12 @@
-import { PublishAdvertisementController } from "../advertisement/UI/Http/PublishAdvertisementController";
+import { PublishAdvertisementController } from "../advertisement/ui/Http/PublishAdvertisementController";
 import { PublishAdvertisementUseCase } from "../advertisement/application/publish-advertisement/PublishAdvertisementUseCase";
 import { SqliteAdvertisementRepository } from "../advertisement/infrastructure/SqliteAdvertisementRepository";
 import { FrameworkRequest } from "./FrameworkRequest";
 import { FrameworkResponse } from "./FrameworkResponse";
 import { SqliteConnectionFactory } from "./database/SqliteConnectionFactory";
 import { UpdateAdvertisementUseCase } from "../advertisement/application/update-advertisement/UpdateAdvertisementUseCase";
-import { UpdateAdvertisementController } from "../advertisement/UI/Http/UpdateAdvertisementController";
-import {RenewAdvertisementController} from "../advertisement/UI/Http/RenewAdvertisementController";
+import { UpdateAdvertisementController } from "../advertisement/ui/Http/UpdateAdvertisementController";
+import {RenewAdvertisementController} from "../advertisement/ui/Http/RenewAdvertisementController";
 import {RenewAdvertisementUseCase} from "../advertisement/application/renew-advertisement/RenewAdvertisementUseCase";
 
 export class FrameworkServer {

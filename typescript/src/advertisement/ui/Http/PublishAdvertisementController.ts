@@ -2,6 +2,7 @@ import { FrameworkRequest } from '../../../framework/FrameworkRequest';
 import { FrameworkResponse } from '../../../framework/FrameworkResponse';
 import { PublishAdvertisementCommand } from '../../application/publish-advertisement/PublishAdvertisementCommand';
 import { PublishAdvertisementUseCase } from '../../application/publish-advertisement/PublishAdvertisementUseCase';
+import {CommonController} from "../../../common/ui/CommonController";
 
 type AddAdvertisementRequest = FrameworkRequest & {
   body: {
@@ -11,11 +12,12 @@ type AddAdvertisementRequest = FrameworkRequest & {
   };
 };
 
-export class PublishAdvertisementController {
+export class PublishAdvertisementController extends CommonController {
 
   constructor(
     private publishAdvertisementUseCase: PublishAdvertisementUseCase
   ) {
+    super();
   }
   async execute(req: AddAdvertisementRequest): Promise<FrameworkResponse> {
 
@@ -29,10 +31,9 @@ export class PublishAdvertisementController {
 
       await this.publishAdvertisementUseCase.execute(command)
 
-      return new FrameworkResponse(201)
-
+      return this.processSuccessfulCreateCommand()
     } catch (error: any) {
-      return new FrameworkResponse(400, error.message)
+      return this.processFailedCommand(error)
     }
   }
 }

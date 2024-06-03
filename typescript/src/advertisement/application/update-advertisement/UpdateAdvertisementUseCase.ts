@@ -3,6 +3,7 @@ import { UpdateAdvertisementCommand } from "./UpdateAdvertisementCommand"
 import {Password} from "../../domain/model/value-object/Password";
 import {Description} from "../../domain/model/value-object/Description";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
+import {sprintf} from "sprintf-js";
 
 export class UpdateAdvertisementUseCase {
 
@@ -18,11 +19,11 @@ export class UpdateAdvertisementUseCase {
     const advertisement = await this.advertisementRepository.findById(advertisementId)
 
     if (!advertisement) {
-      throw new ReferenceError('Advertisement not found')
+      throw new ReferenceError(sprintf('Advertisement not found with Id: %s', advertisementId.value()))
     }
 
     if (!await advertisement.password().isValid(command.password)) {
-      return
+      throw new Error('Invalid password')
     }
 
     advertisement.update(
