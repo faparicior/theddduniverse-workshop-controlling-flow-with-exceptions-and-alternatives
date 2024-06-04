@@ -34,12 +34,17 @@ export class CommonController {
             })
     }
 
-    protected processNotFoundException(error: any): FrameworkResponse {
+    protected processDomainOrApplicationExceptionResponse(error: any): FrameworkResponse {
+        let code = 400;
+        if (error.code() === 404) {
+            code = 404
+        }
+
         return new FrameworkResponse(
-            404,
+            code,
             {
                 errors: error.message,
-                code: 404,
+                code: code,
                 message: error.message
             })
     }
