@@ -1,4 +1,5 @@
-import {sprintf} from "sprintf-js";
+import {DescriptionEmptyException} from "../../exceptions/DescriptionEmptyException";
+import {DescriptionTooLongException} from "../../exceptions/DescriptionTooLongException";
 
 export class Description {
 
@@ -10,11 +11,11 @@ export class Description {
 
     private validate(value: string) {
         if (value.length === 0) {
-            throw new Error("Description empty");
+            throw DescriptionEmptyException.build();
         }
 
         if (value.length > 200) {
-            throw new Error(sprintf("Description has more than 200 characters: Has %d characters", this._value.length));
+            throw DescriptionTooLongException.withLongitudeMessage(this._value);
         }
     }
 

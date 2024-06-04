@@ -4,6 +4,7 @@ import {AdvertisementId} from "../../../../../../src/advertisement/domain/model/
 describe("Advertisement password", () => {
 
     const VALID_UUID = "a98e8d18-ebb8-4b34-acb4-8977bfdad42f"
+    const INVALID_UUID = "a98e8d18-ebb8-9999-acb4-8977bfdad42f"
 
     beforeAll(async () => {
     })
@@ -20,7 +21,7 @@ describe("Advertisement password", () => {
 
     it("Should throw an exception when has not uuid 4 standards", async () => {
         expect(() => {
-            new AdvertisementId("invalid");
-        }).toThrow("Invalid unique identifier");
+            new AdvertisementId(INVALID_UUID);
+        }).toThrow("Invalid unique identifier format for " + INVALID_UUID);
     });
 });
