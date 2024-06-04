@@ -4,6 +4,7 @@ import {Password} from "../../domain/model/value-object/Password";
 import {Description} from "../../domain/model/value-object/Description";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {sprintf} from "sprintf-js";
+import {InvalidPasswordException} from "../exceptions/InvalidPasswordException";
 
 export class UpdateAdvertisementUseCase {
 
@@ -23,7 +24,7 @@ export class UpdateAdvertisementUseCase {
     }
 
     if (!await advertisement.password().isValid(command.password)) {
-      throw new Error('Invalid password')
+      throw InvalidPasswordException.build()
     }
 
     advertisement.update(

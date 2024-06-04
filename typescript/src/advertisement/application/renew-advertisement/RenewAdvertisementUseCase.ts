@@ -3,6 +3,7 @@ import { RenewAdvertisementCommand } from "./RenewAdvertisementCommand"
 import {Password} from "../../domain/model/value-object/Password";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {sprintf} from "sprintf-js";
+import {InvalidPasswordException} from "../exceptions/InvalidPasswordException";
 
 export class RenewAdvertisementUseCase {
 
@@ -21,7 +22,7 @@ export class RenewAdvertisementUseCase {
     }
 
     if (!await advertisement.password().isValid(command.password)) {
-      throw new Error('Invalid password')
+      throw InvalidPasswordException.build()
     }
 
     advertisement.renew(await Password.fromPlainPassword(command.password))

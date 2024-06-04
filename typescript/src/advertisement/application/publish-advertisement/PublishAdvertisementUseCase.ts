@@ -5,7 +5,7 @@ import {Password} from "../../domain/model/value-object/Password";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {Description} from "../../domain/model/value-object/Description";
 import {AdvertisementDate} from "../../domain/model/value-object/AdvertisementDate";
-import {sprintf} from "sprintf-js";
+import {AdvertisementAlreadyExistsException} from "../../domain/exceptions/AdvertisementAlreadyExistsException";
 
 export class PublishAdvertisementUseCase {
 
@@ -19,7 +19,7 @@ export class PublishAdvertisementUseCase {
     const advertisementId = new AdvertisementId(command.id)
 
     if(await this.advertisementRepository.findById(advertisementId)) {
-      throw new Error(sprintf('Advertisement with Id %s already exists', advertisementId.value()))
+      throw AdvertisementAlreadyExistsException.withId(advertisementId.value())
     }
 
     const advertisement = new Advertisement(
