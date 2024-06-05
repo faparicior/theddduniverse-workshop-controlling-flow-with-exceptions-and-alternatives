@@ -5,6 +5,8 @@ import {Password} from "../domain/model/value-object/Password";
 import {AdvertisementDate} from "../domain/model/value-object/AdvertisementDate";
 import {Description} from "../domain/model/value-object/Description";
 import {AdvertisementId} from "../domain/model/value-object/AdvertisementId";
+import {Result} from "../../common/Result";
+import {ZeroRecordsException} from "./exceptions/ZeroRecordsException";
 
 export class SqliteAdvertisementRepository implements AdvertisementRepository {
 
@@ -12,12 +14,12 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
     private connection: DatabaseConnection) {
   }
 
-  async findById(id: AdvertisementId): Promise<Advertisement | null> {
+  async findById(id: AdvertisementId): Promise<Result<void, any>> {
 
     const result = await this.connection.query(`SELECT * FROM advertisements WHERE id = ? `, [id.value()])
 
     if (!result || result.length < 1) {
-      return null
+      return  Result.failure(ZeroRecordsException.build())
     }
 
     const row = result[0] as any;
@@ -27,7 +29,6 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
       Password.fromEncryptedPassword(row.password),
       new AdvertisementDate(new Date(row.advertisement_date))
     )
-
   }
 
   async save(advertisement: Advertisement): Promise<void> {

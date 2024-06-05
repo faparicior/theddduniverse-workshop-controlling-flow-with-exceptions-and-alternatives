@@ -1,5 +1,7 @@
 import argon2 from "argon2";
 import {createHash} from "node:crypto";
+import {Result} from "../../../../common/Result";
+import {DomainException} from "../../../../common/domain/DomainException";
 
 export class Password {
     private constructor(
@@ -7,14 +9,14 @@ export class Password {
     ) {
     }
 
-    public static async fromPlainPassword(password: string): Promise<Password> {
+    public static async fromPlainPassword(password: string): Promise<Result<Password, DomainException>> {
         const hash = await argon2.hash(password);
 
-        return new Password(hash)
+        return Result.success(new Password(hash))
     }
 
-    public static fromEncryptedPassword(password: string): Password {
-        return new Password(password)
+    public static fromEncryptedPassword(password: string): Result<Password, DomainException> {
+        return Result.success(new Password(password))
     }
 
     public async isValid(password: string): Promise<boolean> {

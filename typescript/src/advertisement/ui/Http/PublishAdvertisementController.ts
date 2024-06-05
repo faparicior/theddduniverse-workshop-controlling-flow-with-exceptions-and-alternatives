@@ -30,9 +30,14 @@ export class PublishAdvertisementController extends CommonController {
           req.body.password
       )
 
-      await this.publishAdvertisementUseCase.execute(command)
+      let result = await this.publishAdvertisementUseCase.execute(command)
+      if (result.isSuccess())
+        return this.processSuccessfulCreateCommand()
 
-      return this.processSuccessfulCreateCommand()
+      if (result.getError() instanceof BoundedContextException)
+        return this.processDomainOrApplicationExceptionResponse(result.getError() as BoundedContextException)
+
+      return this.processFailedCommand(result.getError() as Error)
     } catch (error: any) {
       switch (true) {
         case error instanceof BoundedContextException:

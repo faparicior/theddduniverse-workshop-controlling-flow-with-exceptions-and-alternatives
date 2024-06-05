@@ -6,6 +6,7 @@ import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {Description} from "../../domain/model/value-object/Description";
 import {AdvertisementDate} from "../../domain/model/value-object/AdvertisementDate";
 import {AdvertisementAlreadyExistsException} from "../../domain/exceptions/AdvertisementAlreadyExistsException";
+import {Result} from "../../../common/Result";
 
 export class PublishAdvertisementUseCase {
 
@@ -15,11 +16,11 @@ export class PublishAdvertisementUseCase {
 
   }
 
-  async execute(command: PublishAdvertisementCommand): Promise<void> {
+  async execute(command: PublishAdvertisementCommand): Promise<Result<void, any>> {
     const advertisementId = new AdvertisementId(command.id)
 
     if(await this.advertisementRepository.findById(advertisementId)) {
-      throw AdvertisementAlreadyExistsException.withId(advertisementId.value())
+      return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()))
     }
 
     const advertisement = new Advertisement(

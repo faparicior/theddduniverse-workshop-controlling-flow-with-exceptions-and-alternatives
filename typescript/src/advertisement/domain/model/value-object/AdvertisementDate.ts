@@ -1,9 +1,14 @@
+import {Result} from "../../../../common/Result";
 
 export class AdvertisementDate {
 
-    constructor(
+    private constructor(
         readonly _value: Date,
     ) {
+    }
+
+    static build(value: Date): Result<AdvertisementDate, any> {
+        return Result.success(new AdvertisementDate(value));
     }
 
     public value(): Date {
