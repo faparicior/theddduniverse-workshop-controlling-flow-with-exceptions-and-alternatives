@@ -2,11 +2,10 @@ import { AdvertisementRepository } from '../domain/AdvertisementRepository';
 import { Advertisement } from '../domain/model/Advertisement';
 import { DatabaseConnection } from '../../framework/database/DatabaseConnection';
 import {Password} from "../domain/model/value-object/Password";
-import {AdvertisementDate} from "../domain/model/value-object/AdvertisementDate";
-import {Description} from "../domain/model/value-object/Description";
 import {AdvertisementId} from "../domain/model/value-object/AdvertisementId";
 import {Result} from "../../common/Result";
 import {ZeroRecordsException} from "./exceptions/ZeroRecordsException";
+import {InfrastructureException} from "../../common/infrastructure/InfrastructureException";
 
 export class SqliteAdvertisementRepository implements AdvertisementRepository {
 
@@ -14,7 +13,7 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
     private connection: DatabaseConnection) {
   }
 
-  async findById(id: AdvertisementId): Promise<Result<void, any>> {
+  async findById(id: AdvertisementId): Promise<Result<Advertisement, InfrastructureException>> {
 
     const result = await this.connection.query(`SELECT * FROM advertisements WHERE id = ? `, [id.value()])
 
@@ -23,15 +22,21 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
     }
 
     const row = result[0] as any;
-    return new Advertisement(
-      new AdvertisementId(row.id),
-      new Description(row.description),
-      Password.fromEncryptedPassword(row.password),
-      new AdvertisementDate(new Date(row.advertisement_date))
+
+    const passwordResult = Password.fromEncryptedPassword(row.password);
+    if (passwordResult.isFailure()) {
+      return Result.failure(passwordResult.getError() as any);
+    }
+
+    return Advertisement.build(
+      row.id,
+      row.description,
+      passwordResult.getOrThrow(),
+      new Date(row.advertisement_date)
     )
   }
 
-  async save(advertisement: Advertisement): Promise<void> {
+  async save(advertisement: Advertisement): Promise<Result<void, InfrastructureException>> {
 
     await this.connection.execute(
       `INSERT INTO advertisements (id, description, password, advertisement_date) 
@@ -43,5 +48,7 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
       advertisement.password().value(),
       advertisement.date().value().toISOString(),
     ]);
+
+    return Result.success();
   }
 }
