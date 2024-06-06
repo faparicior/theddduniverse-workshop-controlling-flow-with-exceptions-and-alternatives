@@ -7,5 +7,5 @@ export interface AdvertisementRepository {
 
   save(name: Advertisement): Promise<Result<void, InfrastructureException>>;
 
-  findById(id: AdvertisementId): Promise<Result<Advertisement, InfrastructureException> | null>;
+  findById(id: AdvertisementId): Promise<Result<Advertisement, InfrastructureException>>;
 }

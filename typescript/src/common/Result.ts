@@ -44,6 +44,16 @@ export class Result<T, E extends Error> {
     public static failure<E extends Error>(error: E): Result<any, E> {
         return new Result(ResultType.Failure, undefined, error);
     }
+
+    public static runCatching<T, E extends Error>(
+        block: () => Promise<T>
+    ): Promise<Result<T, E>> {
+        return new Promise((resolve) => {
+            block()
+                .then((value) => resolve(Result.success(value)))
+                .catch((error) => resolve(Result.failure(error as E)));
+        });
+    }
 }
 
 enum ResultType {

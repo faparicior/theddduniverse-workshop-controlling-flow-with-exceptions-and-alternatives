@@ -4,6 +4,8 @@ import {Password} from "../../domain/model/value-object/Password";
 import {Description} from "../../domain/model/value-object/Description";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {InvalidPasswordException} from "../exceptions/InvalidPasswordException";
+import {Result} from "../../../common/Result";
+import {ZeroRecordsException} from "../../infrastructure/exceptions/ZeroRecordsException";
 import {AdvertisementNotFoundException} from "../../domain/exceptions/AdvertisementNotFoundException";
 
 export class UpdateAdvertisementUseCase {
@@ -14,24 +16,32 @@ export class UpdateAdvertisementUseCase {
 
   }
 
-  async execute(command: UpdateAdvertisementCommand): Promise<void> {
-    const advertisementId = new AdvertisementId(command.id)
+  async execute(command: UpdateAdvertisementCommand): Promise<Result<unknown, Error>> {
+    return await Result.runCatching(async () => {
+      const advertisementId = AdvertisementId.build(command.id).getOrThrow()
+      const advertisementResult = (await this.advertisementRepository.findById(advertisementId))
 
-    const advertisement = await this.advertisementRepository.findById(advertisementId)
+      if (advertisementResult.isFailure()) {
+        if (advertisementResult.getError() instanceof ZeroRecordsException) {
+          return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value())).getOrThrow()
+        }
+        return Result.failure(advertisementResult.getError() as Error).getOrThrow()
+      }
 
-    if (!advertisement) {
-      throw AdvertisementNotFoundException.withId(advertisementId.value())
-    }
+      const advertisement = advertisementResult.getOrThrow()
 
-    if (!await advertisement.password().isValid(command.password)) {
-      throw InvalidPasswordException.build()
-    }
+      if (!await advertisement.password().isValid(command.password)) {
+        return Result.failure(InvalidPasswordException.build())
+      }
 
-    advertisement.update(
-        new Description(command.description),
-        await Password.fromPlainPassword(command.password)
-    )
+      advertisement.update(
+          Description.build(command.description).getOrThrow(),
+          (await Password.fromPlainPassword(command.password)).getOrThrow()
+      );
 
-    await this.advertisementRepository.save(advertisement)
+      await this.advertisementRepository.save(advertisement)
+
+      return Result.success().getOrThrow()
+    })
   }
 }

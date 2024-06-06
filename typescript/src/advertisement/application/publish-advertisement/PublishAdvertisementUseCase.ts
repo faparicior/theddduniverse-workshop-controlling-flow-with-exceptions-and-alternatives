@@ -15,8 +15,15 @@ export class PublishAdvertisementUseCase {
 
   }
 
-  async execute(command: PublishAdvertisementCommand): Promise<Result<void, DomainException>> {
-    await this.assureAdvertisementDoesNotExist(command)
+  async execute(command: PublishAdvertisementCommand): Promise<Result<void, Error>> {
+    const advertisementIdResult = AdvertisementId.build(command.id);
+    if (advertisementIdResult.isFailure()) {
+      return Result.failure(advertisementIdResult.getError() as DomainException);
+    }
+    const advertisementId = advertisementIdResult.getOrThrow();
+    if ((await this.advertisementRepository.findById(advertisementId)).isSuccess()) {
+      return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()));
+    }
 
     const passwordResult = await Password.fromPlainPassword(command.password);
     if (passwordResult.isFailure()) {
@@ -36,18 +43,6 @@ export class PublishAdvertisementUseCase {
 
     await this.advertisementRepository.save(advertisementResult.getOrThrow())
 
-    return Result.success();
-  }
-
-  private async assureAdvertisementDoesNotExist(command: PublishAdvertisementCommand): Promise<Result<void, DomainException>> {
-    const advertisementIdResult = AdvertisementId.build(command.id);
-    if (advertisementIdResult.isFailure()) {
-      return Result.failure(advertisementIdResult.getError() as DomainException);
-    }
-    const advertisementId = advertisementIdResult.getOrThrow();
-    if (await this.advertisementRepository.findById(advertisementId)) {
-      return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()));
-    }
     return Result.success();
   }
 }

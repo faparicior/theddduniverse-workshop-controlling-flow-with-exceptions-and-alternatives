@@ -30,7 +30,7 @@ export class PublishAdvertisementController extends CommonController {
           req.body.password
       )
 
-      let result = await this.publishAdvertisementUseCase.execute(command)
+      const result = await this.publishAdvertisementUseCase.execute(command)
       if (result.isSuccess())
         return this.processSuccessfulCreateCommand()
 
