@@ -27,9 +27,15 @@ export class RenewAdvertisementController extends CommonController {
           req.body.password
       )
 
-      await this.renewAdvertisementUseCase.execute(command)
+      const result = await this.renewAdvertisementUseCase.execute(command)
 
-      return this.processSuccessfulCommand()
+      if (result.isSuccess())
+        return this.processSuccessfulCommand()
+
+      if (result.getError() instanceof BoundedContextException)
+        return this.processDomainOrApplicationExceptionResponse(result.getError() as BoundedContextException)
+
+      return this.processFailedCommand(result.getError() as Error)
     } catch (error: any) {
       switch (true) {
         case error instanceof BoundedContextException:

@@ -20,6 +20,7 @@ export class PublishAdvertisementUseCase {
     if (advertisementIdResult.isFailure()) {
       return Result.failure(advertisementIdResult.getError() as DomainException);
     }
+
     const advertisementId = advertisementIdResult.getOrThrow();
     if ((await this.advertisementRepository.findById(advertisementId)).isSuccess()) {
       return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()));
