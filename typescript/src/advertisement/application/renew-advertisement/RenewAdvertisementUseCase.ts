@@ -21,10 +21,9 @@ export class RenewAdvertisementUseCase {
     if (advertisementIdResult.isFailure()) {
       return Result.failure(advertisementIdResult.getError() as DomainException);
     }
-
     const advertisementId = advertisementIdResult.getOrThrow();
-    const advertisementResult = (await this.advertisementRepository.findById(advertisementId))
 
+    const advertisementResult = await this.advertisementRepository.findById(advertisementId)
     if (advertisementResult.isFailure()) {
       if (advertisementResult.getError() instanceof ZeroRecordsException) {
         return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value())).getOrThrow()
