@@ -1,11 +1,11 @@
-import { AdvertisementRepository } from '../domain/AdvertisementRepository';
-import { Advertisement } from '../domain/model/Advertisement';
-import { DatabaseConnection } from '../../framework/database/DatabaseConnection';
-import {Password} from "../domain/model/value-object/Password";
-import {AdvertisementId} from "../domain/model/value-object/AdvertisementId";
-import {Result} from "../../common/Result";
-import {ZeroRecordsException} from "./exceptions/ZeroRecordsException";
-import {InfrastructureException} from "../../common/infrastructure/InfrastructureException";
+import { AdvertisementRepository } from '../../domain/AdvertisementRepository';
+import { Advertisement } from '../../domain/model/Advertisement';
+import { DatabaseConnection } from '../../../framework/database/DatabaseConnection';
+import {Password} from "../../domain/model/value-object/Password";
+import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
+import {Result} from "../../../common/Result";
+import {ZeroRecordsException} from "../exceptions/ZeroRecordsException";
+import {InfrastructureException} from "../../../common/infrastructure/InfrastructureException";
 
 export class SqliteAdvertisementRepository implements AdvertisementRepository {
 
