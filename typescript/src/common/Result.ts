@@ -54,6 +54,20 @@ export class Result<T, E extends Error> {
                 .catch((error) => resolve(Result.failure(error as E)));
         });
     }
+
+    public map<U>(transform: (value: T) => U): Result<U, E> {
+        if (this.isSuccess()) {
+            return Result.success(transform(this.value!));
+        }
+        return Result.failure(this.error!);
+    }
+
+    public fold<U>(onSuccess: (value: T) => U, onFailure: (error: E) => U): U {
+        if (this.isSuccess()) {
+            return onSuccess(this.value!);
+        }
+        return onFailure(this.error!);
+    }
 }
 
 enum ResultType {

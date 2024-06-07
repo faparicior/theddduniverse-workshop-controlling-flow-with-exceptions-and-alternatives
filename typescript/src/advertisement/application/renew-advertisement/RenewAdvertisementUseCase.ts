@@ -7,6 +7,7 @@ import {AdvertisementNotFoundException} from "../../domain/exceptions/Advertisem
 import {Result} from "../../../common/Result";
 import {DomainException} from "../../../common/domain/DomainException";
 import {ZeroRecordsException} from "../../infrastructure/exceptions/ZeroRecordsException";
+import {Advertisement} from "../../domain/model/Advertisement";
 
 export class RenewAdvertisementUseCase {
 
@@ -17,28 +18,40 @@ export class RenewAdvertisementUseCase {
   }
 
   async execute(command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
-    const advertisementIdResult = AdvertisementId.build(command.id);
-    if (advertisementIdResult.isFailure()) {
-      return Result.failure(advertisementIdResult.getError() as DomainException);
-    }
-    const advertisementId = advertisementIdResult.getOrThrow();
+    return AdvertisementId.build(command.id)
+      .map(id => id)
+      .fold(
+        id => this.findAdvertisement(id, command),
+        error => Promise.resolve(Result.failure(error as DomainException))
+      );
+  }
 
-    const advertisementResult = await this.advertisementRepository.findById(advertisementId)
-    if (advertisementResult.isFailure()) {
-      if (advertisementResult.getError() instanceof ZeroRecordsException) {
-        return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value())).getOrThrow()
-      }
-      return Result.failure(advertisementResult.getError() as Error).getOrThrow()
-    }
-    const advertisement = advertisementResult.getOrThrow()
+  private async findAdvertisement(id: AdvertisementId, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
+    const advertisementResult = await this.advertisementRepository.findById(id);
+    return advertisementResult
+      .map(advertisement => advertisement)
+      .fold(
+        advertisement => this.validatePasswordMatch(advertisement, command),
+        error => {
+          if (error instanceof ZeroRecordsException) {
+            return Promise.resolve(Result.failure(AdvertisementNotFoundException.withId(id.value())));
+          }
+          return Promise.resolve(Result.failure(error as DomainException));
+        }
+      );
+  }
 
+  private async validatePasswordMatch(advertisement: Advertisement, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
     const passwordResult = await Password.fromPlainPassword(command.password);
-    if (passwordResult.isFailure()) {
-      return Result.failure(passwordResult.getError() as DomainException);
-    }
+    return passwordResult
+      .map(password => password)
+      .fold(
+        password => this.renewAdvertisement(advertisement, password, command),
+        error => Promise.resolve(Result.failure(error as DomainException))
+      );
+  }
 
-    const password = passwordResult.getOrThrow();
-
+  private async renewAdvertisement(advertisement: Advertisement, password: Password, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
     if (!await advertisement.password().isValid(command.password)) {
       return Result.failure(InvalidPasswordException.build())
     }
