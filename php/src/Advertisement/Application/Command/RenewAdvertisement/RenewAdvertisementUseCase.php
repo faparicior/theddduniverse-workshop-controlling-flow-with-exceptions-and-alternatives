@@ -21,9 +21,9 @@ final class RenewAdvertisementUseCase
     public function execute(RenewAdvertisementCommand $command): Either
     {
         return AdvertisementId::build($command->id)
-            ->flatMap(fn($advertisementId) => $this->findAdvertisement($advertisementId))
-            ->flatMap(fn($advertisement) => $this->validatePassword($command->password, $advertisement))
-            ->flatMap(fn($advertisement) => $this->renewAdvertisement($command->password, $advertisement))
+            ->bind(fn($advertisementId) => $this->findAdvertisement($advertisementId))
+            ->bind(fn($advertisement) => $this->validatePassword($command->password, $advertisement))
+            ->bind(fn($advertisement) => $this->renewAdvertisement($command->password, $advertisement))
             ->map(fn($advertisement) => $this->saveAdvertisement($advertisement));
     }
 

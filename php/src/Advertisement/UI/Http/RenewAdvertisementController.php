@@ -29,7 +29,7 @@ final class RenewAdvertisementController extends CommonController
             if ($result->isRight()) {
                 return $this->processSuccessfulCommand();
             }
-            if ($result->isLeft() instanceof AdvertisementNotFoundException){
+            if ($result->getLeft() instanceof AdvertisementNotFoundException){
                 return $this->processNotFoundCommand($result);
             }
 
