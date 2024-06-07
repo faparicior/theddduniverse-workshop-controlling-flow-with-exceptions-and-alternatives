@@ -71,6 +71,20 @@ final readonly class Result
         }
     }
 
+    public function fold(callable $onSuccess, callable $onFailure)
+    {
+        return $this->isSuccess ? $onSuccess($this->data) : $onFailure($this->error);
+    }
+
+    public function map(callable $transform): self
+    {
+        if ($this->isSuccess) {
+            return self::success($transform($this->data));
+        }
+
+        return $this;
+    }
+
     public function getErrorCode(): ?string
     {
         return $this->errorCode;
