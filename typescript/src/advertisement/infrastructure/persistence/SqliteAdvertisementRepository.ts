@@ -1,10 +1,10 @@
-import { AdvertisementRepository } from '../domain/AdvertisementRepository';
-import { Advertisement } from '../domain/model/Advertisement';
-import { DatabaseConnection } from '../../framework/database/DatabaseConnection';
-import {Password} from "../domain/model/value-object/Password";
-import {AdvertisementDate} from "../domain/model/value-object/AdvertisementDate";
-import {Description} from "../domain/model/value-object/Description";
-import {AdvertisementId} from "../domain/model/value-object/AdvertisementId";
+import { AdvertisementRepository } from '../../domain/AdvertisementRepository';
+import { Advertisement } from '../../domain/model/Advertisement';
+import { DatabaseConnection } from '../../../framework/database/DatabaseConnection';
+import {Password} from "../../domain/model/value-object/Password";
+import {AdvertisementDate} from "../../domain/model/value-object/AdvertisementDate";
+import {Description} from "../../domain/model/value-object/Description";
+import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 
 export class SqliteAdvertisementRepository implements AdvertisementRepository {
 
