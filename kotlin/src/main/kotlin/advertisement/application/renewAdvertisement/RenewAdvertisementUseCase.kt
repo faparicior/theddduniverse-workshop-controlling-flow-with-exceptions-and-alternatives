@@ -3,7 +3,6 @@ package advertisement.application.renewAdvertisement
 import advertisement.domain.exceptions.AdvertisementNotFoundException
 import advertisement.application.exceptions.PasswordDoesNotMatchException
 import advertisement.domain.AdvertisementRepository
-import advertisement.domain.model.Advertisement
 import advertisement.domain.model.value_object.AdvertisementId
 import advertisement.domain.model.value_object.Password
 import advertisement.infrastructure.exceptions.ZeroRecordsException
@@ -15,7 +14,7 @@ class RenewAdvertisementUseCase(private val advertisementRepository: Advertiseme
             onFailure = { return Result.failure(it) }
         )
 
-        var advertisement = advertisementRepository.findById(advertisementId).map { it as Advertisement }.fold(
+        var advertisement = advertisementRepository.findById(advertisementId).map { it }.fold(
             onSuccess = { it },
             onFailure = {
                 if  (it is ZeroRecordsException) return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value()))

@@ -20,7 +20,7 @@ class SqLiteAdvertisementRepository(private val connection: DatabaseConnection):
         return Result.success(advertisement)
     }
 
-    override fun findById(id: AdvertisementId): Result<Any> {
+    override fun findById(id: AdvertisementId): Result<Advertisement> {
         val result = connection.query(
             "SELECT * FROM advertisements WHERE id = '${id.value()}'"
         )
@@ -31,7 +31,7 @@ class SqLiteAdvertisementRepository(private val connection: DatabaseConnection):
 
         val passwordResult = Password.fromEncryptedPassword(result.getString("password"))
         if (passwordResult.isFailure) {
-            return passwordResult
+            return Result.failure(passwordResult.exceptionOrNull()!!)
         }
 
         val password = passwordResult.getOrThrow()
