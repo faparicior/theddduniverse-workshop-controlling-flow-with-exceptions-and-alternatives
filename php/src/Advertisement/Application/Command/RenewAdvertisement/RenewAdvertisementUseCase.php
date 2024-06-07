@@ -27,17 +27,17 @@ final class RenewAdvertisementUseCase
         return AdvertisementId::build($command->id)
             ->map(fn($id) => $id)
             ->fold(
-                onSuccess: fn($id) => $this->processAdvertisement($id, $command),
+                onSuccess: fn($id) => $this->findAdvertisement($id, $command),
                 onFailure: fn($error) => Result::failure($error)
             );
     }
 
-    private function processAdvertisement($id, RenewAdvertisementCommand $command): Result
+    private function findAdvertisement($id, RenewAdvertisementCommand $command): Result
     {
         return $this->advertisementRepository->findById($id)
             ->map(fn($advertisement) => $advertisement)
             ->fold(
-                onSuccess: fn($advertisement) => $this->processPasswordMatch($advertisement, $command),
+                onSuccess: fn($advertisement) => $this->generateNewPassword($advertisement, $command),
                 onFailure: function($error) use ($id) {
                     if ($error instanceof ZeroRecordsException) {
                         return Result::failure(AdvertisementNotFoundException::withId($id->value()));
@@ -47,29 +47,23 @@ final class RenewAdvertisementUseCase
             );
     }
 
-    private function processPasswordMatch(Advertisement $advertisement, RenewAdvertisementCommand $command): Result
-    {
-        return $this->validatePasswordMatch($command->password, $advertisement)
-            ->map(fn($isValid) => $isValid)
-            ->fold(
-                onSuccess: fn($isValid) => $this->processNewPassword($advertisement, $command),
-                onFailure: fn($error) => Result::failure($error)
-            );
-    }
-
-    private function processNewPassword(Advertisement $advertisement, RenewAdvertisementCommand $command): Result
+    private function generateNewPassword(Advertisement $advertisement, RenewAdvertisementCommand $command): Result
     {
         return Password::fromPlainPassword($command->password)
             ->map(fn($newPassword) => $newPassword)
             ->fold(
-                onSuccess: fn($newPassword) => $this->processRenewAdvertisement($advertisement, $newPassword),
+                onSuccess: fn($newPassword) => $this->renewAdvertisement($advertisement, $newPassword, $command),
                 onFailure: fn($error) => Result::failure($error)
             );
     }
 
-    private function processRenewAdvertisement(Advertisement $advertisement, Password $newPassword): Result
+    private function renewAdvertisement(Advertisement $advertisement, Password $password, RenewAdvertisementCommand $command): Result
     {
-        return $advertisement->renew($newPassword)
+        if (!$advertisement->password()->isValidatedWith($command->password)) {
+            return Result::failure(InvalidPasswordException::build());
+        }
+
+        return $advertisement->renew($password)
             ->map(fn($renewedAdvertisement) => $renewedAdvertisement)
             ->fold(
                 onSuccess: fn($renewedAdvertisement) => $this->saveAdvertisement($renewedAdvertisement),
@@ -80,14 +74,6 @@ final class RenewAdvertisementUseCase
     private function saveAdvertisement(Advertisement $advertisement): Result
     {
         $this->advertisementRepository->save($advertisement);
-        return Result::success();
-    }
-
-    private function validatePasswordMatch(string $password, Advertisement $advertisement): Result
-    {
-        if (!$advertisement->password()->isValidatedWith($password)) {
-            return Result::failure(InvalidPasswordException::build());
-        }
         return Result::success();
     }
 }

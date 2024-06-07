@@ -31,7 +31,7 @@ export class RenewAdvertisementUseCase {
     return advertisementResult
       .map(advertisement => advertisement)
       .fold(
-        advertisement => this.validatePasswordMatch(advertisement, command),
+        advertisement => this.generateNewPassword(advertisement, command),
         error => {
           if (error instanceof ZeroRecordsException) {
             return Promise.resolve(Result.failure(AdvertisementNotFoundException.withId(id.value())));
@@ -41,7 +41,7 @@ export class RenewAdvertisementUseCase {
       );
   }
 
-  private async validatePasswordMatch(advertisement: Advertisement, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
+  private async generateNewPassword(advertisement: Advertisement, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
     const passwordResult = await Password.fromPlainPassword(command.password);
     return passwordResult
       .map(password => password)
