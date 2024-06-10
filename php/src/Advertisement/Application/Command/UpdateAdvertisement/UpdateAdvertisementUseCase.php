@@ -5,10 +5,12 @@ namespace Demo\App\Advertisement\Application\Command\UpdateAdvertisement;
 
 use Demo\App\Advertisement\Application\Exceptions\InvalidPasswordException;
 use Demo\App\Advertisement\Domain\AdvertisementRepository;
+use Demo\App\Advertisement\Domain\Exceptions\AdvertisementNotFoundException;
 use Demo\App\Advertisement\Domain\Model\Advertisement;
 use Demo\App\Advertisement\Domain\Model\ValueObject\AdvertisementId;
 use Demo\App\Advertisement\Domain\Model\ValueObject\Password;
 use Chemem\Bingo\Functional\Functors\Monads\Either;
+use Demo\App\Advertisement\Infrastructure\Exceptions\ZeroRecordsException;
 
 final class UpdateAdvertisementUseCase
 {
@@ -20,11 +22,14 @@ final class UpdateAdvertisementUseCase
     {
         return AdvertisementId::build($command->id)
             ->flatMap(function($advertisementId) use ($command) {
-                return $this->advertisementRepository->findById($advertisementId)
+                $advertisementResult = $this->advertisementRepository->findById($advertisementId);
+                if ($advertisementResult->isLeft() && $advertisementResult->getLeft() instanceof ZeroRecordsException) {
+                    return Either::left(AdvertisementNotFoundException::withId($advertisementId->value()));
+                }
+                return $advertisementResult
                     ->flatMap(function($advertisement) use ($command) {
-                        $passwordValidation = $this->validatePasswordMatch($command->password, $advertisement);
-                        if ($passwordValidation->isLeft()) {
-                            return $passwordValidation;
+                        if (!$advertisement->password()->isValidatedWith($command->password)){
+                            return Either::left(InvalidPasswordException::build());
                         }
                         return Password::fromPlainPassword($command->password)
                             ->flatMap(function($newPassword) use ($advertisement, $command) {
