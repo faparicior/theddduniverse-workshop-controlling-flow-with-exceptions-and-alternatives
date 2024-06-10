@@ -32,7 +32,7 @@ final class UpdateAdvertisementUseCase
                             return Either::left(InvalidPasswordException::build());
                         }
                         return Password::fromPlainPassword($command->password)
-                            ->flatMap(function($newPassword) use ($advertisement, $command) {
+                            ->map(function($newPassword) use ($advertisement, $command) {
                                 $advertisement->update(
                                     $command->description,
                                     $command->email,
@@ -43,5 +43,39 @@ final class UpdateAdvertisementUseCase
                             });
                     });
             });
+    }
+
+    public function execute2(UpdateAdvertisementCommand $command): Either
+    {
+        $advertisementIdResult = AdvertisementId::build($command->id);
+
+        if ($advertisementIdResult->isLeft()) {
+            return $advertisementIdResult;
+        }
+
+        $advertisementId = $advertisementIdResult->getRight();
+        $advertisementResult = $this->advertisementRepository->findById($advertisementId);
+
+        if ($advertisementResult->isLeft() && $advertisementResult->getLeft() instanceof ZeroRecordsException) {
+            return Either::left(AdvertisementNotFoundException::withId($advertisementId->value()));
+        }
+
+        $advertisement = $advertisementResult->getRight();
+
+        if (!$advertisement->password()->isValidatedWith($command->password)){
+            return Either::left(InvalidPasswordException::build());
+        }
+
+        $newPasswordResult = Password::fromPlainPassword($command->password);
+
+        if ($newPasswordResult->isLeft()) {
+            return $newPasswordResult;
+        }
+
+        $newPassword = $newPasswordResult->getRight();
+        $advertisement->update($command->description, $command->email, $newPassword);
+        $this->advertisementRepository->save($advertisement);
+
+        return Either::right(null);
     }
 }

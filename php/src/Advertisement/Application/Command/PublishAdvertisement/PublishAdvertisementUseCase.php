@@ -28,18 +28,14 @@ final class PublishAdvertisementUseCase
                 );
             })
             ->flatMap(function($advertisement) {
-                return $this->ensureThatAdvertisementDoesNotExist($advertisement);
+                $findAdvertisementResult = $this->advertisementRepository->findById($advertisement->id());
+                if ($findAdvertisementResult->isRight()) {
+                    return Either::left(AdvertisementAlreadyExistsException::withId($advertisement->id()->value()));
+                }
+                return Either::right($advertisement);
             })
             ->map(function($advertisement) {
                 return $this->advertisementRepository->save($advertisement);
             });
-    }
-
-    private function ensureThatAdvertisementDoesNotExist(Advertisement $advertisement): Either
-    {
-        $findAdvertisementResult = $this->advertisementRepository->findById($advertisement->id());
-        return $findAdvertisementResult->isRight()
-            ? Either::left(AdvertisementAlreadyExistsException::withId($advertisement->id()->value()))
-            : Either::right($advertisement);
     }
 }
