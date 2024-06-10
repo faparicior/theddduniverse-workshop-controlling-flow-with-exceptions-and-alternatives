@@ -8,6 +8,9 @@ import {Result} from "../../../common/Result";
 import {DomainException} from "../../../common/domain/DomainException";
 import {ZeroRecordsException} from "../../infrastructure/exceptions/ZeroRecordsException";
 import {Advertisement} from "../../domain/model/Advertisement";
+import {chain, Either, left, right} from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
+import {taskEither} from "fp-ts";
 
 export class RenewAdvertisementUseCase {
 
@@ -17,49 +20,45 @@ export class RenewAdvertisementUseCase {
 
   }
 
-  async execute(command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
-    return AdvertisementId.build(command.id)
-      .map(id => id)
-      .fold(
-        id => this.findAdvertisement(id, command),
-        error => Promise.resolve(Result.failure(error as DomainException))
-      );
+  execute(command: RenewAdvertisementCommand): Promise<Either<DomainException, Advertisement>> {
+    return pipe(
+      AdvertisementId.build(command.id),
+      chain(id => this.findAdvertisement(id)),
+      // chain(advertisement => this.validatePassword(advertisement, command.password)),
+      // chain(advertisement => this.renewAdvertisement(advertisement, command.password)),
+      // chain(advertisement => this.saveAdvertisement(advertisement))
+      // AdvertisementId.build(command.id),
+      // chain(id => this.findAdvertisement(id)),
+      // chain(advertisement => this.validatePassword(advertisement, command.password)),
+      // chain(advertisement => this.renewAdvertisement(advertisement, command.password)),
+      // chain(advertisement => this.saveAdvertisement(advertisement))
+    );
+
+    // return pipe(
+    //   AdvertisementId.build(command.id),
+    //   chain(id => this.findAdvertisement(id)),
+    //   chain(advertisement => this.validatePassword(advertisement, command.password)),
+    //   chain(advertisement => this.renewAdvertisement(advertisement, command.password)),
+    //   chain(advertisement => this.saveAdvertisement(advertisement))
+    // )();
   }
 
-  private async findAdvertisement(id: AdvertisementId, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
-    const advertisementResult = await this.advertisementRepository.findById(id);
-    return advertisementResult
-      .map(advertisement => advertisement)
-      .fold(
-        advertisement => this.generateNewPassword(advertisement, command),
-        error => {
-          if (error instanceof ZeroRecordsException) {
-            return Promise.resolve(Result.failure(AdvertisementNotFoundException.withId(id.value())));
-          }
-          return Promise.resolve(Result.failure(error as DomainException));
-        }
-      );
+  private async findAdvertisement(id: AdvertisementId): Promise<Either<DomainException, Advertisement>> {
+    const advertisement = await this.advertisementRepository.findById(id);
+    return advertisement ? right(advertisement) : left(AdvertisementNotFoundException.withId(id.value()));
   }
 
-  private async generateNewPassword(advertisement: Advertisement, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
-    const passwordResult = await Password.fromPlainPassword(command.password);
-    return passwordResult
-      .map(password => password)
-      .fold(
-        password => this.renewAdvertisement(advertisement, password, command),
-        error => Promise.resolve(Result.failure(error as DomainException))
-      );
+  private validatePassword(advertisement: Advertisement, password: string): Either<DomainException, Advertisement> {
+    return await advertisement.password().isValid(password) ? right(advertisement) : left(InvalidPasswordException.build());
   }
 
-  private async renewAdvertisement(advertisement: Advertisement, password: Password, command: RenewAdvertisementCommand): Promise<Result<unknown, DomainException>> {
-    if (!await advertisement.password().isValid(command.password)) {
-      return Result.failure(InvalidPasswordException.build())
-    }
+  private renewAdvertisement(advertisement: Advertisement, password: string): Either<DomainException, Advertisement> {
+    advertisement.renew(password);
+    return right(advertisement);
+  }
 
-    advertisement.renew(password)
-
-    await this.advertisementRepository.save(advertisement)
-
-    return Result.success()
+  private saveAdvertisement(advertisement: Advertisement): Either<DomainException, void> {
+    this.advertisementRepository.save(advertisement);
+    return right(null);
   }
 }

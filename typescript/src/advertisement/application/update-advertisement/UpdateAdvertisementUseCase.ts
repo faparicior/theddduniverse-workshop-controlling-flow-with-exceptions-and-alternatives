@@ -4,9 +4,8 @@ import {Password} from "../../domain/model/value-object/Password";
 import {Description} from "../../domain/model/value-object/Description";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {InvalidPasswordException} from "../exceptions/InvalidPasswordException";
-import {Result} from "../../../common/Result";
-import {ZeroRecordsException} from "../../infrastructure/exceptions/ZeroRecordsException";
-import {AdvertisementNotFoundException} from "../../domain/exceptions/AdvertisementNotFoundException";
+import { Either, left, right } from 'fp-ts/Either';
+import {isLeft} from "fp-ts/These";
 
 export class UpdateAdvertisementUseCase {
 
@@ -16,32 +15,39 @@ export class UpdateAdvertisementUseCase {
 
   }
 
-  async execute(command: UpdateAdvertisementCommand): Promise<Result<unknown, Error>> {
-    return await Result.runCatching(async () => {
-      const advertisementId = AdvertisementId.build(command.id).getOrThrow()
-      const advertisementResult = (await this.advertisementRepository.findById(advertisementId))
+  async execute(command: UpdateAdvertisementCommand): Promise<Either<Error, void>> {
+    const advertisementId = AdvertisementId.build(command.id);
+    if (isLeft(advertisementId)) {
+      return left(advertisementId.left);
+    }
 
-      if (advertisementResult.isFailure()) {
-        if (advertisementResult.getError() instanceof ZeroRecordsException) {
-          return Result.failure(AdvertisementNotFoundException.withId(advertisementId.value())).getOrThrow()
-        }
-        return Result.failure(advertisementResult.getError() as Error).getOrThrow()
-      }
+    const advertisementResult = await this.advertisementRepository.findById(advertisementId.right);
+    if (isLeft(advertisementResult)) {
+      return left(advertisementResult.left);
+    }
 
-      const advertisement = advertisementResult.getOrThrow()
+    const advertisement = advertisementResult.right;
+    if (!await advertisement.password().isValid(command.password)) {
+      return left(InvalidPasswordException.build());
+    }
 
-      if (!await advertisement.password().isValid(command.password)) {
-        return Result.failure(InvalidPasswordException.build())
-      }
+    const newPassword = await Password.fromPlainPassword(command.password);
+    if (isLeft(newPassword)) {
+      return left(newPassword.left);
+    }
 
-      advertisement.update(
-          Description.build(command.description).getOrThrow(),
-          (await Password.fromPlainPassword(command.password)).getOrThrow()
-      );
+    const description = await Description.build(command.description);
+    if (isLeft(description)) {
+      return left(description.left);
+    }
 
-      await this.advertisementRepository.save(advertisement)
+    advertisement.update(
+      description.right,
+      newPassword.right
+    );
 
-      return Result.success().getOrThrow()
-    })
+    await this.advertisementRepository.save(advertisement);
+
+    return right(undefined);
   }
 }

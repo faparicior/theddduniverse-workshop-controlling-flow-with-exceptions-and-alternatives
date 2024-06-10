@@ -4,8 +4,11 @@ import { PublishAdvertisementCommand } from "./PublishAdvertisementCommand";
 import {Password} from "../../domain/model/value-object/Password";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {AdvertisementAlreadyExistsException} from "../../domain/exceptions/AdvertisementAlreadyExistsException";
-import {Result} from "../../../common/Result";
 import {DomainException} from "../../../common/domain/DomainException";
+import { Either, left, right, map, chain } from 'fp-ts/Either';
+import { pipe } from 'fp-ts/lib/function';
+import {InvalidPasswordException} from "../exceptions/InvalidPasswordException";
+import {InfrastructureException} from "../../../common/infrastructure/InfrastructureException";
 
 export class PublishAdvertisementUseCase {
 
@@ -15,35 +18,33 @@ export class PublishAdvertisementUseCase {
 
   }
 
-  async execute(command: PublishAdvertisementCommand): Promise<Result<void, Error>> {
-    const advertisementIdResult = AdvertisementId.build(command.id);
-    if (advertisementIdResult.isFailure()) {
-      return Result.failure(advertisementIdResult.getError() as DomainException);
-    }
+  execute(command: PublishAdvertisementCommand): Promise<Either<DomainException, void>> {
+    return pipe(
+      AdvertisementId.build(command.id),
+      chain(id => this.findAdvertisement(id)),
+      chain(advertisement => this.validatePassword(advertisement, command.password)),
+      chain(advertisement => this.publishAdvertisement(advertisement, command.password)),
+      chain(advertisement => this.saveAdvertisement(advertisement)),
+      map(() => undefined)
+    )();
+  }
 
-    const advertisementId = advertisementIdResult.getOrThrow();
-    if ((await this.advertisementRepository.findById(advertisementId)).isSuccess()) {
-      return Result.failure(AdvertisementAlreadyExistsException.withId(advertisementId.value()));
-    }
+  private findAdvertisement(id: AdvertisementId): Either<never, Promise<Either<InfrastructureException, Advertisement>>> | Either<AdvertisementAlreadyExistsException, never> {
+    const advertisement = this.advertisementRepository.findById(id);
+    return advertisement ? right(advertisement) : left(AdvertisementAlreadyExistsException.withId(id.value()));
+  }
 
-    const passwordResult = await Password.fromPlainPassword(command.password);
-    if (passwordResult.isFailure()) {
-      return Result.failure(passwordResult.getError() as DomainException);
-    }
+  private async validatePassword(advertisement: Advertisement, password: string): Promise<Either<DomainException, Advertisement>> {
+    return await advertisement.password().isValid(password) ? right(advertisement) : left(InvalidPasswordException.build());
+  }
 
-    const advertisementResult = Advertisement.build(
-      command.id,
-      command.description,
-      passwordResult.getOrThrow(),
-      new Date()
-    )
+  private publishAdvertisement(advertisement: Advertisement, password: string): Either<DomainException, Advertisement> {
+    advertisement.publish(password);
+    return right(advertisement);
+  }
 
-    if (advertisementResult.isFailure()) {
-      return Result.failure(advertisementResult.getError() as DomainException);
-    }
-
-    await this.advertisementRepository.save(advertisementResult.getOrThrow())
-
-    return Result.success();
+  private saveAdvertisement(advertisement: Advertisement): Either<DomainException, void> {
+    this.advertisementRepository.save(advertisement);
+    return right(undefined);
   }
 }
