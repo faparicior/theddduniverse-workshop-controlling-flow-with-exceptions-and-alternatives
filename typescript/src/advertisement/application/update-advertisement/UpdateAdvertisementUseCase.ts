@@ -31,7 +31,7 @@ export class UpdateAdvertisementUseCase {
       const advertisement = advertisementResult.getOrThrow()
 
       if (!await advertisement.password().isValid(command.password)) {
-        return Result.failure(InvalidPasswordException.build())
+        return Result.failure(InvalidPasswordException.build()).getOrThrow()
       }
 
       advertisement.update(
