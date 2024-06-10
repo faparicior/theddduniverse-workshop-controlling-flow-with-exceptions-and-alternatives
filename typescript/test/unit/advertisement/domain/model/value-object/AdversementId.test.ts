@@ -24,14 +24,14 @@ describe("Advertisement id", () => {
     it("Should be created with a valid unique identifier", async () => {
         const result = AdvertisementId.build(VALID_UUID);
 
-        expect(result.isSuccess).toBeTruthy();
-        expect(result.getOrThrow().value()).toBe(VALID_UUID);
+        expect(result._tag === 'Right').toBeTruthy();
+        expect(result._tag === 'Right' && result.right.value()).toBe(VALID_UUID);
     });
 
     it("Should throw an exception when has not uuid 4 standards", async () => {
         const result = AdvertisementId.build(INVALID_UUID);
 
-        expect(result.isFailure()).toBeTruthy();
-        expect(result.getError()).toBeInstanceOf(InvalidUniqueIdentifierException)
+        expect(result._tag === 'Left').toBeTruthy();
+        expect(result._tag === 'Left' && result.left).toBeInstanceOf(InvalidUniqueIdentifierException)
     });
 });

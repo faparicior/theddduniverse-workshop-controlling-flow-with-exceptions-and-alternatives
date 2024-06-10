@@ -2,8 +2,8 @@ import {Password} from "./value-object/Password";
 import {Description} from "./value-object/Description";
 import {AdvertisementId} from "./value-object/AdvertisementId";
 import {AdvertisementDate} from "./value-object/AdvertisementDate";
-import {Result} from "../../../common/Result";
 import {DomainException} from "../../../common/domain/DomainException";
+import { Either, left, right } from 'fp-ts/Either';
 
 export class Advertisement {
 
@@ -15,48 +15,48 @@ export class Advertisement {
   ) {
   }
 
-  public static build(id: string, description: string, password: Password, date: Date): Result<Advertisement, DomainException> {
+  public static build(id: string, description: string, password: Password, date: Date): Either<DomainException, Advertisement> {
     const advertisementIdResult = AdvertisementId.build(id);
-    if (advertisementIdResult.isFailure()) {
-      return Result.failure(advertisementIdResult.getError() as DomainException);
+    if (advertisementIdResult._tag === 'Left') {
+      return left(advertisementIdResult.left);
     }
     const descriptionResult = Description.build(description);
-    if (descriptionResult.isFailure()) {
-      return Result.failure(descriptionResult.getError() as DomainException);
+    if (descriptionResult._tag === 'Left') {
+      return left(descriptionResult.left);
     }
     const advertisementDateResult = AdvertisementDate.build(date);
-    if (advertisementDateResult.isFailure()) {
-      return Result.failure(advertisementDateResult.getError() as DomainException);
+    if (advertisementDateResult._tag === 'Left') {
+      return left(advertisementDateResult.left);
     }
-    return Result.success(new Advertisement(
-      advertisementIdResult.getOrThrow(),
-      descriptionResult.getOrThrow(),
+    return right(new Advertisement(
+      advertisementIdResult.right,
+      descriptionResult.right,
       password,
-      advertisementDateResult.getOrThrow()
+      advertisementDateResult.right
     ));
   }
 
-  public update(description: Description, password: Password): Result<Advertisement, DomainException> {
+  public update(description: Description, password: Password): Either<DomainException, Advertisement> {
     this._description = description;
     this._password = password;
 
     const result = this.updateDate();
-    if (result.isFailure()) {
-      return Result.failure(result.getError() as DomainException);
+    if (result._tag === 'Left') {
+      return left(result.left);
     }
 
-    return Result.success(this);
+    return right(this);
   }
 
-  public renew(password: Password): Result<Advertisement, DomainException> {
+  public renew(password: Password): Either<DomainException, Advertisement> {
     this._password = password;
 
     const result = this.updateDate();
-    if (result.isFailure()) {
-      return Result.failure(result.getError() as DomainException);
+    if (result._tag === 'Left') {
+      return left(result.left);
     }
 
-    return Result.success(this);
+    return right(this);
   }
 
   public id(): AdvertisementId {
@@ -75,14 +75,14 @@ export class Advertisement {
     return this._date
   }
 
-  private updateDate(): Result<Advertisement, DomainException> {
+  private updateDate(): Either<DomainException, Advertisement> {
     const advertisementDateResult = AdvertisementDate.build(new Date());
-    if (advertisementDateResult.isFailure()) {
-      return Result.failure(advertisementDateResult.getError() as DomainException);
+    if (advertisementDateResult._tag === 'Left') {
+      return left(advertisementDateResult.left);
     }
 
-    this._date = advertisementDateResult.getOrThrow();
+    this._date = advertisementDateResult.right;
 
-    return Result.success(this);
+    return right(this);
   }
 }

@@ -21,26 +21,26 @@ describe("Advertisement password", () => {
     it("Should be created with a strong algorithm", async () => {
         let password = await Password.fromPlainPassword("password");
 
-        expect(password.getOrThrow().value().startsWith('$argon2')).toBe(true) ;
+        expect(password._tag === 'Right').toBeTruthy();
+        expect(password._tag === 'Right' && password.right.value().startsWith('$argon2')).toBe(true) ;
     });
 
     it("Should be created with encrypted value without change the original hash", async () => {
         let strongPassword = Password.fromEncryptedPassword(STRONG_HASH_PASSWORD);
         let weakPassword = Password.fromEncryptedPassword(WEAK_HASH_PASSWORD);
 
-        expect(strongPassword.getOrThrow().value()).toEqual(STRONG_HASH_PASSWORD);
-        expect(weakPassword.getOrThrow().value()).toEqual(WEAK_HASH_PASSWORD);
+        expect(strongPassword._tag === 'Right' && strongPassword.right.value()).toEqual(STRONG_HASH_PASSWORD);
+        expect(weakPassword._tag === 'Right' && weakPassword.right.value()).toEqual(WEAK_HASH_PASSWORD);
     });
 
     it("Should validate passwords with a strong algorithm", async () => {
         let password = Password.fromEncryptedPassword(STRONG_HASH_PASSWORD);
 
-        expect(await password.getOrThrow().isValid("password")).toBe(true);
+        expect(password._tag === 'Right' && await password.right.isValid("password")).toBe(true);
     });
 
     it("Should validate passwords with a weak algorithm", async () => {
         let password = Password.fromEncryptedPassword(WEAK_HASH_PASSWORD);
 
-        expect(await password.getOrThrow().isValid("password")).toBe(true);
-    });
-});
+        expect(password._tag === 'Right' && await password.right.isValid("password")).toBe(true);
+    });});

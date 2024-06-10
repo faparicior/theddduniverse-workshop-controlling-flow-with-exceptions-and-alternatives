@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import {createHash} from "node:crypto";
-import {Result} from "../../../../common/Result";
+import { Either, left, right } from 'fp-ts/Either';
 import {DomainException} from "../../../../common/domain/DomainException";
 
 export class Password {
@@ -9,14 +9,17 @@ export class Password {
     ) {
     }
 
-    public static async fromPlainPassword(password: string): Promise<Result<Password, DomainException>> {
-        const hash = await argon2.hash(password);
-
-        return Result.success(new Password(hash))
+    public static async fromPlainPassword(password: string): Promise<Either<DomainException, Password>> {
+        try {
+            const hash = await argon2.hash(password);
+            return right(new Password(hash));
+        } catch (error) {
+            return left(new DomainException('Error hashing password'));
+        }
     }
 
-    public static fromEncryptedPassword(password: string): Result<Password, DomainException> {
-        return Result.success(new Password(password))
+    public static fromEncryptedPassword(password: string): Either<DomainException, Password> {
+        return right(new Password(password));
     }
 
     public async isValid(password: string): Promise<boolean> {

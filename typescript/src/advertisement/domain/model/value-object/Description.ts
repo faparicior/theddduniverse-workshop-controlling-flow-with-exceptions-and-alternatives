@@ -1,7 +1,7 @@
 import {DescriptionEmptyException} from "../../exceptions/DescriptionEmptyException";
 import {DescriptionTooLongException} from "../../exceptions/DescriptionTooLongException";
-import {Result} from "../../../../common/Result";
 import {DomainException} from "../../../../common/domain/DomainException";
+import { Either, left, right } from 'fp-ts/Either';
 
 export class Description {
 
@@ -9,23 +9,24 @@ export class Description {
         readonly _value: string,
     ) {}
 
-    public static build(value: string): Result<Description, DomainException> {
+    public static build(value: string): Either<DomainException, Description> {
         const validation = this.validate(value);
-        if (validation.isFailure())
-            return Result.failure(validation.getError() as DomainException);
+        if (validation._tag === 'Left')
+            return left(validation.left);
 
-        return Result.success(new Description(value));
+        return right(new Description(value));
     }
-    private static validate(value: string): Result<void, DomainException> {
+
+    private static validate(value: string): Either<DomainException, void> {
         if (value.length === 0) {
-            return Result.failure(DescriptionEmptyException.build());
+            return left(DescriptionEmptyException.build());
         }
 
         if (value.length > 200) {
-            return Result.failure(DescriptionTooLongException.withLongitudeMessage(value));
+            return left(DescriptionTooLongException.withLongitudeMessage(value));
         }
 
-        return Result.success()
+        return right(undefined);
     }
 
     public value(): string {

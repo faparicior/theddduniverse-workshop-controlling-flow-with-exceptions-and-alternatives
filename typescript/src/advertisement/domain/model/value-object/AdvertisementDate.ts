@@ -1,4 +1,4 @@
-import {Result} from "../../../../common/Result";
+import { Either, right } from 'fp-ts/Either';
 
 export class AdvertisementDate {
 
@@ -7,8 +7,8 @@ export class AdvertisementDate {
     ) {
     }
 
-    static build(value: Date): Result<AdvertisementDate, any> {
-        return Result.success(new AdvertisementDate(value));
+    static build(value: Date): Either<never, AdvertisementDate> {
+        return right(new AdvertisementDate(value));
     }
 
     public value(): Date {

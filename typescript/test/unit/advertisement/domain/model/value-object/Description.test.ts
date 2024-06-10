@@ -5,6 +5,9 @@ import {
 import {
     DescriptionTooLongException
 } from "../../../../../../src/advertisement/domain/exceptions/DescriptionTooLongException";
+import {getOrElse} from "fp-ts/Either";
+import {DomainException} from "../../../../../../src/common/domain/DomainException";
+import { map, getOrElseW } from 'fp-ts/Either';
 
 
 describe("Advertisement description", () => {
@@ -25,23 +28,30 @@ describe("Advertisement description", () => {
 
     it("Should be created with a valid unique description", async () => {
         const result = Description.build(DESCRIPTION);
+        const description = map((description: Description) => description.value())(result);
 
-        expect(result.isSuccess()).toBeTruthy();
-        expect(result.getOrThrow().value()).toBe(DESCRIPTION);
+        expect(result._tag === 'Right').toBeTruthy();
+        expect(getOrElse(() => 'default')(description)).toBe(DESCRIPTION);
     });
 
     it("Should throw an exception when is empty", async () => {
         const result = Description.build("");
+        const description = getOrElseW(
+          (error: DomainException) => error
+        )(result);
 
-        expect(result.isFailure()).toBeTruthy();
-        expect(result.getError()).toBeInstanceOf(DescriptionEmptyException)
+        expect(result._tag === 'Left').toBeTruthy();
+        expect(description).toBeInstanceOf(DescriptionEmptyException)
     });
 
     it("Should throw an exception when hs more than 200 characters", async () => {
         const rep = "a".repeat(201);
         const result = Description.build(rep);
+        const description = getOrElseW(
+          (error: DomainException) => error
+        )(result);
 
-        expect(result.isFailure()).toBeTruthy();
-        expect(result.getError()).toBeInstanceOf(DescriptionTooLongException)
+        expect(result._tag === 'Left').toBeTruthy();
+        expect(description).toBeInstanceOf(DescriptionTooLongException)
     });
 });

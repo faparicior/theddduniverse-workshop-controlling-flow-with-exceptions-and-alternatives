@@ -2,6 +2,8 @@ import {AdvertisementDate} from "../../../../../../src/advertisement/domain/mode
 
 describe("Advertisement Date", () => {
 
+    const VALID_DATE = new Date();
+
     beforeAll(async () => {
     })
 
@@ -14,11 +16,10 @@ describe("Advertisement Date", () => {
         expect(functions.includes('constructor')).toBe(false);
     });
 
-    it("Should be created with a Date", async () => {
-        const date = new Date();
-        const result = AdvertisementDate.build(date);
+    it("Should be created with a valid date", async () => {
+        const result = AdvertisementDate.build(VALID_DATE);
 
-        expect(result.isSuccess()).toBeTruthy();
-        expect(result.getOrThrow().value()).toBe(date);
+        expect(result._tag === 'Right').toBeTruthy();
+        expect(result._tag === 'Right' && result.right.value()).toEqual(VALID_DATE);
     });
 });
