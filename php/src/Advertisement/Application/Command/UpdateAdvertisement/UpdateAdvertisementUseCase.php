@@ -44,11 +44,4 @@ final class UpdateAdvertisementUseCase
                     });
             });
     }
-
-    private function validatePasswordMatch(string $password, Advertisement $advertisement): Either
-    {
-        return $advertisement->password()->isValidatedWith($password)
-            ? Either::right($advertisement)
-            : Either::left(InvalidPasswordException::build());
-    }
 }
