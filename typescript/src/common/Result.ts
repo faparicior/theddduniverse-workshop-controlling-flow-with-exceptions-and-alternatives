@@ -46,12 +46,16 @@ export class Result<T, E extends Error> {
     }
 
     public static runCatching<T, E extends Error>(
-        block: () => Promise<T>
+      block: () => Promise<Result<T, E>>
     ): Promise<Result<T, E>> {
         return new Promise((resolve) => {
             block()
-                .then((value) => resolve(Result.success(value)))
-                .catch((error) => resolve(Result.failure(error as E)));
+              .then((result) => {
+                  if (result instanceof Result) {
+                      resolve(result);
+                  }
+              })
+              .catch((error) => resolve(Result.failure(error as E)));
         });
     }
 

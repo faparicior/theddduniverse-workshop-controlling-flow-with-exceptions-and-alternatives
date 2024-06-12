@@ -39,9 +39,7 @@ export class UpdateAdvertisementUseCase {
           (await Password.fromPlainPassword(command.password)).getOrThrow()
       );
 
-      await this.advertisementRepository.save(advertisement)
-
-      return Result.success().getOrThrow()
+      return await this.advertisementRepository.save(advertisement)
     })
   }
 }

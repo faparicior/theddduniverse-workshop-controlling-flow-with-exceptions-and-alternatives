@@ -62,10 +62,13 @@ final readonly class Result
         return $this->error;
     }
 
-    public static function runCatching($object, \Closure $block) {
+    public static function runCatching($object, \Closure $block): Result
+    {
         try {
             $result = $block($object);
-            return self::success($result);
+            if ($result instanceof self) {
+                return $result;
+            }
         } catch (Throwable $e) {
             return self::failure($e);
         }

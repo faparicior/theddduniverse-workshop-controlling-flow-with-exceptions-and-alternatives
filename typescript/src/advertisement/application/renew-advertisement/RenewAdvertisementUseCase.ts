@@ -58,8 +58,6 @@ export class RenewAdvertisementUseCase {
 
     advertisement.renew(password)
 
-    await this.advertisementRepository.save(advertisement)
-
-    return Result.success()
+    return await this.advertisementRepository.save(advertisement)
   }
 }

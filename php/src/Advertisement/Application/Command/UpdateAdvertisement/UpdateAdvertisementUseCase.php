@@ -41,9 +41,7 @@ final class UpdateAdvertisementUseCase
                 $newPassword,
             );
 
-            $this->advertisementRepository->save($advertisement);
-
-            return Result::success();
+            return $this->advertisementRepository->save($advertisement);
         });
     }
 

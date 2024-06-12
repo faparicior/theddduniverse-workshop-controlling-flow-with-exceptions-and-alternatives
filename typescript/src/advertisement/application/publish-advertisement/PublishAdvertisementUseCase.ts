@@ -42,8 +42,6 @@ export class PublishAdvertisementUseCase {
       return Result.failure(advertisementResult.getError() as DomainException);
     }
 
-    await this.advertisementRepository.save(advertisementResult.getOrThrow())
-
-    return Result.success();
+    return await this.advertisementRepository.save(advertisementResult.getOrThrow())
   }
 }
