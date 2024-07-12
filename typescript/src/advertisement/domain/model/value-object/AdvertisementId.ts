@@ -1,6 +1,6 @@
 import {InvalidUniqueIdentifierException} from "../../exceptions/InvalidUniqueIdentifierException";
 import {DomainException} from "../../../../common/domain/DomainException";
-import { Either, left, right } from 'fp-ts/Either';
+import {Effect, Either} from "effect"
 
 export class AdvertisementId {
 
@@ -10,9 +10,9 @@ export class AdvertisementId {
 
     public static build(value: string): Either<DomainException, AdvertisementId> {
         if (!this.validate(value))
-            return left(InvalidUniqueIdentifierException.withId(value));
+            return Either.left(InvalidUniqueIdentifierException.withId(value));
 
-        return right(new AdvertisementId(value));
+        return Either.right(new AdvertisementId(value));
     }
 
     private static validate(value: string): boolean {

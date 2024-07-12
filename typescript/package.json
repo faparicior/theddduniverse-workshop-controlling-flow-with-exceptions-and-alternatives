@@ -30,6 +30,7 @@
   "dependencies": {
     "@types/sprintf-js": "^1.1.4",
     "argon2": "^0.40.1",
+    "effect": "^3.5.3",
     "fp-ts": "^2.16.6",
     "sanctuary": "^3.1.0",
     "sanctuary-either": "^2.1.0",
