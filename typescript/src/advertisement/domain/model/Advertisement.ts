@@ -3,7 +3,7 @@ import {Description} from "./value-object/Description";
 import {AdvertisementId} from "./value-object/AdvertisementId";
 import {AdvertisementDate} from "./value-object/AdvertisementDate";
 import {DomainException} from "../../../common/domain/DomainException";
-import { Either, left, right } from 'fp-ts/Either';
+import * as E from '@effect-ts/core/Either';
 
 export class Advertisement {
 
@@ -15,20 +15,20 @@ export class Advertisement {
   ) {
   }
 
-  public static build(id: string, description: string, password: Password, date: Date): Either<DomainException, Advertisement> {
+  public static build(id: string, description: string, password: Password, date: Date): E.Either<DomainException, Advertisement> {
     const advertisementIdResult = AdvertisementId.build(id);
     if (advertisementIdResult._tag === 'Left') {
-      return left(advertisementIdResult.left);
+      return E.left(advertisementIdResult.left);
     }
     const descriptionResult = Description.build(description);
     if (descriptionResult._tag === 'Left') {
-      return left(descriptionResult.left);
+      return E.left(descriptionResult.left);
     }
     const advertisementDateResult = AdvertisementDate.build(date);
     if (advertisementDateResult._tag === 'Left') {
-      return left(advertisementDateResult.left);
+      return E.left(advertisementDateResult.left);
     }
-    return right(new Advertisement(
+    return E.right(new Advertisement(
       advertisementIdResult.right,
       descriptionResult.right,
       password,
@@ -36,27 +36,27 @@ export class Advertisement {
     ));
   }
 
-  public update(description: Description, password: Password): Either<DomainException, Advertisement> {
+  public update(description: Description, password: Password): E.Either<DomainException, Advertisement> {
     this._description = description;
     this._password = password;
 
     const result = this.updateDate();
     if (result._tag === 'Left') {
-      return left(result.left);
+      return E.left(result.left);
     }
 
-    return right(this);
+    return E.right(this);
   }
 
-  public renew(password: Password): Either<DomainException, Advertisement> {
+  public renew(password: Password): E.Either<DomainException, Advertisement> {
     this._password = password;
 
     const result = this.updateDate();
     if (result._tag === 'Left') {
-      return left(result.left);
+      return E.left(result.left);
     }
 
-    return right(this);
+    return E.right(this);
   }
 
   public id(): AdvertisementId {
@@ -75,14 +75,14 @@ export class Advertisement {
     return this._date
   }
 
-  private updateDate(): Either<DomainException, Advertisement> {
+  private updateDate(): E.Either<DomainException, Advertisement> {
     const advertisementDateResult = AdvertisementDate.build(new Date());
     if (advertisementDateResult._tag === 'Left') {
-      return left(advertisementDateResult.left);
+      return E.left(advertisementDateResult.left);
     }
 
     this._date = advertisementDateResult.right;
 
-    return right(this);
+    return E.right(this);
   }
 }

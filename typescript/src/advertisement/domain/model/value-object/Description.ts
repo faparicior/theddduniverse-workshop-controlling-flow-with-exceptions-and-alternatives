@@ -1,32 +1,32 @@
-import {DescriptionEmptyException} from "../../exceptions/DescriptionEmptyException";
-import {DescriptionTooLongException} from "../../exceptions/DescriptionTooLongException";
-import {DomainException} from "../../../../common/domain/DomainException";
-import { Either, left, right } from 'fp-ts/Either';
+import { DescriptionEmptyException } from "../../exceptions/DescriptionEmptyException";
+import { DescriptionTooLongException } from "../../exceptions/DescriptionTooLongException";
+import { DomainException } from "../../../../common/domain/DomainException";
+import * as E from '@effect-ts/core/Either';
 
 export class Description {
 
     private constructor(
-        readonly _value: string,
+      readonly _value: string,
     ) {}
 
-    public static build(value: string): Either<DomainException, Description> {
+    public static build(value: string): E.Either<DomainException, Description> {
         const validation = this.validate(value);
-        if (validation._tag === 'Left')
-            return left(validation.left);
+        if (E.isLeft(validation))
+            return E.left(validation.left);
 
-        return right(new Description(value));
+        return E.right(new Description(value));
     }
 
-    private static validate(value: string): Either<DomainException, void> {
+    private static validate(value: string): E.Either<DomainException, void> {
         if (value.length === 0) {
-            return left(DescriptionEmptyException.build());
+            return E.left(DescriptionEmptyException.build());
         }
 
         if (value.length > 200) {
-            return left(DescriptionTooLongException.withLongitudeMessage(value));
+            return E.left(DescriptionTooLongException.withLongitudeMessage(value));
         }
 
-        return right(undefined);
+        return E.right(undefined);
     }
 
     public value(): string {

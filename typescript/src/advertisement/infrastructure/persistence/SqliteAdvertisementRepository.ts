@@ -5,7 +5,7 @@ import {Password} from "../../domain/model/value-object/Password";
 import {AdvertisementId} from "../../domain/model/value-object/AdvertisementId";
 import {ZeroRecordsException} from "../exceptions/ZeroRecordsException";
 import {InfrastructureException} from "../../../common/infrastructure/InfrastructureException";
-import { Either, left, right } from 'fp-ts/Either';
+import * as E from '@effect-ts/core/Either';
 
 export class SqliteAdvertisementRepository implements AdvertisementRepository {
 
@@ -13,19 +13,19 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
     private connection: DatabaseConnection) {
   }
 
-  async findById(id: AdvertisementId): Promise<Either<InfrastructureException, Advertisement>> {
+  async findById(id: AdvertisementId): Promise<E.Either<InfrastructureException, Advertisement>> {
 
     const result = await this.connection.query(`SELECT * FROM advertisements WHERE id = ? `, [id.value()])
 
     if (!result || result.length < 1) {
-      return  left(ZeroRecordsException.build())
+      return  E.left(ZeroRecordsException.build())
     }
 
     const row = result[0] as any;
 
     const passwordResult = await Password.fromEncryptedPassword(row.password);
     if (passwordResult._tag === 'Left') {
-      return left(passwordResult.left);
+      return E.left(passwordResult.left);
     }
 
     const advertisementResult = Advertisement.build(
@@ -36,13 +36,13 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
     )
 
     if (advertisementResult._tag === 'Left') {
-      return left(advertisementResult.left);
+      return E.left(advertisementResult.left);
     }
 
-    return right(advertisementResult.right);
+    return E.right(advertisementResult.right);
   }
 
-  async save(advertisement: Advertisement): Promise<Either<InfrastructureException, void>> {
+  async save(advertisement: Advertisement): Promise<E.Either<InfrastructureException, void>> {
 
     await this.connection.execute(
       `INSERT INTO advertisements (id, description, password, advertisement_date) 
@@ -55,6 +55,6 @@ export class SqliteAdvertisementRepository implements AdvertisementRepository {
       advertisement.date().value().toISOString(),
     ]);
 
-    return right(undefined);
+    return E.right(undefined);
   }
 }

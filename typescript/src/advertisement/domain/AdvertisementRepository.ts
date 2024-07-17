@@ -1,12 +1,11 @@
 import { Advertisement } from "./model/Advertisement";
 import {AdvertisementId} from "./model/value-object/AdvertisementId";
-import {Result} from "../../common/Result";
 import {InfrastructureException} from "../../common/infrastructure/InfrastructureException";
-import {Either} from "fp-ts/Either";
+import * as E from "@effect-ts/core/Either";
 
 export interface AdvertisementRepository {
 
-  save(advertisement: Advertisement): Promise<Either<InfrastructureException, void>>;
+  save(advertisement: Advertisement): Promise<E.Either<InfrastructureException, void>>;
 
-  findById(id: AdvertisementId): Promise<Either<InfrastructureException, Advertisement>>;
+  findById(id: AdvertisementId): Promise<E.Either<InfrastructureException, Advertisement>>;
 }

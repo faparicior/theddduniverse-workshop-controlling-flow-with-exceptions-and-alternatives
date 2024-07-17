@@ -1,14 +1,12 @@
-import { Either, right } from 'fp-ts/Either';
+import * as E from '@effect-ts/core/Either';
 
 export class AdvertisementDate {
-
     private constructor(
-        readonly _value: Date,
-    ) {
-    }
+      readonly _value: Date,
+    ) {}
 
-    static build(value: Date): Either<never, AdvertisementDate> {
-        return right(new AdvertisementDate(value));
+    static build(value: Date): E.Either<never, AdvertisementDate> {
+        return E.right(new AdvertisementDate(value));
     }
 
     public value(): Date {
